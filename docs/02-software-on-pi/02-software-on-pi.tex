@@ -1,0 +1,160 @@
+\documentclass[
+    10pt,
+    a4paper,
+    % listof = totoc
+]{scrartcl}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[english,ngerman]{babel}
+\selectlanguage{ngerman}
+\usepackage[T1]{fontenc}
+
+% Math stuff
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% Farben
+\usepackage[usenames,x11names,dvipsnames,rgb]{xcolor}
+\definecolor{grey}{rgb}{0.4,0.4,0.4}
+\definecolor{lightgrey}{rgb}{0.8,0.8,0.8}
+\definecolor{ultralightgrey}{rgb}{0.96,0.96,0.96}
+
+% Grafix
+\usepackage{graphicx}
+
+% Schriften
+\usepackage{mathpazo,avant,courier}
+
+% TikZ (dot2tex etc.)
+% \usepackage{tikz}
+% \usetikzlibrary{decorations, arrows, shapes}
+
+% Farben in Tabellen
+\usepackage{colortbl}
+
+% Lange Tabellen
+\usepackage{longtable}
+
+% Gewrappte boxen (können innerhalb f{rame}box's verwendet werden)
+\usepackage{minibox}
+
+% FloatBarrier stellt z.B. sicher, dass das Literaturverzeichnis am Ende des
+% Dokuments erscheint.
+\usepackage{placeins}
+
+% Hyperref
+\usepackage{hyperref}
+% Hypersetup
+\hypersetup{
+    pdftitle = {ES-HH - Software Design ras-weather},
+    pdfauthor = {David Daniel},
+    pdfsubject = {Software Design ras-weather},
+    pdfkeywords = {Software Design} {ES-HH},
+    % hidelinks
+    colorlinks = true,
+    linkcolor = blue,
+    % urlcolor = black
+    urlcolor = Blue,
+    citecolor = grey
+}
+\urlstyle{same}
+
+% Apa cite style
+\usepackage{apacite}
+
+% Glossar (load _after_ ! hyperref)
+% \usepackage[toc]{glossaries}
+% \makeglossaries
+% \newglossaryentry{RTTI}
+% {
+    % name = {RTTI},
+    % description = {"``Run time type information"'' liefert Informationen über
+    % benutzerdefinierte Typen zur Laufzeit}
+% }
+
+% Listings
+% @see http://tex.stackexchange.com/questions/51867/koma-warning-about-toc
+% \usepackage{scrhack}
+% \usepackage{listings}
+% \lstset{
+    % breakatwhitespace=true,
+    % columns=fullflexible,
+    % keepspaces=true,
+    % breaklines=true,
+    % tabsize=4, 
+    % showstringspaces=false,
+    % extendedchars=true,
+    % basicstyle=\footnotesize\ttfamily,
+    % numbers=left,
+    % numberstyle=\scriptsize,
+    % firstnumber=1
+% }
+% \lstdefinestyle{custom}{
+    % belowcaptionskip=1\baselineskip,
+    % captionpos = b,
+    % breaklines=true,
+    % frame=l,
+    % xleftmargin=\parindent,
+    % showstringspaces=false,
+    % keywordstyle=\bfseries\color{green!40!black},
+    % commentstyle=\itshape\color{purple!40!black},
+    % identifierstyle=\color{blue},
+    % stringstyle=\color{orange},
+% }
+
+\title{ES-HH - Software Design}
+% \subtitle{}
+\author{Andreas Hasler \\{\small andreas.hasler@students.ffhs.ch}
+\and David Daniel\\{\small david.daniel@students.ffhs.ch}}
+\date{\today}
+
+\begin{document}
+\maketitle
+\pagenumbering{Alph}% Use uppercase alphabetic page numbers (and reset to A)
+
+\begin{abstract}
+    Dieses Dokument erläutert die Architekturüberlegungen zum Software Design für
+    ras-weather. Die hier diskutierte Architektur bezieht sich auf die Software, welche
+    auf dem Raspberry Pi betrieben wird. Externe Software wie die Web-Applikation oder die
+    Smartphone Applikation werden in diesem Dokument nicht beschrieben.
+\end{abstract}
+
+\clearpage
+\pagenumbering{Roman}% Use uppercase roman page numbers (and reset to I)
+\tableofcontents
+
+\section{Analyse}
+\pagenumbering{arabic}% Use numeric page numbers (and reset to 1)
+
+Gemäss den Anwendungsfällen aus \cite{project-doc} können die folgenden Subjekte und
+Objekte ermittelt werden:
+
+\begin{itemize}
+    \item Messwerte (UC 2, 3, 6, 7, 8, 9, 10)
+        \begin{itemize}
+            \item Luftdruck
+            \item Temperatur
+            \item Feuchtigkeit
+            \item Lichtstärke
+        \end{itemize}
+\end{itemize}<++>
+
+
+% \FloatBarrier
+% \appendix
+
+% \listoftables
+% \listoffigures
+% \lstlistoflistings
+% \printglossary[title = Glossar, toctitle = Glossar]
+
+% \bibliographystyle{apacite}
+% \bibliography{<++>}
+
+% \renewcommand{\refname}{\section{Bibliographie}}
+% \begin{thebibliography}{}
+    % \bibitem[<+text+>]{<+name+>} <+author+>: <+book+>, <+publisher+>, <+year+>
+% \end{thebibliography}<++>
+
+\end{document}
