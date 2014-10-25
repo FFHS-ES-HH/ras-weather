@@ -127,19 +127,101 @@
 \section{Analyse}
 \pagenumbering{arabic}% Use numeric page numbers (and reset to 1)
 
-Gemäss den Anwendungsfällen aus \cite{project-doc} können die folgenden Subjekte und
-Objekte ermittelt werden:
+Gemäss den Anwendungsfällen \cite{project-doc} können die folgenden Objekte ermittelt
+werden:
 
 \begin{itemize}
-    \item Messwerte (UC 2, 3, 6, 7, 8, 9, 10)
+    \item Messwerte (UC 2, 3, 6-10)
         \begin{itemize}
             \item Luftdruck
             \item Temperatur
             \item Feuchtigkeit
             \item Lichtstärke
         \end{itemize}
-\end{itemize}<++>
+    \item IP Adresse (UC 4)
+    \item Datenbank (UC 3, 10)
+    \item Anzeige, resp. LC Display (UC 2, 4, 6-9)
+\end{itemize}
 
+Die Messwerte können durch einen Objekt Zustand repräsentiert werden. Die IP Adresse
+spielt eine etwas spezielle Rolle, diese wird nicht über die Sensoren ermittelt und auch
+nicht in der Datenbank abgelegt, daher sollte sie auch nicht Bestandteil der Messwerte
+sein.
+
+Die Datenbank resp. dessen Repräsentation muss die Möglichkeit bieten, jeden Satz an
+Messwerten mit dem aktuellen Zeit Stempel zu speichern.
+
+Das Auslesen der Messwerte aus der Datenbank wird durch eine andere Anwendung
+durchgeführt, daher muss die Abstraktion, welche in der Software auf dem Raspberry Pi
+eingesetzt wird, dies vorerst nicht unterstützen. Es ist denkbar, dass die Funktionalität
+später ausgebaut wird, daher sollte es generell möglich sein, dass dies nachträglich noch
+eingebaut wird.
+
+Das LCD wird zur Darstellung von verschiedenen Werten verwendet, darin werden sowohl
+Messwerte mit unterschiedlichen Einheiten (Grad, Pascal oder hPa, Prozent etc.) sowie die
+IP Adresse und evtl. auch die Zeit dargestellt. Aufgrund des beschränkten Platzes auf dem
+Display wäre es schwierig, dem Anwender des Displays freizustellen, wie der anzuzeigende
+Inhalt auf dem Display dargestellt werden soll. Das Gerät muss lediglich die gewünschten
+Werte auf dem Display darstellen, es reicht daher, wenn die Abstraktion des Displays dies
+entsprechend ermöglicht. Somit muss das Display bloss eine Möglichkeit bieten, einen Text
+anzuzeigen.
+
+\section{Synthese}
+
+Somit ergeben sich die folgenden Klassen resp. Abstraktionen mit ihren Eigenschaften und
+Methoden:
+
+\begin{itemize}
+    \item Messwerte
+        \begin{itemize}
+            \item Eigenschaften
+                \begin{itemize}
+                    \item Luftdruck
+                    \item Temperatur
+                    \item Feuchtigkeit
+                    \item Lichtstärke
+                    \item Zeit Stempel
+                \end{itemize}
+            \item Methoden
+                \begin{itemize}
+                    \item Setzen und Ermitteln der Werte
+                \end{itemize}
+        \end{itemize}
+    \item Datenbank
+        \begin{itemize}
+            \item Methoden
+                \begin{itemize}
+                    \item Speichern von Messwerten
+                \end{itemize}
+        \end{itemize}
+    \item LC Display
+        \begin{itemize}
+            \item Methoden
+                \begin{itemize}
+                    \item Darstellen von Werten, Texten
+                \end{itemize}
+        \end{itemize}
+    \item System
+        \begin{itemize}
+            \item Methoden
+                \begin{itemize}
+                    \item Ermitteln der IP Adresse
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\subsection{Ablauf}
+
+Die Software ermittelt in periodischen Zeitabständen die aktuellen Messwerte, speichert
+diese in der Datenbank und stellt sie auf dem Display dar. Der Ablauf ist im Sequenz
+Diagramm in Abbildung \ref{fig:sequence-diagram} ersichtlich.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{sequence-diagram}
+    \caption{Sequenz Diagramm}
+    \label{fig:sequence-diagram}
+\end{figure}
 
 % \FloatBarrier
 % \appendix
@@ -149,8 +231,8 @@ Objekte ermittelt werden:
 % \lstlistoflistings
 % \printglossary[title = Glossar, toctitle = Glossar]
 
-% \bibliographystyle{apacite}
-% \bibliography{<++>}
+\bibliographystyle{apacite}
+\bibliography{02-software-on-pi}
 
 % \renewcommand{\refname}{\section{Bibliographie}}
 % \begin{thebibliography}{}
