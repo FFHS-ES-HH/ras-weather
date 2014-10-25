@@ -139,15 +139,21 @@ werden:
             \item Lichtstärke
         \end{itemize}
     \item IP Adresse (UC 4)
+        \begin{itemize}
+            \item Tastendruck - der Anwender kommuniziert den Wunsch zur Anzeige der IP
+                Adresse (oder einem anderen Wert).
+        \end{itemize}
     \item Datenbank (UC 3, 10)
     \item Anzeige, resp. LC Display (UC 2, 4, 6-9)
 \end{itemize}
 
+\subsection{Messwerte}
 Die Messwerte können durch einen Objekt Zustand repräsentiert werden. Die IP Adresse
 spielt eine etwas spezielle Rolle, diese wird nicht über die Sensoren ermittelt und auch
 nicht in der Datenbank abgelegt, daher sollte sie auch nicht Bestandteil der Messwerte
 sein.
 
+\subsection{Datenbank}
 Die Datenbank resp. dessen Repräsentation muss die Möglichkeit bieten, jeden Satz an
 Messwerten mit dem aktuellen Zeit Stempel zu speichern.
 
@@ -157,6 +163,7 @@ eingesetzt wird, dies vorerst nicht unterstützen. Es ist denkbar, dass die Funk
 später ausgebaut wird, daher sollte es generell möglich sein, dass dies nachträglich noch
 eingebaut wird.
 
+\subsection{LCD}
 Das LCD wird zur Darstellung von verschiedenen Werten verwendet, darin werden sowohl
 Messwerte mit unterschiedlichen Einheiten (Grad, Pascal oder hPa, Prozent etc.) sowie die
 IP Adresse und evtl. auch die Zeit dargestellt. Aufgrund des beschränkten Platzes auf dem
@@ -164,10 +171,16 @@ Display wäre es schwierig, dem Anwender des Displays freizustellen, wie der anz
 Inhalt auf dem Display dargestellt werden soll. Das Gerät muss lediglich die gewünschten
 Werte auf dem Display darstellen, es reicht daher, wenn die Abstraktion des Displays dies
 entsprechend ermöglicht. Somit muss das Display bloss eine Möglichkeit bieten, einen Text
+wie die IP Adresse, eine Temperatur etc. oder alle aktuellen Messwerte zugleich
 anzuzeigen.
+
+\subsection{System}
+Es wird eine Komponente benötigt, welche einen Zugriff auf System Informationen (IP
+Adresse, Tastendruck) erhält und diese der Anwendung verfügbar macht.
 
 \section{Synthese}
 
+\subsection{Abstraktionen}
 Somit ergeben sich die folgenden Klassen resp. Abstraktionen mit ihren Eigenschaften und
 Methoden:
 
@@ -206,6 +219,7 @@ Methoden:
             \item Methoden
                 \begin{itemize}
                     \item Ermitteln der IP Adresse
+                    \item Reagieren auf Tastendruck
                 \end{itemize}
         \end{itemize}
 \end{itemize}
@@ -223,11 +237,36 @@ Diagramm in Abbildung \ref{fig:sequence-diagram} ersichtlich.
     \label{fig:sequence-diagram}
 \end{figure}
 
+\subsection{Struktur}
+Die Anwendung befindet sich im laufenden Zustand, sobald das Gerät gestartet wird. Sie
+wird bis zum Herunterfahren des Gerätes nicht mehr gestoppt. Es handelt sich also um einen
+Dämon, welcher über geeignete Massnahmen dazu bewegt werden muss, die Werte auszulesen,
+diese zu speichern und auf dem Display anzuzeigen. Zudem kann der Anwender die Anzeige auf
+dem Display wechseln, resp. er kann den anzuzeigenden Wert wählen oder die IP Adresse
+anzeigen lassen. Daher muss zusätzlich eine Möglichkeit bestehen, den Dämon zu
+veranlassen, die Anzeige zu wechseln.
+
+Das Auslesen und Abspeichern der Werte läuft vollkommen automatisch im Hintergrund ab,
+diesen Vorgang kann der Benutzer nicht beeinflussen. Daher kann dies in einem eigenen
+Thread abgearbeitet werden, welcher während der gesamten Laufzeit des Dämons aktiv ist.
+Für den Wechsel der Anzeige muss der Dämon resp. die zugehörige Einheit auf Tastendruck
+reagieren.
+
+Zusammenfassend ergibt sich die Klassenstruktur wie sie in Abbildung
+\ref{fig:class-diagram} dargestellt ist.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{class-diagram.eps}
+    \caption{Klassen Diagramm}
+    \label{fig:class-diagram}
+\end{figure}
+
 % \FloatBarrier
 % \appendix
 
 % \listoftables
-% \listoffigures
+\listoffigures
 % \lstlistoflistings
 % \printglossary[title = Glossar, toctitle = Glossar]
 
