@@ -176,7 +176,9 @@ anzuzeigen.
 
 \subsection{System}
 Es wird eine Komponente benötigt, welche einen Zugriff auf System Informationen (IP
-Adresse, Tastendruck) erhält und diese der Anwendung verfügbar macht.
+Adresse, Tastendruck) erhält und diese der Anwendung verfügbar macht. Falls die Anwendung
+die Messwerte anzeigt und ein Wert sich ändert, weil beispielsweise die Temperatur ändert,
+so muss die Anwendung
 
 \section{Synthese}
 
@@ -197,7 +199,7 @@ Methoden:
                 \end{itemize}
             \item Methoden
                 \begin{itemize}
-                    \item Setzen und Ermitteln der Werte
+                    \item Setzen und Lesen der Werte
                 \end{itemize}
         \end{itemize}
     \item Datenbank
@@ -220,15 +222,22 @@ Methoden:
                 \begin{itemize}
                     \item Ermitteln der IP Adresse
                     \item Reagieren auf Tastendruck
+                    \item Liefern der Messwerte
+                    \item Benachrichtigung bei Änderungen eines Messwertes
                 \end{itemize}
         \end{itemize}
 \end{itemize}
 
 \subsection{Ablauf}
 
-Die Software ermittelt in periodischen Zeitabständen die aktuellen Messwerte, speichert
-diese in der Datenbank und stellt sie auf dem Display dar. Der Ablauf ist im Sequenz
-Diagramm in Abbildung \ref{fig:sequence-diagram} ersichtlich.
+Die Anwendung ermittelt in periodischen Zeitabständen die aktuellen Messwerte und
+speichert diese in der Datenbank. Auf Anfrage über einen Schalter wechselt die Anwendung
+die Anzeige und stellt den gewünschten Wert dar. Das periodische Speichern der Werte
+beeinflusst jedoch nicht die Anzeige, für die Anzweige werden stets aktuelle Werte
+ermittelt. Sobald die Anzeige wechselt, wird der entsprechende Wert ermittelt und
+angezeigt. Anschliessend werden Änderungen des aktuell dargestellten Wertes registriert
+und bei jeder Änderung wird die Anzeige aktualisiert. Der Ablauf ist im Sequenz Diagramm
+in Abbildung \ref{fig:sequence-diagram} ersichtlich.
 
 \begin{figure}[ht]
     \centering
@@ -243,14 +252,13 @@ wird bis zum Herunterfahren des Gerätes nicht mehr gestoppt. Es handelt sich al
 Dämon, welcher über geeignete Massnahmen dazu bewegt werden muss, die Werte auszulesen,
 diese zu speichern und auf dem Display anzuzeigen. Zudem kann der Anwender die Anzeige auf
 dem Display wechseln, resp. er kann den anzuzeigenden Wert wählen oder die IP Adresse
-anzeigen lassen. Daher muss zusätzlich eine Möglichkeit bestehen, den Dämon zu
-veranlassen, die Anzeige zu wechseln.
+anzeigen lassen.
 
 Das Auslesen und Abspeichern der Werte läuft vollkommen automatisch im Hintergrund ab,
 diesen Vorgang kann der Benutzer nicht beeinflussen. Daher kann dies in einem eigenen
 Thread abgearbeitet werden, welcher während der gesamten Laufzeit des Dämons aktiv ist.
 Für den Wechsel der Anzeige muss der Dämon resp. die zugehörige Einheit auf Tastendruck
-reagieren.
+und auf Änderungen des angezeigten Wertes reagieren.
 
 Zusammenfassend ergibt sich die Klassenstruktur wie sie in Abbildung
 \ref{fig:class-diagram} dargestellt ist.
