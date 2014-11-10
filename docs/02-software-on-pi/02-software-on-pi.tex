@@ -127,6 +127,17 @@
 \section{Analyse}
 \pagenumbering{arabic}% Use numeric page numbers (and reset to 1)
 
+Auf dem Raspberry Pi wird eine Software betrieben, welche zusammenfassend
+\cite{project-doc} die folgenden Funktionalitäten bietet:
+\begin{itemize}
+    \item Nach Einschalten des Gerätes werden die aktuellen Messwerte wie Temperatur und
+        Luftdruck auf dem Display angezeigt.
+    \item Die Messwerte werden in periodischen Abständen in der Datenbank gespeichert.
+    \item Auf Knopfdruck kann der Anwender die IP Adresse anzeigen lassen, resp. es ist
+        möglich, mittels Knopfdruck die Anzeige zwischen den Messwerten und der IP Adresse
+        zu wechseln.
+\end{itemize}
+
 Gemäss den Anwendungsfällen \cite{project-doc} können die folgenden Objekte ermittelt
 werden:
 
@@ -148,20 +159,30 @@ werden:
 \end{itemize}
 
 \subsection{Messwerte}
-Die Messwerte können durch einen Objekt Zustand repräsentiert werden. Die IP Adresse
-spielt eine etwas spezielle Rolle, diese wird nicht über die Sensoren ermittelt und auch
-nicht in der Datenbank abgelegt, daher sollte sie auch nicht Bestandteil der Messwerte
-sein.
+Die Messwerte werden von den Sensoren ermittelt. Für jede zu messende Einheit kommt ein
+anderer Sensor zum Einsatz. Daher bietet es sich an, statt von Messwerten von Sensoren zu
+sprechen und einen Sensor als Lieferanten eines spezifischen Wertes zu betrachten.
+
+\subsection{Sensoren}
+Die Sensoren werden periodisch von der Anwendung abgefragt. Zudem soll das Display die
+Anzeige aktualisieren, sobald sich ein Wert ändert. Es wird daher eine Möglichkeit
+benötigt, auf Ereignisse bezüglich der gemessenen Werte eines Sensors reagieren zu können.
+Ein Sensor benötigt daher eine Beobachter Schnittstelle.
 
 \subsection{Datenbank}
-Die Datenbank resp. dessen Repräsentation muss die Möglichkeit bieten, jeden Satz an
-Messwerten mit dem aktuellen Zeit Stempel zu speichern.
+Eine Sammlung von Messwerten wird schliesslich in der Datenbank abgelegt, zu welcher
+folglich ein entsprechendes Schema folgende Felder umfasst (ohne Primärschlüssel):
+\begin{itemize}
+    \item Temperatur
+    \item Luftdruck
+    \item Lichtstärke
+    \item Feuchtigkeit
+    \item Datum, Uhrzeit~\footnote{Datum und Uhrzeit der Erstellung der Messwerte}
+\end{itemize}
 
-Das Auslesen der Messwerte aus der Datenbank wird durch eine andere Anwendung
-durchgeführt, daher muss die Abstraktion, welche in der Software auf dem Raspberry Pi
-eingesetzt wird, dies vorerst nicht unterstützen. Es ist denkbar, dass die Funktionalität
-später ausgebaut wird, daher sollte es generell möglich sein, dass dies nachträglich noch
-eingebaut wird.
+Das Auslesen der Messwerte aus der Datenbank wird durch eine andere Anwendung durchgeführt
+(Web-Anwendung), daher muss die Abstraktion, welche hier eingesetzt wird, dies vorerst
+nicht unterstützen.
 
 \subsection{LCD}
 Das LCD wird zur Darstellung von verschiedenen Werten verwendet, darin werden sowohl
@@ -170,15 +191,16 @@ IP Adresse und evtl. auch die Zeit dargestellt. Aufgrund des beschränkten Platz
 Display wäre es schwierig, dem Anwender des Displays freizustellen, wie der anzuzeigende
 Inhalt auf dem Display dargestellt werden soll. Das Gerät muss lediglich die gewünschten
 Werte auf dem Display darstellen, es reicht daher, wenn die Abstraktion des Displays dies
-entsprechend ermöglicht. Somit muss das Display bloss eine Möglichkeit bieten, einen Text
-wie die IP Adresse, eine Temperatur etc. oder alle aktuellen Messwerte zugleich
-anzuzeigen.
+entsprechend ermöglicht. Somit muss das Display eine Möglichkeit bieten, einen Text wie
+die IP Adresse, eine Temperatur etc. oder alle aktuellen Messwerte zugleich anzuzeigen.
 
 \subsection{System}
 Es wird eine Komponente benötigt, welche einen Zugriff auf System Informationen (IP
-Adresse, Tastendruck) erhält und diese der Anwendung verfügbar macht. Falls die Anwendung
-die Messwerte anzeigt und ein Wert sich ändert, weil beispielsweise die Temperatur ändert,
-so muss die Anwendung
+Adresse, Tastendruck) erhält und diese der Anwendung verfügbar macht. Auch das Ermitteln
+der Messwerte kann als System Dienst betrachtet werden, da die Sensoren einen Teil des
+Systems darstellen. Falls die Anwendung die Messwerte anzeigt und ein Wert sich ändert,
+weil beispielsweise die Temperatur ändert, so muss die Anwendung entsprechend reagieren
+und die Anzeige aktualisieren.
 
 \section{Synthese}
 
