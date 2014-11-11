@@ -138,36 +138,27 @@ Auf dem Raspberry Pi wird eine Software betrieben, welche zusammenfassend
         zu wechseln.
 \end{itemize}
 
-Gemäss den Anwendungsfällen \cite{project-doc} können die folgenden Objekte ermittelt
-werden:
+Somit handelt es sich um die folgenden Komponenten, welche miteinander kommunizieren:
 
 \begin{itemize}
-    \item Messwerte (UC 2, 3, 6-10)
-        \begin{itemize}
-            \item Luftdruck
-            \item Temperatur
-            \item Feuchtigkeit
-            \item Lichtstärke
-        \end{itemize}
-    \item IP Adresse (UC 4)
-        \begin{itemize}
-            \item Tastendruck - der Anwender kommuniziert den Wunsch zur Anzeige der IP
-                Adresse (oder einem anderen Wert).
-        \end{itemize}
-    \item Datenbank (UC 3, 10)
-    \item Anzeige, resp. LC Display (UC 2, 4, 6-9)
+    \item LCD
+    \item Sensoren
+    \item Datenbank
+    \item Schalter
 \end{itemize}
 
-\subsection{Messwerte}
-Die Messwerte werden von den Sensoren ermittelt. Für jede zu messende Einheit kommt ein
-anderer Sensor zum Einsatz. Daher bietet es sich an, statt von Messwerten von Sensoren zu
-sprechen und einen Sensor als Lieferanten eines spezifischen Wertes zu betrachten.
+Da die Anwendung nach dem Einschalten des Gerätes nicht mehr gestoppt wird, bis das Gerät
+ausgeschaltet wird, handelt es sich um einen Prozess, welcher im Hintergrund läuft. Dieser
+Prozess ermittelt die Messwerte von den Sensoren, speichert diese in der Datenbank und
+stellt die Werte auf dem LCD dar. Somit benötigt der Prozess während der gesamten Laufzeit
+Zugriff auf die genannten Komponenten.
 
 \subsection{Sensoren}
 Die Sensoren werden periodisch von der Anwendung abgefragt. Zudem soll das Display die
 Anzeige aktualisieren, sobald sich ein Wert ändert. Es wird daher eine Möglichkeit
 benötigt, auf Ereignisse bezüglich der gemessenen Werte eines Sensors reagieren zu können.
-Ein Sensor benötigt daher eine Beobachter Schnittstelle.
+Ein Sensor benötigt daher eine Beobachter Schnittstelle und die Möglichkeit, die aktuellen
+Messwerte zu liefern.
 
 \subsection{Datenbank}
 Eine Sammlung von Messwerten wird schliesslich in der Datenbank abgelegt, zu welcher
@@ -194,61 +185,17 @@ Werte auf dem Display darstellen, es reicht daher, wenn die Abstraktion des Disp
 entsprechend ermöglicht. Somit muss das Display eine Möglichkeit bieten, einen Text wie
 die IP Adresse, eine Temperatur etc. oder alle aktuellen Messwerte zugleich anzuzeigen.
 
-\subsection{System}
-Es wird eine Komponente benötigt, welche einen Zugriff auf System Informationen (IP
-Adresse, Tastendruck) erhält und diese der Anwendung verfügbar macht. Auch das Ermitteln
-der Messwerte kann als System Dienst betrachtet werden, da die Sensoren einen Teil des
-Systems darstellen. Falls die Anwendung die Messwerte anzeigt und ein Wert sich ändert,
-weil beispielsweise die Temperatur ändert, so muss die Anwendung entsprechend reagieren
-und die Anzeige aktualisieren.
+Durch die Notwendigkeit, dass das Display die Anzeige aktualisiert, was das Beobachten der
+Sensoren bedingt, bietet es sich an, einen klassischen Model-View Ansatz zu verfolgen. Die
+Sensoren bilden so das Model, währenddem das Display als View auf Änderungen am Model
+lauscht.
+
+\subsection{Schalter}
+Der oder die Schalter fungieren als Botschafter, welche die Anwendung benachrichtigen,
+sobald ein Schalter gedrückt wurde. Hierzu bietet sich daher ebenfalls ein klassisches
+Beobachter Modell an.
 
 \section{Synthese}
-
-\subsection{Abstraktionen}
-Somit ergeben sich die folgenden Klassen resp. Abstraktionen mit ihren Eigenschaften und
-Methoden:
-
-\begin{itemize}
-    \item Messwerte
-        \begin{itemize}
-            \item Eigenschaften
-                \begin{itemize}
-                    \item Luftdruck
-                    \item Temperatur
-                    \item Feuchtigkeit
-                    \item Lichtstärke
-                    \item Zeit Stempel
-                \end{itemize}
-            \item Methoden
-                \begin{itemize}
-                    \item Setzen und Lesen der Werte
-                \end{itemize}
-        \end{itemize}
-    \item Datenbank
-        \begin{itemize}
-            \item Methoden
-                \begin{itemize}
-                    \item Speichern von Messwerten
-                \end{itemize}
-        \end{itemize}
-    \item LC Display
-        \begin{itemize}
-            \item Methoden
-                \begin{itemize}
-                    \item Darstellen von Werten, Texten
-                \end{itemize}
-        \end{itemize}
-    \item System
-        \begin{itemize}
-            \item Methoden
-                \begin{itemize}
-                    \item Ermitteln der IP Adresse
-                    \item Reagieren auf Tastendruck
-                    \item Liefern der Messwerte
-                    \item Benachrichtigung bei Änderungen eines Messwertes
-                \end{itemize}
-        \end{itemize}
-\end{itemize}
 
 \subsection{Ablauf}
 
@@ -267,6 +214,46 @@ in Abbildung \ref{fig:sequence-diagram} ersichtlich.
     \caption{Sequenz Diagramm}
     \label{fig:sequence-diagram}
 \end{figure}
+
+\subsection{Abstraktionen}
+Somit ergeben sich die folgenden Klassen resp. Abstraktionen mit ihren Eigenschaften und
+Methoden:
+
+\begin{itemize}
+    \item Sensoren
+        \begin{itemize}
+            \item Alle Sensoren bieten die Möglichkeit, den aktuellen Messwert zu
+                ermitteln und einen Beobachter zu benachrichtigen, sobald der aktuelle Wert
+                signifikant~\footnote{Mit signifikant ist gemeint, dass sich der Wert mind. soweit
+                geändert hat, als dass die Änderung auf dem Display erkennbar ist.}.
+                Folgende Sensoren werden benötigt:
+                \begin{itemize}
+                    \item Temperatur-Sensor
+                    \item Feuchtigkeits-Sensor
+                    \item Luftdruck-Sensor
+                    \item Licht-Sensor
+                \end{itemize}
+        \end{itemize}
+    \item Datenbank
+        \begin{itemize}
+            \item Die Datenbank muss eine Menge von Messwerten (Temperatur, Luftdruck
+                etc.) mit dem aktuellen Zeitstempel speichern.
+        \end{itemize}
+    \item LCD
+        \begin{itemize}
+            \item Das Display muss die folgenden Elemente darstellen können:
+                \begin{itemize}
+                    \item Die aktuellen Messwerte
+                    \item Die IP Adresse des Gerätes
+                    \item Eine Fehlermeldung
+                \end{itemize}
+        \end{itemize}
+    \item Schalter
+        \begin{itemize}
+            \item Der Schalter bietet die Möglichkeit, einen Beobachter zu registrieren,
+                welcher nach dem Betätigen des Schalters benachrichtigt wird.
+        \end{itemize}
+\end{itemize}
 
 \subsection{Struktur}
 Die Anwendung befindet sich im laufenden Zustand, sobald das Gerät gestartet wird. Sie
@@ -291,6 +278,42 @@ Zusammenfassend ergibt sich die Klassenstruktur wie sie in Abbildung
     \caption{Klassen Diagramm}
     \label{fig:class-diagram}
 \end{figure}
+
+\section{Verifikation}
+Um den korrekten Betrieb der Software sicher zu stellen, werden in erster Linie die
+möglichen Fehlerquellen ermittelt. Jede Komponente der Software und der Hardware kann
+Fehler produzieren oder auslösen. Externe Fehlerquellen wie ein Ausfall der Stromzufuhr
+werden ignoriert, solche Fehler können nicht adressiert werden. Ein Ausfall des LCD oder
+ein festsitzender Schalter können ebenfalls nicht adressiert werden. Es bleiben daher
+die folgenden möglichen Fehler, welche behandelt werden müssen:
+
+\begin{itemize}
+    \item Sensoren
+        \begin{itemize}
+            \item Liefern von falschen Werten (durch falsche Berechnung)
+            \item Ausfall der physischen Sensoren
+        \end{itemize}
+    \item Datenbank
+        \begin{itemize}
+            \item Korrupte Daten
+            \item Kein Speicherplatz mehr verfügbar
+        \end{itemize}
+\end{itemize}
+
+Das Liefern von falschen Werten kann mittels Testing vermieden werden, resp. es kann
+mittels manuellem Testing verifiziert werden, dass die berechneten Werte in einem
+Toleranzbereich liegen. Der Ausfall der Sensoren sollte von der Anwendung erkannt werden,
+es sollten keine falschen Werte angezeigt oder gespeichert werden, stattdessen sollen im
+Falle von ausgefallenen Sensoren die entsprechenden Werte ignoriert werden. Die Temperatur
+beträgt in diesem Fall 0° Celsius.
+
+Korrupte Daten
+
+% \section{Testing}
+
+% Um den korrekten Betrieb der Software sicher zu stellen, werden Testfälle definiert,
+% welche manuell während des Betriebs der Software überprüft werden.
+
 
 % \FloatBarrier
 % \appendix
