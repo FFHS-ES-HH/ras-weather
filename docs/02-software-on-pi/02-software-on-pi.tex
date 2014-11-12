@@ -175,6 +175,10 @@ Das Auslesen der Messwerte aus der Datenbank wird durch eine andere Anwendung du
 (Web-Anwendung), daher muss die Abstraktion, welche hier eingesetzt wird, dies vorerst
 nicht unterstützen.
 
+Die Daten werden in einer SQLite Datenbank abgelegt, auf diese Weise muss kein separater
+Datenbankserver betrieben werden und eine externe Anwendung (Web Anwendung) kann ebenfalls
+mittels einem standardisierten Verfahren (SQL) auf die Daten zugreifen.
+
 \subsection{LCD}
 Das LCD wird zur Darstellung von verschiedenen Werten verwendet, darin werden sowohl
 Messwerte mit unterschiedlichen Einheiten (Grad, Pascal oder hPa, Prozent etc.) sowie die
@@ -195,8 +199,6 @@ Der oder die Schalter fungieren als Botschafter, welche die Anwendung benachrich
 sobald ein Schalter gedrückt wurde. Hierzu bietet sich daher ebenfalls ein klassisches
 Beobachter Modell an.
 
-\section{Synthese}
-
 \subsection{Ablauf}
 
 Die Anwendung ermittelt in periodischen Zeitabständen die aktuellen Messwerte und
@@ -206,14 +208,26 @@ beeinflusst jedoch nicht die Anzeige, für die Anzweige werden stets aktuelle We
 ermittelt. Sobald die Anzeige wechselt, wird der entsprechende Wert ermittelt und
 angezeigt. Anschliessend werden Änderungen des aktuell dargestellten Wertes registriert
 und bei jeder Änderung wird die Anzeige aktualisiert. Der Ablauf ist im Sequenz Diagramm
-in Abbildung \ref{fig:sequence-diagram} ersichtlich.
+in Abbildung \ref{fig:sequence-startup-running} ersichtlich. In Abbildung
+\ref{fig:sequence-store-periodic} ist der Programmfluss der periodischen Speicherung der
+Messwerte visualisiert. Dieser Vorgang läuft unter einem separaten Thread kontinuierlich
+ab.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\textwidth]{sequence-diagram}
-    \caption{Sequenz Diagramm}
-    \label{fig:sequence-diagram}
+    \includegraphics[width=.7\textwidth]{sequence-startup-running}
+    \caption{Die Anwendung reagiert auf Änderungen der Messwerte und auf Tastendruck}
+    \label{fig:sequence-startup-running}
 \end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=.7\textwidth]{sequence-store-periodic}
+    \caption{Die Messwerte werden periodisch gespeichert}
+    \label{fig:sequence-store-periodic}
+\end{figure}
+
+\section{Synthese}
 
 \subsection{Abstraktionen}
 Somit ergeben sich die folgenden Klassen resp. Abstraktionen mit ihren Eigenschaften und
@@ -256,18 +270,18 @@ Methoden:
 \end{itemize}
 
 \subsection{Struktur}
-Die Anwendung befindet sich im laufenden Zustand, sobald das Gerät gestartet wird. Sie
-wird bis zum Herunterfahren des Gerätes nicht mehr gestoppt. Es handelt sich also um einen
-Dämon, welcher über geeignete Massnahmen dazu bewegt werden muss, die Werte auszulesen,
-diese zu speichern und auf dem Display anzuzeigen. Zudem kann der Anwender die Anzeige auf
-dem Display wechseln, resp. er kann den anzuzeigenden Wert wählen oder die IP Adresse
-anzeigen lassen.
+% Die Anwendung befindet sich im laufenden Zustand, sobald das Gerät gestartet wird. Sie
+% wird bis zum Herunterfahren des Gerätes nicht mehr gestoppt. Es handelt sich also um einen
+% Dämon, welcher über geeignete Massnahmen dazu bewegt werden muss, die Werte auszulesen,
+% diese zu speichern und auf dem Display anzuzeigen. Zudem kann der Anwender die Anzeige auf
+% dem Display wechseln, resp. er kann den anzuzeigenden Wert wählen oder die IP Adresse
+% anzeigen lassen.
 
-Das Auslesen und Abspeichern der Werte läuft vollkommen automatisch im Hintergrund ab,
-diesen Vorgang kann der Benutzer nicht beeinflussen. Daher kann dies in einem eigenen
-Thread abgearbeitet werden, welcher während der gesamten Laufzeit des Dämons aktiv ist.
-Für den Wechsel der Anzeige muss der Dämon resp. die zugehörige Einheit auf Tastendruck
-und auf Änderungen des angezeigten Wertes reagieren.
+% Das Auslesen und Abspeichern der Werte läuft vollkommen automatisch im Hintergrund ab,
+% diesen Vorgang kann der Benutzer nicht beeinflussen. Daher kann dies in einem eigenen
+% Thread abgearbeitet werden, welcher während der gesamten Laufzeit des Dämons aktiv ist.
+% Für den Wechsel der Anzeige muss der Dämon resp. die zugehörige Einheit auf Tastendruck
+% und auf Änderungen des angezeigten Wertes reagieren.
 
 Zusammenfassend ergibt sich die Klassenstruktur wie sie in Abbildung
 \ref{fig:class-diagram} dargestellt ist.
@@ -279,13 +293,13 @@ Zusammenfassend ergibt sich die Klassenstruktur wie sie in Abbildung
     \label{fig:class-diagram}
 \end{figure}
 
-\section{Verifikation}
-Um den korrekten Betrieb der Software sicher zu stellen, werden in erster Linie die
-möglichen Fehlerquellen ermittelt. Jede Komponente der Software und der Hardware kann
+\section{Qualitätssicherung}
+Um den notwendigen Qualitätsstand der Anwendung sicher zu stellen, werden in erster Linie
+die möglichen Fehlerquellen ermittelt. Jede Komponente der Software und der Hardware kann
 Fehler produzieren oder auslösen. Externe Fehlerquellen wie ein Ausfall der Stromzufuhr
-werden ignoriert, solche Fehler können nicht adressiert werden. Ein Ausfall des LCD oder
-ein festsitzender Schalter können ebenfalls nicht adressiert werden. Es bleiben daher
-die folgenden möglichen Fehler, welche behandelt werden müssen:
+werden ignoriert, solche Fehler können nicht von der Software adressiert werden. Ein
+Ausfall des LCD oder ein festsitzender Schalter können ebenfalls nicht adressiert werden.
+Es bleiben daher die folgenden möglichen Fehler, welche behandelt werden müssen:
 
 \begin{itemize}
     \item Sensoren
@@ -295,24 +309,26 @@ die folgenden möglichen Fehler, welche behandelt werden müssen:
         \end{itemize}
     \item Datenbank
         \begin{itemize}
-            \item Korrupte Daten
             \item Kein Speicherplatz mehr verfügbar
         \end{itemize}
 \end{itemize}
 
 Das Liefern von falschen Werten kann mittels Testing vermieden werden, resp. es kann
 mittels manuellem Testing verifiziert werden, dass die berechneten Werte in einem
-Toleranzbereich liegen. Der Ausfall der Sensoren sollte von der Anwendung erkannt werden,
-es sollten keine falschen Werte angezeigt oder gespeichert werden, stattdessen sollen im
-Falle von ausgefallenen Sensoren die entsprechenden Werte ignoriert werden. Die Temperatur
-beträgt in diesem Fall 0° Celsius.
+Toleranzbereich liegen. Der Ausfall der Sensoren muss von der Anwendung erkannt werden, es
+dürfen keine falschen Werte angezeigt oder gespeichert werden, stattdessen sollen im Falle
+von ausgefallenen Sensoren die entsprechenden Werte ignoriert werden. Auf dem LCD soll in
+diesem Fall eine entsprechende Fehlermeldung angezeigt werden.
 
-Korrupte Daten
+Falls das Speichern der Messwerte fehlschlägt, weil kein Speicherplatz mehr verfügbar ist,
+soll auf dem LCD eine entsprechende Fehlermeldung angezeigt werden.
 
-% \section{Testing}
+Eine Fehlermeldung wird solange dargestellt, bis der verursachende Fehler beseitigt wurde.
 
-% Um den korrekten Betrieb der Software sicher zu stellen, werden Testfälle definiert,
-% welche manuell während des Betriebs der Software überprüft werden.
+\section{Testing}
+
+Um den korrekten Betrieb der Software sicher zu stellen, werden Testfälle definiert und
+durchlaufen.
 
 
 % \FloatBarrier
