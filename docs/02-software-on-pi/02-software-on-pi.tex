@@ -189,10 +189,10 @@ Werte auf dem Display darstellen, es reicht daher, wenn die Abstraktion des Disp
 entsprechend ermöglicht. Somit muss das Display eine Möglichkeit bieten, einen Text wie
 die IP Adresse, eine Temperatur etc. oder alle aktuellen Messwerte zugleich anzuzeigen.
 
-Durch die Notwendigkeit, dass das Display die Anzeige aktualisiert, was das Beobachten der
-Sensoren bedingt, bietet es sich an, einen klassischen Model-View Ansatz zu verfolgen. Die
-Sensoren bilden so das Model, währenddem das Display als View auf Änderungen am Model
-lauscht.
+Durch die Notwendigkeit, dass das Display die Anzeige aktualisiert, was das
+Beobachten der Sensoren bedingt, bietet es sich an, einen Model-View Ansatz zu
+verfolgen. Die Sensoren bilden so das Model, währenddem das Display als View
+auf Änderungen am Model lauscht.
 
 \subsection{Schalter}
 Der oder die Schalter fungieren als Botschafter, welche die Anwendung benachrichtigen,
@@ -282,23 +282,49 @@ Somit ergeben sich die folgenden Abstraktionen mit ihren Eigenschaften und Metho
 % Für den Wechsel der Anzeige muss der Dämon resp. die zugehörige Einheit auf Tastendruck
 % und auf Änderungen des angezeigten Wertes reagieren.
 
+Statt einen monolithischen Ansatz zu verfolgen und dem LCD die Rolle der View zu
+zuordnen, sollte eher angestrebt werden, einen modularen Aufbau zu erzielen. Da
+andernfalls das Hinzufügen von weiteren Sensoren und die Implementierung der View
+schwierig sind. Eine einfache Indirektion löst dieses Problem: Statt dass die View auf
+alle Sensoren lauscht, existiert zu jedem Sensor eine kleine View, welche nur auf einen
+einzelnen Sensor lauscht und das LCD als Zeichen-Oberfläche erhält. Auf diese Weise können
+die einzelnen Sensoren leichter ausgetauscht werden und die Anwendung weist eine
+schwächere Kopplung auf.
+
 Zusammenfassend ergibt sich die Klassenstruktur wie sie in Abbildung
 \ref{fig:class-diagram} dargestellt ist.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\textwidth]{class-diagram.eps}
+    \includegraphics[width=\textwidth]{class-diagram}
     \caption{Klassen Diagramm}
     \label{fig:class-diagram}
 \end{figure}
 
+Der Grund, weswegen keine Schnittstelle Observer definiert wurde, liegt darin, dass mit
+C++ gearbeitet wird und statt einer Schnittstelle für den Observer lediglich ein
+Funktionsobjekt verwendet werden kann. Da der Funktor vorgängig mit Argumenten gebunden
+werden kann, muss dem Observer beim Aufruf kein spezifisches Argument mitgegeben werden.
+Generell interessiert den Beobachter lediglich, dass sich der Wert des beobachteten
+Sensors geändert hat. Eine Schnittstelle des Beobachters, welche beispielsweise den Sensor
+als Argument erhält, wäre nutzlos, da es sich bei dem Sensor, welcher der Observer
+erhalten würde, um eine Schnittstelle handeln würde, um den konkreten Sensor zu erhalten,
+wäre daher ein casting notwendig. Dies entfällt durch das vorgängige Binden des Funktors.
+
+Aus Platzgründen wurden nicht alle Attribute und Methoden der Klasse \texttt{Application}
+notiert, generell spielt sich jedoch das wichtigste in der Methode \texttt{onStart} ab,
+darin werden die Views bei den Sensoren als Beobachter registriert und die Anzeige mit den
+aktuellen Werten versehen. Bei einem Wechsel der Anzeige können schliesslich die
+registrierten Beobachter de-registriert werden um die IP Adresse oder im Fehlerfall die
+Fehlermeldung anzuzeigen.
+
 \section{Qualitätssicherung}
 Um den notwendigen Stand der Qualität der Anwendung sicher zu stellen, werden in erster
 Linie die möglichen Fehlerquellen ermittelt. Jede Komponente der Software und der Hardware
-kann Fehler produzieren oder auslösen. Externe Fehlerquellen wie ein Ausfall der
-Stromzufuhr werden ignoriert, solche Fehler können nicht von der Software adressiert
+kann Fehler produzieren oder auslösen, wobei externe Fehlerquellen wie ein Ausfall der
+Stromzufuhr ignoriert werden, solche Fehler können nicht von der Software adressiert
 werden. Ein Ausfall des LCD oder ein festsitzender Schalter können ebenfalls nicht
-adressiert werden.  Es bleiben daher die folgenden möglichen Fehler, welche behandelt
+adressiert werden. Es bleiben daher die folgenden möglichen Fehler, welche behandelt
 werden müssen:
 
 \begin{itemize}
@@ -313,7 +339,7 @@ werden müssen:
         \end{itemize}
 \end{itemize}
 
-Das Liefern von falschen Werten kann mittels Testing vermieden werden, resp. es kann
+Das Liefern von falschen Werten kann mittels Testing vermieden werden, resp. es kann 
 mittels manuellem Testing verifiziert werden, dass die berechneten Werte in einem
 Toleranzbereich liegen. Der Ausfall der Sensoren muss von der Anwendung erkannt werden, es
 dürfen keine falschen Werte angezeigt oder gespeichert werden, stattdessen sollen im Falle
@@ -328,7 +354,8 @@ Eine Fehlermeldung wird solange dargestellt, bis der verursachende Fehler beseit
 \section{Testing}
 
 Um den korrekten Betrieb der Software sicher zu stellen, werden Testfälle definiert und
-durchlaufen.
+durchlaufen. Die benötigten Testfälle können anhand der zuvor ermittelten
+Qualitätskriterien erstellt werden.
 
 
 % \FloatBarrier
