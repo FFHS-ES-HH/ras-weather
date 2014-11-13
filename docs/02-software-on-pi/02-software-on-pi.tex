@@ -309,53 +309,122 @@ Generell interessiert den Beobachter lediglich, dass sich der Wert des beobachte
 Sensors geändert hat. Eine Schnittstelle des Beobachters, welche beispielsweise den Sensor
 als Argument erhält, wäre nutzlos, da es sich bei dem Sensor, welcher der Observer
 erhalten würde, um eine Schnittstelle handeln würde, um den konkreten Sensor zu erhalten,
-wäre daher ein casting notwendig. Dies entfällt durch das vorgängige Binden des Funktors.
+wäre daher ein casting notwendig. Dies entfällt durch das vorgängige Binden des Funktors,
+beispielsweise kann eine Instanz einer \texttt{std::function<void()>} mittels einer
+Closure oder einer gebundenen Member Funktion erzeugt werden.
 
-Aus Platzgründen wurden nicht alle Attribute und Methoden der Klasse \texttt{Application}
-notiert, generell spielt sich jedoch das wichtigste in der Methode \texttt{onStart} ab,
-darin werden die Views bei den Sensoren als Beobachter registriert und die Anzeige mit den
-aktuellen Werten versehen. Bei einem Wechsel der Anzeige können schliesslich die
-registrierten Beobachter de-registriert werden um die IP Adresse oder im Fehlerfall die
-Fehlermeldung anzuzeigen.
+Aus Platzgründen wurden nicht alle Attribute und Methoden der Klasse Application
+notiert, generell handelt es sich um eine grobe Sicht auf die Architektur. Eine zentrale
+Rolle spielt der Konstruktor der Klasse, darin werden die Views bei den Sensoren als
+Beobachter registriert und die Anzeige mit den aktuellen Werten versehen. Bei einem
+Wechsel der Anzeige können schliesslich die registrierten Beobachter de-registriert werden
+um die IP Adresse oder im Fehlerfall die Fehlermeldung anzuzeigen. Eine Alternative zu dem
+erwähnten Modell, in welchem die Views auf Änderungen am Modell lauschen, besteht darin,
+dass nicht die Views direkt auf Änderungen am Display lauschen sondern
+Application. Dies kann realisiert werden, indem wie angedeutet, eine Methode
+\texttt{onValueChanged} als Grundlage dient, einen Observer zu erstellen. Die Methode kann
+mit \texttt{this} und der zugehörigen View gebunden werden, um einen Funktor zu erzeugen,
+welcher als Beobachter eines Sensores dient. Analog dazu muss schliesslich noch dasselbe
+für den Thread \texttt{dbWriter} getan werden, indem statt bloss den Observer mit dem
+Sensor zu speichern, zusätzlich noch ein Funktor gespeichert wird, welcher den zugehörigen
+Wert in Values setzt. Schliesslich kann der Thread die map durchwandern, jeden zugehörigen
+Funktor mit einem Value aufrufen, den Zeit Stempel setzen und die so assemblierten Werte
+mittels der Datenbank speichern. Im Falle eines Wechsels der Anzeige werden jeweils die
+Beobachter bei den Sensoren an- resp. abgemeldet.
 
 \section{Qualitätssicherung}
-Um den notwendigen Stand der Qualität der Anwendung sicher zu stellen, werden in erster
-Linie die möglichen Fehlerquellen ermittelt. Jede Komponente der Software und der Hardware
-kann Fehler produzieren oder auslösen, wobei externe Fehlerquellen wie ein Ausfall der
-Stromzufuhr ignoriert werden, solche Fehler können nicht von der Software adressiert
-werden. Ein Ausfall des LCD oder ein festsitzender Schalter können ebenfalls nicht
-adressiert werden. Es bleiben daher die folgenden möglichen Fehler, welche behandelt
-werden müssen:
+Um den notwendigen Qualität Standard zu ermitteln, werden die funktionalen Anforderungen
+herbeigezogen um daraus entsprechende Test Szenarien abzuleiten.
 
 \begin{itemize}
-    \item Sensoren
+    \item Luftdruck, Temperatur, Feuchtigkeit und Lichtstärke müssen korrekt ermittelt,
+        dargestellt und gespeichert werden.
         \begin{itemize}
-            \item Liefern von falschen Werten (durch falsche Berechnung)
-            \item Ausfall der physischen Sensoren
+            \item Mittels manuellen Tests und einem Referenz Gerät kann verifiziert
+                werden, ob die Werte in einem gültigen Toleranzbereich liegen. Falls dies
+                über das LCD verifiziert werden kann, ist auch sichergestellt, dass die
+                Werte entsprechend ermittelt werden.
+            \item Mittels manueller Überprüfung kann verifiziert werden, ob der
+                entsprechende Inhalt in der Datenbank abgelegt wurde. Beispielsweise
+                mittels einer SQLite Shell.
         \end{itemize}
-    \item Datenbank
+    \item Sämtliche Informationen müssen über eine Web Applikation eingesehen werden
+        können.
         \begin{itemize}
-            \item Kein Speicherplatz mehr verfügbar
+            \item Auch dies kann mittels manueller Überprüfung auf dieselbe Weise
+                verifiziert werden: Sämtliche online dargestellten Werte müssen im
+                Vergleich mit den Werten eines Referenz Gerätes in einem gültigen
+                Toleranzbereich liegen. Zudem kann überprüft werden, ob zuvor gespeicherte
+                Daten abrufbar sind.
         \end{itemize}
 \end{itemize}
 
-Das Liefern von falschen Werten kann mittels Testing vermieden werden, resp. es kann 
-mittels manuellem Testing verifiziert werden, dass die berechneten Werte in einem
-Toleranzbereich liegen. Der Ausfall der Sensoren muss von der Anwendung erkannt werden, es
-dürfen keine falschen Werte angezeigt oder gespeichert werden, stattdessen sollen im Falle
-von ausgefallenen Sensoren die entsprechenden Werte ignoriert werden. Auf dem LCD soll in
-diesem Fall eine entsprechende Fehlermeldung angezeigt werden.
+Zudem müssen weitere Risiken berücksichtigt werden, wobei externe Fehlerquellen wie ein
+Ausfall der Stromzufuhr ignoriert werden, solche Fehler können nicht adressiert werden.
+Ein Ausfall des LCD oder ein festsitzender Schalter können ebenfalls nicht behandelt
+werden. Es sollte jedoch sichergestellt werden, dass keine falschen Werte gespeichert
+werden, falls ein Sensor ausfällt, sollte dies von der Anwendung erkannt werden.
 
-Falls das Speichern der Messwerte fehlschlägt, weil kein Speicherplatz mehr verfügbar ist,
-soll auf dem LCD eine entsprechende Fehlermeldung angezeigt werden.
+Zudem ist es möglich, dass irgendwann der Speicher ausgeht. Es wäre auch denkbar, dass
+eine sehr grosse Datenbank Probleme verursacht.
 
-Eine Fehlermeldung wird solange dargestellt, bis der verursachende Fehler beseitigt wurde.
+Es bleiben zusätzlich die folgenden möglichen Fehler, welche behandelt werden müssen:
+
+\begin{itemize}
+    \item Ausfall von Sensoren
+        \begin{itemize}
+            \item Im Falle von ausgefallenen Sensoren sollen die entsprechenden Werte
+                nicht gespeichert werden. Auf dem LCD soll in diesem Fall eine
+                entsprechende Fehlermeldung angezeigt werden.
+        \end{itemize}
+    \item Kein Speicherplatz mehr verfügbar
+        \begin{itemize}
+            \item Falls das Speichern der Messwerte fehlschlägt, weil kein Speicherplatz
+                mehr verfügbar ist, soll auf dem LCD ebenfalls eine entsprechende
+                Fehlermeldung angezeigt werden.
+        \end{itemize}
+    \item Kein Netzwerk verfügbar
+        \begin{itemize}
+            \item In diesem Fall soll bei einem Wechsel der Anzeige zur IP Adresse eine
+                Fehlermeldung angezeigt werden.
+        \end{itemize}
+\end{itemize}
 
 \section{Testing}
 
-Um den korrekten Betrieb der Software sicher zu stellen, werden Testfälle definiert und
-durchlaufen. Die benötigten Testfälle können anhand der zuvor ermittelten
-Qualitätskriterien erstellt werden.
+Um den korrekten Betrieb des Systems zu verifizieren, werden Testfälle definiert, welche
+im Anschluss an die Implementierung und auch währenddessen durchlaufen werden. Die
+benötigten Testfälle können anhand der zuvor ermittelten Kriterien und Risiken erstellt
+werden.
+
+\subsection{TC1 - Ermitteln der Werte}
+Das korrekte Ermitteln der Werte der Sensoren wird wie beschrieben manuell überprüft. Ein
+Referenz Gerät liefert die Werte, mit welchen die ermittelten Werte verglichen werden.
+Die Differenz muss anschliessend im gültigen Toleranzbereich liegen.
+
+\subsection{TC2 - Speicherung}
+Mittels einer SQLite Shell wird geprüft, ob der periodisch gespeicherte Inhalt in der
+Datenbank vorhanden ist.
+
+\subsection{TC3 - Aktuelle Daten über die Web Applikation}
+Mittels manuellem Testing wird verifiziert, dass die von der Web Applikation dargestellten
+Werte im gültigen Toleranzbereich liegen.
+
+\subsection{TC4 - Gespeicherte Daten über die Web Applikation}
+Mittels manuellem Testing wird verifiziert, dass die zuvor gespeicherten Werte verfügbar
+sind.
+
+\subsection{TC5 - Ausfall aller Sensoren}
+Während des Betriebs wird das Verbindungskabel zwischen dem Raspberry Pi und der
+Wetterstation getrennt. Auf der Anzeige der Werte der Sensoren muss eine entsprechende
+Fehlermeldung angezeigt werden.
+
+\subsection{TC6 - Speicherplatz}
+Es wird eine ausreichend grosse Datei auf eine separate, für diesen Test präparierte SD
+Karte gelegt. Die Datei muss so gross sein, dass bloss noch wenige Bytes an Speicher auf
+der Karte vorhanden sind. Eine solche Datei kann mittels \texttt{dd} erstellt werden.
+Anschliessend wird verifiziert, dass die Anwendung versucht, die Datensätze abzulegen.
+Sobald dies fehlschlägt, muss eine entsprechende Fehlermeldung angezeigt werden.
 
 
 % \FloatBarrier
@@ -368,10 +437,5 @@ Qualitätskriterien erstellt werden.
 
 \bibliographystyle{apacite}
 \bibliography{02-software-on-pi}
-
-% \renewcommand{\refname}{\section{Bibliographie}}
-% \begin{thebibliography}{}
-    % \bibitem[<+text+>]{<+name+>} <+author+>: <+book+>, <+publisher+>, <+year+>
-% \end{thebibliography}<++>
 
 \end{document}
