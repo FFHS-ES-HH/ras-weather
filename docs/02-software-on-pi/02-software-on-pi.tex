@@ -36,6 +36,9 @@
 % Lange Tabellen
 \usepackage{longtable}
 
+% Tabellen mit Spalten variabler Breite
+\usepackage{tabularx, booktabs}
+
 % Gewrappte boxen (können innerhalb f{rame}box's verwendet werden)
 \usepackage{minibox}
 
@@ -236,10 +239,11 @@ Somit ergeben sich die folgenden Abstraktionen mit ihren Eigenschaften und Metho
     \item Sensoren
         \begin{itemize}
             \item Alle Sensoren bieten die Möglichkeit, den aktuellen Messwert zu
-                ermitteln und einen Beobachter zu benachrichtigen, sobald der aktuelle Wert
-                signifikant~\footnote{Mit signifikant ist gemeint, dass sich der Wert mind. soweit
-                geändert hat, als dass die Änderung auf dem Display erkennbar ist.}.
-                Folgende Sensoren werden benötigt:
+                ermitteln und einen Beobachter zu benachrichtigen, sobald der
+                aktuelle Wert signifikant geändert hat~\footnote{Mit signifikant
+                ist gemeint, dass sich der Wert mind. soweit geändert hat, als dass die
+                Änderung auf dem Display erkennbar ist.}. Folgende Sensoren werden
+                benötigt:
                 \begin{itemize}
                     \item Temperatur-Sensor
                     \item Feuchtigkeit-Sensor
@@ -332,6 +336,33 @@ Funktor mit einem Value aufrufen, den Zeit Stempel setzen und die so assembliert
 mittels der Datenbank speichern. Im Falle eines Wechsels der Anzeige werden jeweils die
 Beobachter bei den Sensoren an- resp. abgemeldet.
 
+\section{Datenbank}
+Die periodisch ermittelten Messwerte werden für spätere Auswertungen und für den Zugriff
+über die Web Applikation gespeichert. Dass kein zusätzlicher Datenbank Server betrieben
+werden muss und die Daten dennoch möglichst übergreifend verfügbar sind und zudem eine
+standardisierte Abfragesprache wie SQL verwendet werden kann, wird SQLite eingesetzt. Für
+die Messwerte wird bloss eine einzige Tabelle benötigt, worin sämtliche Messwerte mit
+entsprechendem Zeitstempel abgelegt werden. Die Tabelle \ref{tab:db-table} beinhaltet eine
+Auflistung der Spalten der Datenbank Tabelle.
+
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{|l|l|X|} \hline
+        \textbf{Name} & \textbf{Typ} & \textbf{Bemerkungen} \\\hline
+        id & INTEGER & Ein stetig wachsender integraler Wert, der die Zeile eindeutig
+            identifiziert. \\\hline
+        created\_at & TEXT & Ein Zeitstempel in ISO Darstellung ("`YYYY-MM-DD
+            HH:MM:SSS.Z"') der den Zeitpunkt der Erstellung der Messwerte repräsentiert.
+            \\\hline
+        temperature & REAL & Die Temperatur \\\hline
+        humidity & REAL &  Die Feuchtigkeit \\\hline
+        pressure & REAL & Der Luftdruck \\\hline
+        illumination & REAL & Die Lichtstärke \\\hline
+    \end{tabularx}
+    \caption{Die Messwerte in der Datenbank}
+    \label{tab:db-table}
+\end{table}
+
 \section{Qualitätssicherung}
 Um den notwendigen Qualität Standard zu ermitteln, werden die funktionalen Anforderungen
 herbeigezogen um daraus entsprechende Test Szenarien abzuleiten.
@@ -395,42 +426,158 @@ Es bleiben zusätzlich die folgenden möglichen Fehler, welche behandelt werden 
 Um den korrekten Betrieb des Systems zu verifizieren, werden Testfälle definiert, welche
 im Anschluss an die Implementierung und auch währenddessen durchlaufen werden. Die
 benötigten Testfälle können anhand der zuvor ermittelten Kriterien und Risiken erstellt
-werden.
+werden. Folgende Testfälle wurden definiert:
 
-\subsection{TC1 - Ermitteln der Werte}
-Das korrekte Ermitteln der Werte der Sensoren wird wie beschrieben manuell überprüft. Ein
-Referenz Gerät liefert die Werte, mit welchen die ermittelten Werte verglichen werden.
-Die Differenz muss anschliessend im gültigen Toleranzbereich liegen.
+\begin{itemize}
+    \item Es wird geprüft, ob die korrekten Werte ermittelt werden. Tabelle \ref{tab:tc1}
+    \item Es wird geprüft, ob die Speicherung der gemessenen Daten funktioniert. Tabelle
+        \ref{tab:tc2}
+    \item Es wird geprüft, ob die aktuellen Messwerte über die Web Anwendung abrufbar
+        sind. Tabelle \ref{tab:tc3}
+    \item Es wird geprüft, ob die zuvor gespeicherten Messdaten über die Web Anwendung
+        abrufbar sind. Tabelle \ref{tab:tc4}
+    \item Es wird geprüft, ob sich das System gemäss den Anforderungen verhält, wenn alle
+        Sensoren ausfallen. Tabelle \ref{tab:tc5}
+    \item Es wird geprüft, ob sich das System gemäss den Anforderungen verhält, wenn kein
+        weiterer Speicherplatz mehr verfügbar ist. Tabelle \ref{tab:tc6}
+\end{itemize}
 
-\subsection{TC2 - Speicherung}
-Mittels einer SQLite Shell wird geprüft, ob der periodisch gespeicherte Inhalt in der
-Datenbank vorhanden ist.
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{lX}
+        \multicolumn{2}{c}{\textbf{TC1 - Ermitteln der Werte}} \\\toprule
+        \textit{Beschreibung} & Das korrekte Ermitteln der Werte der Sensoren wird
+            manuell überprüft. Ein Referenz Gerät liefert die Werte, mit welchen die
+            ermittelten Werte verglichen werden. Die Differenz muss anschliessend im
+            gültigen Toleranzbereich liegen. \\\midrule
+        \textit{Vorbedingungen} &
+            \begin{itemize}
+                \item Ein beliebiges, handelsübliches Gerät als Referenz Gerät
+                \item Definition der Toleranzbereiche
+                    \begin{itemize}
+                        \item Feuchtigkeit: 2\%
+                        \item Temperatur: 0.7°
+                        \item Lichtstärke: 0.4lx
+                        \item Luftdruck: 1.4hPa
+                    \end{itemize}
+            \end{itemize}
+            \\\midrule
+        \textit{Ablauf} & Die Messwerte werden vom Display des Gerätes abgelesen und mit
+            den Werten des Referenz Gerätes verglichen. Die Differenz der beiden Messdaten
+            wird für jeden gemessenen Werte berechnet. \\\midrule
+        \textit{Auswertung} & Die berechnete Differenz eines jeden Messwertes muss im
+            Toleranzbereich liegen. \\\bottomrule
+    \end{tabularx}
+    \caption{Test Case 1 - Ermitteln der Werte}
+    \label{tab:tc1}
+\end{table}
 
-\subsection{TC3 - Aktuelle Daten über die Web Applikation}
-Mittels manuellem Testing wird verifiziert, dass die von der Web Applikation dargestellten
-Werte im gültigen Toleranzbereich liegen.
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{lX}
+        \multicolumn{2}{c}{\textbf{TC2 - Speicherung}} \\\toprule
+        \textit{Beschreibung} & Mittels einer SQLite Shell wird geprüft, ob der periodisch
+            gespeicherte Inhalt in der Datenbank vorhanden ist. \\\midrule
+        \textit{Vorbedingungen} & Die Anwendung befindet sich in laufendem Betrieb und es
+            wurden gemäss der bereits verstrichenen Zeit Datensätze angelegt.\\\midrule
+        \textit{Ablauf} & Nachdem die Anwendung bereits so lange läuft, dass mind. 3
+            Datensätze angelegt wurden, wird mittels Shell eine Verbindung zu der SQLite
+            Datenbank hergestellt. Es wird geprüft, dass die erwarteten Datensätze vorhanden
+            sind. \\\midrule
+        \textit{Auswertung} & Die erwarteten Datensätze müssen mit den korrekten
+            Zeitstempeln existieren. \\\bottomrule
+    \end{tabularx}
+    \caption{Test Case 2 - Speicherung}
+    \label{tab:tc2}
+\end{table}
 
-\subsection{TC4 - Gespeicherte Daten über die Web Applikation}
-Mittels manuellem Testing wird verifiziert, dass die zuvor gespeicherten Werte verfügbar
-sind.
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{lX}
+        \multicolumn{2}{c}{\textbf{TC3 - Aktuelle Daten über die Web Applikation}} \\\toprule
+        \textit{Beschreibung} & Mittels manuellem Testing wird verifiziert, dass die von
+            der Web Applikation dargestellten Werte im gültigen Toleranzbereich
+            liegen.\\\midrule
+        \textit{Vorbedingungen} & Die Web Applikation ist über den Browser erreichbar.
+            \\\midrule
+        \textit{Ablauf} & Die Web Anwendung wird mit dem Browser geöffnet. Es werden die
+            aktuellen Werte über die Web Oberfläche mit den Werten des Referenz Gerätes
+            verglichen. Zu den Werten des Referenz Gerätes wird zu jeder gemessenen Grösse die
+            Differenz berechnet. \\\midrule
+        \textit{Auswertung} & Die angezeigten Werte müssen im Toleranzbereich von TC1
+            liegen. \\\bottomrule
+    \end{tabularx}
+    \caption{Test Case 3 - Aktuelle Daten über die Web Applikation}
+    \label{tab:tc3}
+\end{table}
 
-\subsection{TC5 - Ausfall aller Sensoren}
-Während des Betriebs wird das Verbindungskabel zwischen dem Raspberry Pi und der
-Wetterstation getrennt. Auf der Anzeige der Werte der Sensoren muss eine entsprechende
-Fehlermeldung angezeigt werden.
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{lX}
+        \multicolumn{2}{c}{\textbf{TC4 - Gespeicherte Daten über die Web Applikation}} \\\toprule
+        \textit{Beschreibung} & Mittels manuellem Testing wird verifiziert, dass die zuvor
+            gespeicherten Werte auch über die Web Oberfläche verfügbar sind. \\\midrule
+        \textit{Vorbedingungen} & Die Web Applikation ist über den Browser erreichbar.
+            \\\midrule
+        \textit{Ablauf} & Die Web Anwendung wird mit dem Browser geöffnet. Es werden die
+            gespeicherten Werte über die Web Oberfläche abgefragt. Parallel dazu werden die
+            gespeicherten Werte über eine SQLite Shell ermittelt. \\\midrule
+        \textit{Auswertung} & Die angezeigten Werte müssen mit denjenigen in der SQLite
+            Datenbank übereinstimmen. \\\bottomrule
+    \end{tabularx}
+    \caption{Test Case 4 - Gespeicherte Daten über die Web Applikation}
+    \label{tab:tc4}
+\end{table}
 
-\subsection{TC6 - Speicherplatz}
-Es wird eine ausreichend grosse Datei auf eine separate, für diesen Test präparierte SD
-Karte gelegt. Die Datei muss so gross sein, dass bloss noch wenige Bytes an Speicher auf
-der Karte vorhanden sind. Eine solche Datei kann mittels \texttt{dd} erstellt werden.
-Anschliessend wird verifiziert, dass die Anwendung versucht, die Datensätze abzulegen.
-Sobald dies fehlschlägt, muss eine entsprechende Fehlermeldung angezeigt werden.
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{lX}
+        \multicolumn{2}{c}{\textbf{TC5 - Ausfall aller Sensoren}} \\\toprule
+        \textit{Beschreibung} & Während des Betriebs wird das Verbindungskabel zwischen
+            dem Raspberry Pi und der Wetterstation getrennt. Auf der Anzeige der Werte der
+            Sensoren muss eine entsprechende Fehlermeldung angezeigt werden. \\\midrule
+        \textit{Vorbedingungen} & Der Dämon Prozess wurde gestartet und das LCD zeigt die
+            gemessenen Werte an. \\\midrule
+        \textit{Ablauf} & Das Verbindungskabel zum Bricklet wird entfernt. Es wird
+            überprüft, ob auf dem Display eine entsprechende Fehlermeldung angezeigt wird.
+            \\\midrule
+        \textit{Auswertung} & Es wird geprüft, ob eine entsprechende Fehlermeldung
+            angezeigt wird. \\\bottomrule
+    \end{tabularx}
+    \caption{Test Case 5 - Ausfall aller Sensoren}
+    \label{tab:tc5}
+\end{table}
 
+\begin{table}
+    \centering
+    \begin{tabularx}{\columnwidth}{lX}
+        \multicolumn{2}{c}{\textbf{TC6 - Speicherplatz}} \\\toprule
+        \textit{Beschreibung} & Es wird eine ausreichend grosse Datei auf eine separate,
+            für diesen Test präparierte SD Karte gelegt. Die Datei muss so gross sein,
+            dass bloss noch wenige Bytes an Speicher auf der Karte vorhanden sind. Eine
+            solche Datei kann mittels dd erstellt werden. Anschliessend wird verifiziert,
+            dass die Anwendung versucht, die Datensätze abzulegen. Sobald dies
+            fehlschlägt, muss eine entsprechende Fehlermeldung angezeigt werden.
+            \\\midrule
+        \textit{Vorbedingungen} & Für den Test wird eine übergrosse Datei auf dem
+            Dateisystem abgelegt. Die Datei weist eine Grösse auf, welche bis auf wenige
+            Bytes dem noch verfügbaren Speicher der Karte entspricht. Somit weist die
+            verwendete SD Karte bloss noch wenig Speicherplatz auf. \\\midrule
+        \textit{Ablauf} & Die Anwendung wird gestartet und es wird beobachtet, wie der
+            verfügbare Speicher auf der Karte abnimmt. Sobald kein verfügbarer Speicher
+            mehr vorhanden ist, wird geprüft, ob auf dem LCD eine entsprechende
+            Fehlermeldung angezeigt wird. \\\midrule
+        \textit{Auswertung} & Es wird geprüft, ob eine entsprechende Fehlermeldung
+            angezeigt wird. \\\bottomrule
+    \end{tabularx}
+    \caption{Test Case 6 - Speicherplatz}
+    \label{tab:tc6}
+\end{table}
 
-% \FloatBarrier
+\FloatBarrier
 % \appendix
 
-% \listoftables
+\listoftables
 \listoffigures
 % \lstlistoflistings
 % \printglossary[title = Glossar, toctitle = Glossar]
