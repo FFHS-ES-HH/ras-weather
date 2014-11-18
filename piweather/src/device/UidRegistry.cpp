@@ -22,7 +22,9 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "uidregistry.hpp"
+#include    "UidRegistry.hpp"
+
+#include    <atomic>
 
 namespace piw { namespace device {
 
@@ -37,7 +39,7 @@ namespace piw { namespace device {
         EnumerationState (UidMap&);
 
         UidMap& map;
-        std::size_t counter;
+        std::atomic_size_t counter;
     };
 
     EnumerationState::EnumerationState (UidMap& m) :
@@ -64,7 +66,14 @@ namespace piw { namespace device {
 
     UidRegistry::UidRegistry (IPConnection* connection) :
         uids_ (),
-        state_ (new EnumerationState)
+        state_ (new EnumerationState (uids_))
     {
+        ipcon_register_callback (
+                connection,
+                IPCON_CALLBACK_ENUMERATE,
+                reinterpret_cast<void*> (&walk_bricklet),
+                state_.get ());
+
+        ipcon_enumerate (connection);
     }
 }}

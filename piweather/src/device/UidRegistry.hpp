@@ -27,6 +27,7 @@
 
 #include    <map>
 #include    <cstdint>
+#include    <memory>
 
 #include    <ip_connection.h>
 
