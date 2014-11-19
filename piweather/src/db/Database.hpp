@@ -27,6 +27,8 @@
 
 #include    "db/Values.hpp"
 
+#include    <string>
+
 struct sqlite3;
 
 namespace piw { namespace db {

@@ -25,6 +25,8 @@
 #include    "db/Database.hpp"
 
 #include    <stdexcept>
+#include    <chrono>
+#include    <memory>
 
 #include    <sqlite3.h>
 
@@ -36,7 +38,7 @@ namespace piw { namespace db {
             void bind_value (T value, int index, sqlite3_stmt* stmt)
             {
                 if (sqlite3_bind_text (stmt, index, value.c_str (), value.size (), 0) != SQLITE_OK) {
-                    throw std::runtime_error ();
+                    throw std::exception ();
                 }
             }
 
@@ -44,30 +46,33 @@ namespace piw { namespace db {
             void bind_value<double> (double value, int index, sqlite3_stmt* stmt)
             {
                 if (sqlite3_bind_double (stmt, index, value) != SQLITE_OK) {
-                    throw std::runtime_error ();
+                    throw std::exception ();
                 }
             }
 
-        struct Sql {
-            static const std::string insert {
-                "insert into piwvalues ("
+        struct Sql
+        {
+            static const std::string insert;
+        };
+
+        const std::string Sql::insert {
+            "insert into piwvalues ("
                 "temperature, "
                 "humidity, "
                 "pressure, "
                 "illumination, "
                 "date"
                 ") values (?, ?, ?, ?, ?);"
-            };
         };
 
         void bind_values (const Values& values, sqlite3_stmt* stmt)
         {
 
             int i {0};
-            bind_value (++i, values.temperature, stmt);
-            bind_value (++i, values.humidity, stmt);
-            bind_value (++i, values.pressure, stmt);
-            bind_value (++i, values.illumination, stmt);
+            bind_value (values.temperature, ++i, stmt);
+            bind_value (values.humidity, ++i, stmt);
+            bind_value (values.pressure, ++i, stmt);
+            bind_value (values.illumination, ++i, stmt);
 
             // TODO
             // BIND_STRING (++i, date, stmt)
@@ -78,7 +83,7 @@ namespace piw { namespace db {
             void operator() (sqlite3_stmt*) const;
         };
 
-        inline void StatementCloser::operator() (sqlite3_stmt* stmt)
+        inline void StatementCloser::operator() (sqlite3_stmt* stmt) const
         {
             sqlite3_finalize (stmt);
         }
@@ -99,7 +104,7 @@ namespace piw { namespace db {
     /**
      * Closes the database.
      */
-    Database::Database ()
+    Database::~Database ()
     {
         sqlite3_close (handle_);
     }
@@ -128,7 +133,7 @@ namespace piw { namespace db {
             bind_values (values, statement.get ());
 
             if (sqlite3_step (statement.get ()) != SQLITE_OK) {
-                throw std::runtime_error ();
+                throw std::exception ();
             }
         }
         catch (const std::exception&) {
