@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([piweather], [0.1], [david.daniel@students.ffhs.ch])
-AC_CONFIG_SRCDIR([src/enumerator.cpp])
+AC_CONFIG_SRCDIR([src/device/UidRegistry.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([gnu -Wall])
