@@ -25,11 +25,23 @@
 #ifndef PIW_DB_DATABASE_INC
 #define PIW_DB_DATABASE_INC
 
+#include    "db/Values.hpp"
+
+struct sqlite3;
+
 namespace piw { namespace db {
+
     class Database
     {
         public:
 
+            Database (const std::string&);
+            ~Database ();
+
+            Database& storeValues (const Values&);
+
+        private:
+            sqlite3* handle_;
     };
 }}
 

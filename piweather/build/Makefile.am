@@ -27,7 +27,9 @@ libpiweather_la_SOURCES		=\
 				 $(lib)/ip_connection.c \
 				 $(lib)/ip_connection.h \
 				 $(src)/device/UidRegistry.hpp \
-				 $(src)/device/UidRegistry.cpp
+				 $(src)/device/UidRegistry.cpp \
+				 $(src)/db/Database.hpp \
+				 $(src)/db/Database.cpp
 
 libpiweather_la_CFLAGS		= $(PTHREAD_CFLAGS) $(SQLITE3_CFLAGS)
 libpiweather_la_CXXFLAGS	= $(libpiweather_la_CFLAGS)
