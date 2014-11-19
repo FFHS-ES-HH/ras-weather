@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * uidregistry.hpp is free software copyrighted by David Daniel.
+ * Values.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,34 +22,22 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_DEVICE_UIDREGISTRY_INC
-#define PIW_DEVICE_UIDREGISTRY_INC
+#ifndef PIW_DB_VALUES_INC
+#define PIW_DB_VALUES_INC
 
-#include    <map>
-#include    <cstdint>
-#include    <memory>
+#include    <chrono>
 
-#include    <ip_connection.h>
+namespace piw { namespace db {
 
-namespace piw { namespace device {
-
-    struct EnumerationState;
-
-    class UidRegistry
+    struct Values
     {
-        public:
-            UidRegistry (IPConnection*);
-
-            UidRegistry (const UidRegistry&) = delete;
-            UidRegistry& operator= (const UidRegistry&) = delete;
-
-            const std::string& getUid (std::uint16_t) const;
-
-        private:
-            std::map<std::uint16_t, std::string> uids_;
-            std::unique_ptr<EnumerationState> state_;
+        double temperature;
+        double humidity;
+        double pressure;
+        double illumination;
+        std::time_point date;
     };
 }}
 
-#endif /* PIW_DEVICE_UIDREGISTRY_INC */
+#endif /* PIW_DB_VALUES_INC */
 

@@ -17,6 +17,7 @@ LT_INIT
 
 AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
 AX_PTHREAD
+AX_LIB_SQLITE3([3.0.0])
 
 # Checks for libraries.
 

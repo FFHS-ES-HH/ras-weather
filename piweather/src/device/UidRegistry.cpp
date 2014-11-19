@@ -34,7 +34,7 @@ namespace piw { namespace device {
 
     namespace {
 
-        typedef std::lock_guard<std::mutex> Lock;
+        typedef std::unique_lock<std::mutex> Lock;
 
         const size_t NrOfBricklets = 4;
     }
@@ -52,33 +52,34 @@ namespace piw { namespace device {
 
     EnumerationState::EnumerationState (UidMap& m) :
         map (m),
-        counter (NrOfBricklets)
+        counter (NrOfBricklets),
+        ready (false),
+        mutex (),
+        condition ()
     {}
 
     namespace {
 
         void fetch_bricklet (
                 const char* uid,
-                const char* connected_uid,
-                char position,
-                uint8_t hardware_version[3],
-                uint8_t firmware_version[3],
+                const char* /* connected_uid */,
+                char /* position */,
+                uint8_t /* hardware_version */[3],
+                uint8_t /* firmware_version */[3],
                 uint16_t device_identifier,
                 uint8_t enumeration_type,
                 void* user_data) 
         {
+            EnumerationState* state = static_cast<EnumerationState*> (user_data);
+
             if (enumeration_type != IPCON_ENUMERATION_TYPE_DISCONNECTED) {
 
-                EnumerationState* state = static_cast<EnumerationState*> (user_data);
+                state->map.emplace (device_identifier, uid);
 
-                state->map.push_back (std::make_pair (device_identifier, uid));
-                --(state->counter);
+                if (--(state->counter) == 0) {
 
-                if (state->counter.get () == 0) {
-                    state->ready.set (true);
-
-                    Lock lock (state->mutex);
-                    state->condition.notify_all (lock);
+                    state->ready.store (true);
+                    state->condition.notify_all ();
                 }
             }
         }
@@ -105,17 +106,17 @@ namespace piw { namespace device {
      */
     const std::string& UidRegistry::getUid (std::uint16_t id) const
     {
-        while (!state_->ready.get ()) {
+        while (!state_->ready.load ()) {
             Lock lock (state_->mutex);
             state_->condition.wait (lock);
         }
 
-        UidMap::const_iterator atDevice = uids_.find (id);
+        UidMap::const_iterator uid = uids_.find (id);
 
-        if (atDevice == uids_.end ()) {
+        if (uid == uids_.end ()) {
             throw std::runtime_error ("The desired device cannot be found.");
         }
 
-        return atDevice->second;
+        return uid->second;
     }
 }}

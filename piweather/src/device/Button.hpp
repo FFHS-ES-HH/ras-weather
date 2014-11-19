@@ -26,6 +26,7 @@
 #define PIW_DEVICE_BUTTON_INC
 
 #include    <ip_connection.h>
+#include    <bricklet_lcd_20x4.h>
 
 #include    "device/UidRegistry.hpp"
 
