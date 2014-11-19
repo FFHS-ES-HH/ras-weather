@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Lcd.hpp is free software copyrighted by David Daniel.
+ * Button.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,32 +22,21 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_VIEW_LCD_INC
-#define PIW_VIEW_LCD_INC
+#include    "device/Button.hpp"
 
-#include    <string>
+namespace piw { namespace device {
 
-#include    <bricklet_lcd_20x4.h>
-
-#include    <device/UidRegistry.hpp>
-
-namespace piw { namespace view {
-
-    class Lcd
+    Button::Button (IPConnection* connection, const UidRegistry& registry)
     {
-        public:
-            Lcd (IPConnection*, const device::UidRegistry&);
-            ~Lcd ();
+        lcd_20x4_create (
+                &lcd_,
+                registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
+                connection);
+    }
 
-            Lcd& write (unsigned, unsigned, const std::string&);
-            Lcd& backlightOn ();
-            Lcd& backlightOff ();
-            Lcd& clear ();
-
-        private:
-            LCD20x4 lcd_;
-    };
+    Button::~Button ()
+    {
+        lcd_20x4_destroy (&lcd_);
+    }
 }}
-
-#endif /* PIW_VIEW_LCD_INC */
 
