@@ -25,12 +25,17 @@
 #include    "UidRegistry.hpp"
 
 #include    <atomic>
+#include    <mutex>
+#include    <condition_variable>
 
 namespace piw { namespace device {
 
     typedef std::map<std::uint16_t, std::string> UidMap;
 
     namespace {
+
+        typedef std::lock_guard<std::mutex> Lock;
+
         const size_t NrOfBricklets = 4;
     }
 
@@ -40,6 +45,9 @@ namespace piw { namespace device {
 
         UidMap& map;
         std::atomic_size_t counter;
+        std::atomic_bool ready;
+        std::mutex mutex;
+        std::condition_variable condition;
     };
 
     EnumerationState::EnumerationState (UidMap& m) :
@@ -49,7 +57,7 @@ namespace piw { namespace device {
 
     namespace {
 
-        void walk_bricklet (
+        void fetch_bricklet (
                 const char* uid,
                 const char* connected_uid,
                 char position,
@@ -59,9 +67,21 @@ namespace piw { namespace device {
                 uint8_t enumeration_type,
                 void* user_data) 
         {
-            EnumerationState* state = static_cast<EnumerationState*> (user_data);
-        }
+            if (enumeration_type != IPCON_ENUMERATION_TYPE_DISCONNECTED) {
 
+                EnumerationState* state = static_cast<EnumerationState*> (user_data);
+
+                state->map.push_back (std::make_pair (device_identifier, uid));
+                --(state->counter);
+
+                if (state->counter.get () == 0) {
+                    state->ready.set (true);
+
+                    Lock lock (state->mutex);
+                    state->condition.notify_all (lock);
+                }
+            }
+        }
     }
 
     UidRegistry::UidRegistry (IPConnection* connection) :
@@ -71,9 +91,31 @@ namespace piw { namespace device {
         ipcon_register_callback (
                 connection,
                 IPCON_CALLBACK_ENUMERATE,
-                reinterpret_cast<void*> (&walk_bricklet),
+                reinterpret_cast<void*> (&fetch_bricklet),
                 state_.get ());
 
         ipcon_enumerate (connection);
+    }
+
+    /**
+     * Returns the uid of the desired device.
+     * @param id the device id
+     * @return  the desired uid
+     * @throws std::runtime_error if the desired device cannot be found
+     */
+    const std::string& UidRegistry::getUid (std::uint16_t id) const
+    {
+        while (!state_->ready.get ()) {
+            Lock lock (state_->mutex);
+            state_->condition.wait (lock);
+        }
+
+        UidMap::const_iterator atDevice = uids_.find (id);
+
+        if (atDevice == uids_.end ()) {
+            throw std::runtime_error ("The desired device cannot be found.");
+        }
+
+        return atDevice->second;
     }
 }}

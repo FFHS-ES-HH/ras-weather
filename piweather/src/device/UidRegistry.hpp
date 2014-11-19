@@ -22,8 +22,8 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef UIDREGISTRY_INC
-#define UIDREGISTRY_INC
+#ifndef PIW_DEVICE_UIDREGISTRY_INC
+#define PIW_DEVICE_UIDREGISTRY_INC
 
 #include    <map>
 #include    <cstdint>
@@ -39,7 +39,6 @@ namespace piw { namespace device {
     {
         public:
             UidRegistry (IPConnection*);
-            ~UidRegistry ();
 
             const std::string& getUid (std::uint16_t) const;
 
@@ -49,5 +48,5 @@ namespace piw { namespace device {
     };
 }}
 
-#endif /* UIDREGISTRY_INC */
+#endif /* PIW_DEVICE_UIDREGISTRY_INC */
 
