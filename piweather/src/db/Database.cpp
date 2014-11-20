@@ -23,6 +23,7 @@
  * under certain conditions.
  */
 #include    "db/Database.hpp"
+#include    "util/DateConverter.hpp"
 
 #include    <stdexcept>
 #include    <chrono>
@@ -34,11 +35,16 @@ namespace piw { namespace db {
 
     namespace {
 
+        struct Sql
+        {
+            static const std::string insert;
+        };
+
         template<typename T>
             void bind_value (T value, int index, sqlite3_stmt* stmt)
             {
                 if (sqlite3_bind_text (stmt, index, value.c_str (), value.size (), 0) != SQLITE_OK) {
-                    throw std::exception ();
+                    throw std::runtime_error ("Cannot bind the given value.");
                 }
             }
 
@@ -46,37 +52,9 @@ namespace piw { namespace db {
             void bind_value<double> (double value, int index, sqlite3_stmt* stmt)
             {
                 if (sqlite3_bind_double (stmt, index, value) != SQLITE_OK) {
-                    throw std::exception ();
+                    throw std::runtime_error ("Cannot bind the given value.");
                 }
             }
-
-        struct Sql
-        {
-            static const std::string insert;
-        };
-
-        const std::string Sql::insert {
-            "insert into piwvalues ("
-                "temperature, "
-                "humidity, "
-                "pressure, "
-                "illumination, "
-                "date"
-                ") values (?, ?, ?, ?, ?);"
-        };
-
-        void bind_values (const Values& values, sqlite3_stmt* stmt)
-        {
-
-            int i {0};
-            bind_value (values.temperature, ++i, stmt);
-            bind_value (values.humidity, ++i, stmt);
-            bind_value (values.pressure, ++i, stmt);
-            bind_value (values.illumination, ++i, stmt);
-
-            // TODO
-            // BIND_STRING (++i, date, stmt)
-        }
 
         struct StatementCloser
         {
@@ -87,6 +65,16 @@ namespace piw { namespace db {
         {
             sqlite3_finalize (stmt);
         }
+
+        const std::string Sql::insert {
+            "insert into piwvalues ("
+                "temperature, "
+                "humidity, "
+                "pressure, "
+                "illumination, "
+                "date"
+                ") values (?, ?, ?, ?, ?);"
+        };
     }
 
     /**
@@ -127,16 +115,16 @@ namespace piw { namespace db {
         }
 
         std::unique_ptr<sqlite3_stmt, StatementCloser> statement (stmt);
+        const util::DateConverter converter;
 
-        try {
+        int i {0};
+        bind_value (values.temperature, ++i, stmt);
+        bind_value (values.humidity, ++i, stmt);
+        bind_value (values.pressure, ++i, stmt);
+        bind_value (values.illumination, ++i, stmt);
+        bind_value (converter.toString (values.date), ++i, stmt);
 
-            bind_values (values, statement.get ());
-
-            if (sqlite3_step (statement.get ()) != SQLITE_OK) {
-                throw std::exception ();
-            }
-        }
-        catch (const std::exception&) {
+        if (sqlite3_step (statement.get ()) != SQLITE_OK) {
             throw std::runtime_error ("Error on inserting values.");
         }
 
