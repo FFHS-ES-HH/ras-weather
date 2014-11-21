@@ -93,9 +93,9 @@ namespace piw { namespace db {
                 "temperature, "
                 "humidity, "
                 "pressure, "
-                "illumination, "
-                "date"
-                ") values (?, ?, ?, ?, ?);"
+                "illuminance, "
+                "created_at"
+                ") values (?, ?, ?, ?, ?)"
         };
     }
 
