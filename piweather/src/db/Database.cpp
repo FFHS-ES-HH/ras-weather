@@ -23,7 +23,6 @@
  * under certain conditions.
  */
 #include    "db/Database.hpp"
-#include    "util/DateConverter.hpp"
 
 #include    <stdexcept>
 #include    <chrono>
@@ -43,7 +42,7 @@ namespace piw { namespace db {
         template<typename T>
             void bind_value (T value, int index, sqlite3_stmt* stmt)
             {
-                if (sqlite3_bind_text (stmt, index, value.c_str (), value.size (), 0) != SQLITE_OK) {
+                if (sqlite3_bind_int (stmt, index, value) != SQLITE_OK) {
                     throw std::runtime_error ("Cannot bind the given value.");
                 }
             }
@@ -53,6 +52,29 @@ namespace piw { namespace db {
             {
                 if (sqlite3_bind_double (stmt, index, value) != SQLITE_OK) {
                     throw std::runtime_error ("Cannot bind the given value.");
+                }
+            }
+
+        template<typename T>
+            void bind_reference (const T& value, int index, sqlite3_stmt* stmt)
+            {
+                if (sqlite3_bind_text (stmt, index, value.c_str (), value.size (), 0) != SQLITE_OK) {
+                    throw std::runtime_error ("Cannot bind the given value.");
+                }
+            }
+
+        template<>
+            void bind_reference<std::chrono::system_clock::time_point> (
+                    const std::chrono::system_clock::time_point& value,
+                    int index,
+                    sqlite3_stmt* stmt)
+            {
+                std::uint64_t seconds = std::chrono::duration_cast<
+                    std::chrono::seconds> (value.time_since_epoch ())
+                    .count ();
+
+                if (sqlite3_bind_int64 (stmt, index, seconds) != SQLITE_OK) {
+                    throw std::runtime_error ("Cannot bind the given date.");
                 }
             }
 
@@ -115,14 +137,13 @@ namespace piw { namespace db {
         }
 
         std::unique_ptr<sqlite3_stmt, StatementCloser> statement (stmt);
-        const util::DateConverter converter;
 
         int i {0};
         bind_value (values.temperature, ++i, stmt);
         bind_value (values.humidity, ++i, stmt);
         bind_value (values.pressure, ++i, stmt);
         bind_value (values.illumination, ++i, stmt);
-        bind_value (converter.toString (values.date), ++i, stmt);
+        bind_reference (values.date, ++i, stmt);
 
         if (sqlite3_step (statement.get ()) != SQLITE_OK) {
             throw std::runtime_error ("Error on inserting values.");

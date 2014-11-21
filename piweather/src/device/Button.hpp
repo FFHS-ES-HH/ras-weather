@@ -30,16 +30,19 @@
 
 #include    "device/UidRegistry.hpp"
 
+#include    <cstdint>
+
 namespace piw { namespace device {
 
     class Button
     {
         public:
-            Button (IPConnection*, const UidRegistry&);
+            Button (IPConnection*, const UidRegistry&, std::uint8_t);
             ~Button ();
 
         private:
             LCD20x4 lcd_;
+            std::uint8_t button_;
     };
 }}
 

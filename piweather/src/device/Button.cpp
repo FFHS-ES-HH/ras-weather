@@ -26,7 +26,11 @@
 
 namespace piw { namespace device {
 
-    Button::Button (IPConnection* connection, const UidRegistry& registry)
+    Button::Button (
+            IPConnection* connection,
+            const UidRegistry& registry,
+            std::uint8_t which) :
+        button_ (which)
     {
         lcd_20x4_create (
                 &lcd_,
