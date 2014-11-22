@@ -11,36 +11,54 @@ piweather_SOURCES		=\
 				 $(src)/view/Lcd.hpp \
 				 $(src)/view/Lcd.cpp \
 				 $(src)/view/Viewable.hpp \
-				 $(src)/device/Observable.hpp \
-				 $(src)/device/Observable.cpp \
-				 $(src)/device/Button.hpp \
-				 $(src)/device/Button.cpp \
-				 $(src)/db/Values.hpp
+				 $(src)/db/Values.hpp \
+				 $(src)/Application.hpp \
+				 $(src)/Application.cpp \
+				 $(src)/piw-daemon.cpp
 
 piweather_LDADD			= libpiweather.la
 
 libpiweather_la_SOURCES		=\
 				 $(lib)/bricklet_ambient_light.c \
-				 $(lib)/bricklet_ambient_light.h \
 				 $(lib)/bricklet_barometer.c \
-				 $(lib)/bricklet_barometer.h \
 				 $(lib)/bricklet_humidity.c \
-				 $(lib)/bricklet_humidity.h \
 				 $(lib)/bricklet_lcd_20x4.c \
-				 $(lib)/bricklet_lcd_20x4.h \
 				 $(lib)/ip_connection.c \
-				 $(lib)/ip_connection.h \
-				 $(src)/device/UidRegistry.hpp \
 				 $(src)/device/UidRegistry.cpp \
-				 $(src)/db/Database.hpp \
+				 $(src)/device/Observable.cpp \
+				 $(src)/device/Button.cpp \
 				 $(src)/db/Database.cpp \
-				 $(src)/sensors/Temperature.hpp \
 				 $(src)/sensors/Temperature.cpp \
-				 $(src)/sensors/ThresholdObservable.hpp \
-				 $(src)/sensors/Barometer.hpp \
 				 $(src)/sensors/Barometer.cpp \
-				 $(src)/sensors/Humidity.hpp \
+				 $(src)/sensors/Illuminance.cpp \
 				 $(src)/sensors/Humidity.cpp
+
+libpiweather_la_includedir	= $(includedir)/piweather
+libpiweatherdevice_includedir	= $(libpiweather_la_includedir)/device
+libpiweathersensors_includedir	= $(libpiweather_la_includedir)/sensors
+libpiweatherdb_includedir	= $(libpiweather_la_includedir)/db
+
+libpiweather_la_include_HEADERS	=\
+				 $(lib)/bricklet_ambient_light.h \
+				 $(lib)/bricklet_barometer.h \
+				 $(lib)/bricklet_humidity.h \
+				 $(lib)/bricklet_lcd_20x4.h \
+				 $(lib)/ip_connection.h
+
+libpiweatherdevice_include_HEADERS =\
+				 $(src)/device/UidRegistry.hpp \
+				 $(src)/device/Observable.hpp \
+				 $(src)/device/Button.hpp
+
+libpiweathersensors_include_HEADERS =\
+				 $(src)/sensors/ThresholdObservable.hpp \
+				 $(src)/sensors/Humidity.hpp \
+				 $(src)/sensors/Barometer.hpp \
+				 $(src)/sensors/Illuminance.hpp \
+				 $(src)/sensors/Temperature.hpp
+
+libpiweatherdb_include_HEADERS =\
+				 $(src)/db/Database.hpp
 
 libpiweather_la_CFLAGS		= $(PTHREAD_CFLAGS) $(SQLITE3_CFLAGS)
 libpiweather_la_CXXFLAGS	= $(libpiweather_la_CFLAGS)

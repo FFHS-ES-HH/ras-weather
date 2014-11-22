@@ -51,6 +51,11 @@ namespace piw { namespace sensors {
                 wrapper (), this);
     }
 
+    Humidity::~Humidity ()
+    {
+        humidity_destroy (&sensor);
+    }
+
     std::uint16_t Humidity::read ()
     {
         std::uint16_t value;
@@ -74,6 +79,7 @@ namespace piw { namespace sensors {
     void Humidity::valueChanged (std::uint16_t current)
     {
         value (current);
-        ThresholdObservable<std::uint16_t>::adjust ();
+        ThresholdObservable::adjust ();
+        notifyObservers ();
     }
 }}
