@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Barometer.cpp is free software copyrighted by David Daniel.
+ * Humidity.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,64 +22,58 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    <sensors/Barometer.hpp>
+#include    "sensors/Humidity.hpp"
 
 #include    <stdexcept>
 
 namespace piw { namespace sensors {
 
     /**
-     * Constructs a new Barometer.
+     * Constructs a new Humidity.
      */
-    Barometer::Barometer (
+    Humidity::Humidity (
             IPConnection* connection,
             const device::UidRegistry& registry,
-            std::int32_t threshold) :
+            std::uint16_t threshold) :
 
         ThresholdObservable {threshold}
     {
-        barometer_create (
-                &barometer,
-                registry.getUid (BAROMETER_DEVICE_IDENTIFIER).c_str (),
+        humidity_create (
+                &sensor,
+                registry.getUid (HUMIDITY_DEVICE_IDENTIFIER).c_str (),
                 connection);
 
         init ();
 
-        barometer_register_callback (
-                &barometer,
-                BAROMETER_CALLBACK_AIR_PRESSURE_REACHED,
+        humidity_register_callback (
+                &sensor,
+                HUMIDITY_CALLBACK_HUMIDITY_REACHED,
                 wrapper (), this);
     }
 
-    Barometer::~Barometer ()
-    { barometer_destroy (&barometer); }
-
-    std::int32_t Barometer::read ()
+    std::uint16_t Humidity::read ()
     {
-        std::int32_t value;
+        std::uint16_t value;
 
-        if (barometer_get_air_pressure (&barometer, &value) < 0) {
-            throw std::runtime_error ("Cannot get the air pressure.");
+        if (humidity_get_humidity (&sensor, &value) < 0) {
+            throw std::runtime_error ("Cannot get the humidity.");
         }
 
         return value;
     }
 
-    void Barometer::adjust (std::int32_t low, std::int32_t high)
+    void Humidity::adjust (std::uint16_t low, std::uint16_t high)
     {
-        int result = barometer_set_air_pressure_callback_threshold (
-                &barometer, 'o', low, high);
+        int result = humidity_set_humidity_callback_threshold (&sensor, 'o', low, high);
 
         if (result < 0) {
-            throw std::runtime_error ("Cannot adjust the air pressure threshold.");
+            throw std::runtime_error ("Cannot adjust the humidity threshold.");
         }
     }
 
-    void Barometer::valueChanged (std::int32_t v)
+    void Humidity::valueChanged (std::uint16_t current)
     {
-        value (v);
-        ThresholdObservable<std::int32_t>::adjust ();
-        notifyObservers ();
+        value (current);
+        ThresholdObservable<std::uint16_t>::adjust ();
     }
 }}
-

@@ -46,13 +46,14 @@ namespace piw { namespace sensors {
         protected:
             void init ();
             void value (T);
+            void adjust ();
 
             static void* wrapper ();
             static void wrap (T, void*);
 
         protected:
             virtual T read () = 0;
-            virtual void adjust () = 0;
+            virtual void adjust (T min, T max) = 0;
             virtual void valueChanged (T) = 0;
 
         private:
@@ -102,6 +103,14 @@ namespace piw { namespace sensors {
         {
             value (read ());
             adjust ();
+        }
+
+    template<typename T>
+        void ThresholdObservable<T>::adjust ()
+        {
+            T current {value ()};
+            T thresh {threshold ()};
+            adjust (current - thresh, current + thresh);
         }
 
     template<typename T>

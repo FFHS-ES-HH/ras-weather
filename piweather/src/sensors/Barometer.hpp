@@ -31,8 +31,6 @@
 #include    "ip_connection.h"
 #include    "bricklet_barometer.h"
 
-#include    <memory>
-
 namespace piw { namespace sensors {
 
     class Barometer : public ThresholdObservable<std::int32_t>
@@ -46,14 +44,14 @@ namespace piw { namespace sensors {
             double pressure () const;
 
         protected:
-            virtual void adjust ();
+            virtual void adjust (std::int32_t, std::int32_t);
             virtual std::int32_t read ();
 
         protected:
             virtual void valueChanged (std::int32_t);
 
         private:
-            std::unique_ptr<::Barometer> barometer;
+            ::Barometer barometer;
     };
 
     inline double Barometer::pressure () const

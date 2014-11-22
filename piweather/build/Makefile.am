@@ -38,7 +38,9 @@ libpiweather_la_SOURCES		=\
 				 $(src)/sensors/Temperature.cpp \
 				 $(src)/sensors/ThresholdObservable.hpp \
 				 $(src)/sensors/Barometer.hpp \
-				 $(src)/sensors/Barometer.cpp
+				 $(src)/sensors/Barometer.cpp \
+				 $(src)/sensors/Humidity.hpp \
+				 $(src)/sensors/Humidity.cpp
 
 libpiweather_la_CFLAGS		= $(PTHREAD_CFLAGS) $(SQLITE3_CFLAGS)
 libpiweather_la_CXXFLAGS	= $(libpiweather_la_CFLAGS)

@@ -36,34 +36,33 @@ namespace piw { namespace sensors {
             const device::UidRegistry& registry,
             std::int16_t threshold) :
 
-        ThresholdObservable {threshold},
-        barometer {new Barometer}
+        ThresholdObservable {threshold}
     {
         barometer_create (
-                barometer.get (),
+                &barometer,
                 registry.getUid (BAROMETER_DEVICE_IDENTIFIER).c_str (),
                 connection);
 
         init ();
 
-        if (barometer_set_air_pressure_callback_period (barometer.get (), 500) < 0) {
+        if (barometer_set_air_pressure_callback_period (&barometer, 500) < 0) {
             throw std::runtime_error ("Cannot set the temperature callback period.");
         }
 
         barometer_register_callback (
-                barometer.get (),
+                &barometer,
                 BAROMETER_CALLBACK_AIR_PRESSURE,
                 reinterpret_cast<void*> (&Temperature::wrap), this);
     }
 
     Temperature::~Temperature ()
-    { barometer_destroy (barometer.get ()); }
+    { barometer_destroy (&barometer); }
 
     std::int16_t Temperature::read ()
     {
         std::int16_t temp;
 
-        if (barometer_get_chip_temperature (barometer.get (), &temp) < 0) {
+        if (barometer_get_chip_temperature (&barometer, &temp) < 0) {
             throw std::runtime_error ("Cannot get the temperature.");
         }
 
