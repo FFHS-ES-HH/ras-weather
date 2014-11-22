@@ -47,7 +47,10 @@ namespace piw { namespace device {
     void Observable::notifyObservers ()
     {
         for (const Observers::value_type& o : observers_) {
-            o.second ();
+            try {
+                o.second ();
+            }
+            catch (const std::exception&) { /* ignored */ }
         }
     }
 }}

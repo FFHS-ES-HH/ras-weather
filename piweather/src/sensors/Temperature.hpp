@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Button.hpp is free software copyrighted by David Daniel.
+ * Temperature.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,48 +22,47 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_DEVICE_BUTTON_INC
-#define PIW_DEVICE_BUTTON_INC
-
-#include    <ip_connection.h>
-#include    <bricklet_lcd_20x4.h>
+#ifndef PIW_SENSORS_TEMPERATURE_INC
+#define PIW_SENSORS_TEMPERATURE_INC
 
 #include    "device/Observable.hpp"
 #include    "device/UidRegistry.hpp"
 
-#include    <cstdint>
+#include    "sensors/ThresholdObservable.hpp"
+
+#include    <bricklet_barometer.h>
+#include    <ip_connection.h>
+
 #include    <memory>
 
-namespace piw { namespace device {
+namespace piw { namespace sensors {
 
-    class Button : public Observable
+    class Temperature : public ThresholdObservable<std::int16_t>
     {
-        public:
-            enum class Sensitivity
-            {
-                OnPressure,
-                OnRelease
-            };
+        friend class ThresholdObservable;
 
         public:
-            Button (
-                    IPConnection*,
-                    const UidRegistry&,
-                    std::uint8_t,
-                    Sensitivity = Sensitivity::OnPressure);
+            Temperature (IPConnection*, const device::UidRegistry&, std::int16_t = 10);
+            virtual ~Temperature ();
 
-            virtual ~Button ();
-
-            bool isPressed () const;
+            double temperature () const;
 
         protected:
-            static void call (std::uint8_t, void*);
+            virtual std::int16_t read ();
+            virtual void adjust () {}
+
+            virtual void valueChanged (std::int16_t) {}
+            void check (std::int32_t);
+
+            static void wrap (std::int32_t, void*);
 
         private:
-            std::unique_ptr<LCD20x4> lcd_;
-            std::uint8_t button_;
+            std::unique_ptr<Barometer> barometer;
     };
+
+    inline double Temperature::temperature () const
+    { return value () / 100; }
 }}
 
-#endif /* PIW_DEVICE_BUTTON_INC */
+#endif /* PIW_SENSORS_TEMPERATURE_INC */
 

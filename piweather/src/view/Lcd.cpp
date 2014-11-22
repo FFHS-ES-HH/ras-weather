@@ -28,8 +28,6 @@
 
 namespace piw { namespace view {
 
-    using device::UidRegistry;
-
     namespace {
 
         struct LcdMetrics
@@ -42,7 +40,7 @@ namespace piw { namespace view {
     /**
      * Constructs a new Lcd.
      */
-    Lcd::Lcd (IPConnection* connection, const UidRegistry& registry) :
+    Lcd::Lcd (IPConnection* connection, const device::UidRegistry& registry) :
         lcd_ (new LCD20x4)
     {
         lcd_20x4_create (

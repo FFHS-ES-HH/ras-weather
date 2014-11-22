@@ -31,24 +31,39 @@ namespace piw { namespace device {
     Button::Button (
             IPConnection* connection,
             const UidRegistry& registry,
-            std::uint8_t which) :
+            std::uint8_t which,
+            Button::Sensitivity sensitivity) :
+        lcd_ (new LCD20x4 ()),
         button_ (which)
     {
         lcd_20x4_create (
-                &lcd_,
+                lcd_.get (),
                 registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
                 connection);
 
         lcd_20x4_register_callback (
-                &lcd_,
-                LCD_20X4_CALLBACK_BUTTON_PRESSED,
+                lcd_.get (),
+                sensitivity == Sensitivity::OnPressure
+                    ? LCD_20X4_CALLBACK_BUTTON_PRESSED
+                    : LCD_20X4_CALLBACK_BUTTON_RELEASED,
                 reinterpret_cast<void*> (&Button::call),
                 this);
     }
 
     Button::~Button ()
     {
-        lcd_20x4_destroy (&lcd_);
+        lcd_20x4_destroy (lcd_.get ());
+    }
+
+    bool Button::isPressed () const
+    {
+        bool isPressed = false;
+
+        if (lcd_20x4_is_button_pressed (lcd_.get (), button_, &isPressed) < 0) {
+            throw std::runtime_error ("Cannot evaluate whether the button is pressed.");
+        }
+
+        return isPressed;
     }
 
     void Button::call (std::uint8_t button, void* user_data)
