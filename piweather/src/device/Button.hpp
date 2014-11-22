@@ -28,17 +28,21 @@
 #include    <ip_connection.h>
 #include    <bricklet_lcd_20x4.h>
 
+#include    "device/Observable.hpp"
 #include    "device/UidRegistry.hpp"
 
 #include    <cstdint>
 
 namespace piw { namespace device {
 
-    class Button
+    class Button : public Observable
     {
         public:
             Button (IPConnection*, const UidRegistry&, std::uint8_t);
-            ~Button ();
+            virtual ~Button ();
+
+        protected:
+            static void call (std::uint8_t, void*);
 
         private:
             LCD20x4 lcd_;

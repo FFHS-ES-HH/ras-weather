@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Lcd.hpp is free software copyrighted by David Daniel.
+ * Observable.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,34 +22,33 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_VIEW_LCD_INC
-#define PIW_VIEW_LCD_INC
+#include    "device/Observable.hpp"
 
-#include    <bricklet_lcd_20x4.h>
+namespace piw { namespace device {
 
-#include    <device/UidRegistry.hpp>
+    namespace {
+        typedef std::map<const void*, Observable::Observer> Observers;
+    }
 
-#include    <string>
-#include    <memory>
-
-namespace piw { namespace view {
-
-    class Lcd
+    void Observable::addObserver (const Observable::Observer& observer)
     {
-        public:
-            Lcd (IPConnection*, const device::UidRegistry&);
-            ~Lcd ();
+        observers_.insert (std::make_pair (&observer, observer));
+    }
 
-            Lcd& write (unsigned, unsigned, const std::string&);
-            Lcd& backlightOn ();
-            Lcd& backlightOff ();
-            bool isBacklightOn () const;
-            Lcd& clear ();
+    void Observable::removeObserver (const Observable::Observer& observer)
+    {
+        Observers::iterator existing = observers_.find (&observer);
 
-        private:
-            std::unique_ptr<LCD20x4> lcd_;
-    };
+        if (existing != observers_.end ()) {
+            observers_.erase (existing);
+        }
+    }
+
+    void Observable::notifyObservers ()
+    {
+        for (const Observers::value_type& o : observers_) {
+            o.second ();
+        }
+    }
 }}
-
-#endif /* PIW_VIEW_LCD_INC */
 

@@ -24,6 +24,8 @@
  */
 #include    "device/Button.hpp"
 
+#include    <stdexcept>
+
 namespace piw { namespace device {
 
     Button::Button (
@@ -36,11 +38,26 @@ namespace piw { namespace device {
                 &lcd_,
                 registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
                 connection);
+
+        lcd_20x4_register_callback (
+                &lcd_,
+                LCD_20X4_CALLBACK_BUTTON_PRESSED,
+                reinterpret_cast<void*> (&Button::call),
+                this);
     }
 
     Button::~Button ()
     {
         lcd_20x4_destroy (&lcd_);
+    }
+
+    void Button::call (std::uint8_t button, void* user_data)
+    {
+        Button* self = static_cast<Button*> (user_data);
+
+        if (button == self->button_) {
+            self->notifyObservers ();
+        }
     }
 }}
 

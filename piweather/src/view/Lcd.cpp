@@ -24,50 +24,86 @@
  */
 #include    "view/Lcd.hpp"
 
+#include    <stdexcept>
+
 namespace piw { namespace view {
 
     using device::UidRegistry;
 
+    namespace {
+
+        struct LcdMetrics
+        {
+            static const unsigned Lines = 4;
+            static const unsigned Columns = 20;
+        };
+    }
+
     /**
      * Constructs a new Lcd.
      */
-    Lcd::Lcd (IPConnection* connection, const UidRegistry& registry)
+    Lcd::Lcd (IPConnection* connection, const UidRegistry& registry) :
+        lcd_ (new LCD20x4)
     {
         lcd_20x4_create (
-                &lcd_,
+                lcd_.get (),
                 registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
                 connection);
     }
 
     Lcd::~Lcd ()
     {
-        lcd_20x4_destroy (&lcd_);
+        lcd_20x4_destroy (lcd_.get ());
     }
 
     Lcd& Lcd::backlightOn ()
     {
-        lcd_20x4_backlight_on (&lcd_);
+        if (lcd_20x4_backlight_on (lcd_.get ()) < 0) {
+            throw std::runtime_error ("Cannot switch on the backlight of the lcd.");
+        }
 
         return *this;
     }
 
     Lcd& Lcd::backlightOff ()
     {
-        lcd_20x4_backlight_off (&lcd_);
+        if (lcd_20x4_backlight_off (lcd_.get ()) < 0) {
+            throw std::runtime_error ("Cannot switch off the backlight of the lcd.");
+        }
 
         return *this;
     }
 
+    bool Lcd::isBacklightOn () const
+    {
+        bool isOn = false;
+
+        if (lcd_20x4_is_backlight_on (lcd_.get (), &isOn) < 0) {
+            throw std::runtime_error ("Cannot evaluate whether the backlight is on.");
+        }
+
+        return isOn;
+    }
+
     Lcd& Lcd::write (unsigned line, unsigned column, const std::string& text)
     {
-        lcd_20x4_write_line (&lcd_, line, column, text.c_str ());
+        if (line > LcdMetrics::Lines || column > LcdMetrics::Columns) {
+            throw std::invalid_argument (
+                    "The given position to write on the lcd is beyond borders.");
+        }
+
+        if (lcd_20x4_write_line (lcd_.get (), line, column, text.c_str ()) < 0) {
+            throw std::runtime_error ("Cannot write the given text on the lcd.");
+        }
 
         return *this;
     }
 
     Lcd& Lcd::clear ()
     {
-        lcd_20x4_clear_display (&lcd_);
+        if (lcd_20x4_clear_display (lcd_.get ()) < 0) {
+            throw std::runtime_error ("Cannot clear the display on the lcd.");
+        }
 
         return *this;
     }

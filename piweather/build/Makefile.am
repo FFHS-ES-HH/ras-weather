@@ -11,6 +11,8 @@ piweather_SOURCES		=\
 				 $(src)/view/Lcd.hpp \
 				 $(src)/view/Lcd.cpp \
 				 $(src)/view/Viewable.hpp \
+				 $(src)/device/Observable.hpp \
+				 $(src)/device/Observable.cpp \
 				 $(src)/device/Button.hpp \
 				 $(src)/device/Button.cpp \
 				 $(src)/db/Values.hpp
