@@ -3,7 +3,7 @@
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
 	font-size: 10pt;
 	color: #4b4b4b; 
-	background-color: #e4e4e4
+	background-color: #ffffff
 }
 
 td
@@ -20,44 +20,22 @@ th
 	font-weight: normal;
 }
 
-a:link 
-{
-	color:#4b4b4b
-}
-
-a:visited 
-{
-	color:#4b4b4b
-}
-
-a:hover 
-{
-	color:#4b4b4b; 
-	background-color:#d2d2d2;
-}
-
 .NavigationTab
 {
-	background: rgba(187, 17, 66, 1.0);
-	border-left: 2px #4b4b4b solid; 
-	border-right: 2px #4b4b4b solid; 
-	border-top: 2px #4b4b4b solid; 
-	width: 110px; 
+	background: #bb1142;
+	border: 2px #4b4b4b solid; 
+	width: 142px; 
 	text-align: center; 
 	cursor: hand;
 	color: white;
 }
 
-.TableHeaderWithBorder
+.NavigationTabSelected
 {
-	height: 30px;
-	border: thin solid black;
-	background: #b9b9b9;
-}
-
-.TableCellWithBorder
-{
-	height: 30px;
-	border: thin solid black;
-	
+	background: #75aa28;
+	border: 2px #4b4b4b solid; 
+	width: 142px; 
+	text-align: center; 
+	cursor: hand;
+	color: white;
 }

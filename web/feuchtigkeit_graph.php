@@ -1,27 +1,39 @@
 <?php
+	// Die Klassen für den Graphen werden benötigt
 	require_once ("/usr/share/jpgraph/jpgraph.php");
 	require_once ("/usr/share/jpgraph/jpgraph_line.php");
-
+	
+	// Die Datenbank öffnen
+	$dbFileName = "/var/piweather/piweather.sqlite3";	
+	$db = new SQLite3($dbFileName);
+	
+	// Die Temperatur-Einträge ermitteln
+	$query = "SELECT * FROM piw_values ORDER BY id DESC LIMIT 10";
+	$results = $db->query($query);
+	
+	// Die Werte der Y-Achse definieren
+	$labels = array();
+	$yValues = array();
+	while ($row = $results->fetchArray()) {
+		$labels[] = date("H:i", $row['created_at']);
+		$yValues[] = $row['humidity'];
+	}	
+	
+	// Die Datenbank wieder schliessen
+	$db->close();
+	
+	// Den Graphen erstellen
 	$graph = new Graph(600,300,"auto");   	
-	
-	// Die Daten des Graphen
 	$graph->SetScale("textlin");
-	$ydata = array(11,3,8,12,5,1,9,13,5,7); 
-	$lineplot=new LinePlot($ydata);
-	$graph->Add($lineplot);
+	$graph->img->SetMargin(40, 20, 20, 40);
+	$graph->xaxis->SetTickLabels(array_reverse($labels));
 	
-	// Die Bezeichnungen des Graphen
-	$graph->title->Set("Die letzten Luftfeuchtigkeits-Messungen");
-	$graph->title->SetFont(FF_FONT1,FS_BOLD);
-	$graph->xaxis->title->Set("Messungen");
-	$graph->yaxis->title->Set("Luftfeuchtigkeit [%]");
-	$graph->yaxis->title->SetFont(FF_FONT1,FS_BOLD);
-	$graph->xaxis->title->SetFont(FF_FONT1,FS_BOLD);
-	$graph->img->SetMargin(40,20,20,40);
-	
+	// Den Lineplot erstellen
+	$lineplot=new LinePlot(array_reverse($yValues));
 	$lineplot->SetColor("blue");
 	$lineplot->SetWeight(2); 
-	$graph->SetShadow(); 
+	$graph->Add($lineplot);
 	
-	$graph->Stroke();		
+	// Den Graphen zeichnen
+	$graph->Stroke();	
 ?>
