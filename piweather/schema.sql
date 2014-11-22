@@ -6,3 +6,6 @@ CREATE TABLE piw_values IF NOT EXISTS (
     illuminance REAL NOT NULL,
     created_at INTEGER NOT NULL);
 
+CREATE INDEX IF NOT EXISTS created_at_index
+    ON piw_values (created_at DESC);
+

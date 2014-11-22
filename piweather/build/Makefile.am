@@ -1,6 +1,8 @@
 src				= $(top_srcdir)/src
 lib				= $(top_srcdir)/lib
 
+AM_CPPFLAGS			= -I$(src) -I$(lib)
+
 bin_PROGRAMS			= piweather
 
 lib_LTLIBRARIES			= libpiweather.la
@@ -36,6 +38,4 @@ libpiweather_la_CXXFLAGS	= $(libpiweather_la_CFLAGS)
 libpiweather_la_LIBADD		= $(PTHREAD_LIBS) $(SQLITE3_LDFLAGS)
 LIBPIWEATHER_VERSION		= 1:0:0
 libpiweather_la_LDFLAGS		= -version-info $(LIBPIWEATHER_VERSION)
-
-AM_CPPFLAGS			= -I$(src) -I$(lib)
 

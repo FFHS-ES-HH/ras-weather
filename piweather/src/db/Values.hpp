@@ -34,8 +34,8 @@ namespace piw { namespace db {
         double temperature;
         double humidity;
         double pressure;
-        double illumination;
-        std::chrono::system_clock::time_point date;
+        double illuminance;
+        std::chrono::system_clock::time_point created_at;
     };
 }}
 
