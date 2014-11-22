@@ -1,0 +1,41 @@
+﻿body 
+{
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: 10pt;
+	color: #4b4b4b; 
+	background-color: #ffffff
+}
+
+td
+{
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: 10pt;
+	font-weight: normal;
+}
+
+th
+{
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: 10pt;
+	font-weight: normal;
+}
+
+.NavigationTab
+{
+	background: #bb1142;
+	border: 2px #4b4b4b solid; 
+	width: 142px; 
+	text-align: center; 
+	cursor: hand;
+	color: white;
+}
+
+.NavigationTabSelected
+{
+	background: #75aa28;
+	border: 2px #4b4b4b solid; 
+	width: 142px; 
+	text-align: center; 
+	cursor: hand;
+	color: white;
+}

@@ -18,26 +18,20 @@
         <text>Raspberry%20Pi%20-%20Wetterstation</text>
       </controlProperties>
     </control>
-    <control controlID="4" controlTypeID="com.balsamiq.mockups::LineChart" x="495" y="227" w="610" h="213" measuredW="187" measuredH="175" zOrder="3" locked="false" isInGroup="-1"/>
-    <control controlID="5" controlTypeID="com.balsamiq.mockups::Label" x="495" y="174" w="-1" h="-1" measuredW="122" measuredH="21" zOrder="4" locked="false" isInGroup="-1">
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::LineChart" x="495" y="202" w="610" h="238" measuredW="187" measuredH="175" zOrder="3" locked="false" isInGroup="-1"/>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::Label" x="495" y="174" w="-1" h="-1" measuredW="101" measuredH="21" zOrder="4" locked="false" isInGroup="-1">
       <controlProperties>
-        <text>Aktuelle%20Temperatur%3A</text>
+        <text>Letzte%20Messung%3A</text>
       </controlProperties>
     </control>
-    <control controlID="6" controlTypeID="com.balsamiq.mockups::Label" x="632" y="174" w="-1" h="-1" measuredW="38" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::Label" x="611" y="174" w="-1" h="-1" measuredW="38" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
       <controlProperties>
         <text>9.6%20%B0C</text>
       </controlProperties>
     </control>
-    <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="685" y="174" w="-1" h="-1" measuredW="101" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="662" y="174" w="-1" h="-1" measuredW="101" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
       <controlProperties>
         <text>16.11.2014%20%2815%3A12%29</text>
-      </controlProperties>
-    </control>
-    <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="495" y="198" w="-1" h="-1" measuredW="168" measuredH="21" zOrder="7" locked="false" isInGroup="-1">
-      <controlProperties>
-        <bold>true</bold>
-        <text>Gemessene%20Temperaturen%20</text>
       </controlProperties>
     </control>
   </controls>
