@@ -13,11 +13,13 @@ set -e
 
 umask 022
 
-. /lib/lsb/init-functions
+if [ -r /lib/lsb/init-functions ]; then
+    source /lib/lsb/init-functions
+fi
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 
-PIW_OPTS=""
+CMD=""
 if [ -r @sysconfdir@/default/piweather ]; then
     source @sysconfdir@/default/piweather
 fi
@@ -27,7 +29,7 @@ case "$1" in
         log_daemon_msg "Starting piweather station" "piweather" || true
         if start-stop-daemon \
             --start --quiet --background --oknodo \
-            --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $PIW_OPTS
+            --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $CMD
         then
             log_end_msg 0 || true
         else
@@ -50,7 +52,7 @@ case "$1" in
         start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile @localstatedir@/run/piweather.pid
         if start-stop-daemon \
             --start --quiet --background --oknodo \
-            --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $PIW_OPTS
+            --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $CMD
             log_end_msg 0 || true
         else
             log_end_msg 1 || true
@@ -61,7 +63,7 @@ case "$1" in
         status_of_proc -p @localstatedir@/run/piweather.pid @bindir@/piweather piweather && exit 0 || exit $?
         ;;
     *)
-        log_action_msg "Usage: /etc/init.d/piweather {start|stop|restart|status}" || true
+        log_action_msg "Usage: @sysconfdir@/init.d/piweather {start|stop|restart|status}" || true
         exit 1
 
 esac
