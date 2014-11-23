@@ -41,7 +41,7 @@ namespace piw { namespace sensors {
             Barometer (IPConnection*, const device::UidRegistry&, std::int32_t);
             virtual ~Barometer ();
 
-            double pressure () const;
+            double mbar () const;
 
         protected:
             virtual void adjust (std::int32_t, std::int32_t);
@@ -54,8 +54,8 @@ namespace piw { namespace sensors {
             ::Barometer barometer;
     };
 
-    inline double Barometer::pressure () const
-    { return value (); }
+    inline double Barometer::mbar () const
+    { return value () / 1000; }
 }}
 
 #endif /* PIW_SENSORS_BAROMETER_INC */

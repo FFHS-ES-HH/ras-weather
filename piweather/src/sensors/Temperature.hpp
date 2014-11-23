@@ -43,7 +43,7 @@ namespace piw { namespace sensors {
             Temperature (IPConnection*, const device::UidRegistry&, std::int16_t = 10);
             virtual ~Temperature ();
 
-            double temperature () const;
+            double celsius () const;
 
         protected:
             virtual std::int16_t read ();
@@ -58,7 +58,7 @@ namespace piw { namespace sensors {
             Barometer barometer;
     };
 
-    inline double Temperature::temperature () const
+    inline double Temperature::celsius () const
     { return value () / 100; }
 }}
 

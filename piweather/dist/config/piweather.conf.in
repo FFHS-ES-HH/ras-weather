@@ -5,4 +5,11 @@
 ## The sensitivity for the barometer.
 barometer-sensitivity = 20.0
 
+## The illuminance sensitivity
+illuminance-sensitivity = 2.0
 
+## The humidity sensitivity
+humidity-sensitivity = 2.0
+
+## The polling interval in msecs.
+time-polling = 500

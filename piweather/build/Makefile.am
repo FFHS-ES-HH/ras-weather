@@ -2,7 +2,7 @@ src				= $(top_srcdir)/src
 lib				= $(top_srcdir)/lib
 dist				= $(top_srcdir)/dist
 initscripts			= $(dist)/initd
-configs				= $(dist)/configs
+configs				= $(dist)/config
 defaultconfigs			= $(dist)/default
 
 AM_CPPFLAGS			= -I$(src) -I$(lib)
@@ -90,4 +90,7 @@ $(defaultconfigs)/piweather:	$(defaultconfigs)/piweather.in
 $(configs)/piweather.conf:	$(configs)/piweather.conf.in
 	@sed $(SUBST) $< > $@
 
-CLEANFILES			= $(initd_SCRIPTS) $(initdefault_DATA) $(piwconfig_DATA)
+CLEANFILES			=\
+				 $(initd_SCRIPTS) \
+				 $(initdefault_DATA) \
+				 $(piwconfig_DATA)
