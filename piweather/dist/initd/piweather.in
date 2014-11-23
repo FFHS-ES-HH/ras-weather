@@ -19,7 +19,7 @@ export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 
 PIW_OPTS=""
 if [ -r !!sysconfdir!!/default/piweather ]; then
-    source !!sysconfdir!!/init/piweather
+    source !!sysconfdir!!/default/piweather
 fi
 
 case "$1" in

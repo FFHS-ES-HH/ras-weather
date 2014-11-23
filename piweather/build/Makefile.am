@@ -1,12 +1,13 @@
 src				= $(top_srcdir)/src
 lib				= $(top_srcdir)/lib
 dist				= $(top_srcdir)/dist
+initscripts			= $(dist)/initd
+configs				= $(dist)/configs
+defaultconfigs			= $(dist)/default
 
 AM_CPPFLAGS			= -I$(src) -I$(lib)
 
 bin_PROGRAMS			= piweather
-initddir			= $(sysconfdir)/init.d
-initd_SCRIPTS			= $(dist)/piweather
 
 lib_LTLIBRARIES			= libpiweather.la
 
@@ -69,9 +70,24 @@ libpiweather_la_LIBADD		= $(PTHREAD_LIBS) $(SQLITE3_LDFLAGS)
 LIBPIWEATHER_VERSION		= 1:0:0
 libpiweather_la_LDFLAGS		= -version-info $(LIBPIWEATHER_VERSION)
 
-CLEANFILES			= $(bin_SCRIPTS)
+initddir			= $(sysconfdir)/init.d
+initd_SCRIPTS			= $(initscripts)/piweather
+
+initdefaultdir			= $(sysconfdir)/default
+initdefault_DATA		= $(defaultconfigs)/piweather
+
+piwconfigdir			= $(sysconfdir)/piweather
+piwconfig_DATA			= $(configs)/piweather.conf
 
 SUBST="s|!!sysconfdir!!|${sysconfdir}|;s|!!sbindir!!|${sbindir}|;s|!!bindir!!|${bindir}|;s|!!localstatedir!!|${localstatedir}|"
-$(dist)/piweather:	$(dist)/piweather.in
-	sed $(SUBST) $< > $@
 
+$(initscripts)/piweather:	$(initscripts)/piweather.in
+	@sed $(SUBST) $< > $@
+
+$(defaultconfigs)/piweather:	$(defaultconfigs)/piweather.in
+	@sed $(SUBST) $< > $@
+
+$(configs)/piweather.conf:	$(configs)/piweather.conf.in
+	@sed $(SUBST) $< > $@
+
+CLEANFILES			= $(initd_SCRIPTS) $(initdefault_DATA) $(piwconfig_DATA)

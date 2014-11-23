@@ -5,3 +5,4 @@ piweatherdir		= $(pkgdatadir)
 piweather_DATA		= dist/schema.sql
 
 EXTRA_DIST		= $(piweather_DATA) dist/piweather.in
+CLEANFILES		= *~
