@@ -38,6 +38,8 @@
 		
 		<p>Letzte Messung: <?php echo DatabaseHandler::getLastIlluminance(); ?></p>
 		
-		<p><img src="lichtstaerke_graph.php" alt="[Die letzten Lichtstärken-Messungen]"></p>
+		<h3>Die letzten 10 Messwerte</h3>
+		
+		<p><img src="lichtstaerke_graph.php" alt="[Keine Messwerte - Diagramm kann nicht dargestellt werden]"></p>
 	</body>
 </html>
