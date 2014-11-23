@@ -18,7 +18,7 @@
         <text>Raspberry%20Pi%20-%20Wetterstation</text>
       </controlProperties>
     </control>
-    <control controlID="4" controlTypeID="com.balsamiq.mockups::LineChart" x="495" y="202" w="610" h="238" measuredW="187" measuredH="175" zOrder="3" locked="false" isInGroup="-1"/>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::LineChart" x="517" y="202" w="588" h="224" measuredW="187" measuredH="175" zOrder="3" locked="false" isInGroup="-1"/>
     <control controlID="5" controlTypeID="com.balsamiq.mockups::Label" x="495" y="174" w="-1" h="-1" measuredW="101" measuredH="21" zOrder="4" locked="false" isInGroup="-1">
       <controlProperties>
         <text>Letzte%20Messung%3A</text>
@@ -32,6 +32,17 @@
     <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="662" y="174" w="-1" h="-1" measuredW="101" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
       <controlProperties>
         <text>16.11.2014%20%2815%3A12%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="673" y="426" w="-1" h="-1" measuredW="255" measuredH="21" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Zeitpunkte%20der%20Messung%20%28Datum%20/%20Uhrzeit%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Label" x="495" y="282" w="-1" h="-1" measuredW="21" measuredH="65" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Messwerte</text>
+        <textOrientation>up</textOrientation>
       </controlProperties>
     </control>
   </controls>
