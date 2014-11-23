@@ -1,0 +1,69 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:     piweather
+# Required-Start:   $syslog
+# Required-Stop:    $syslog
+# Default-Start:    2 3 4 5
+# Default-Stop:     
+# Short-Description:    PiWeather Station
+### END INIT INFO
+
+set -e
+
+umask 022
+
+. /lib/lsb/init-functions
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+PIW_OPTS=""
+if [ -r !!sysconfdir!!/default/piweather ]; then
+    source !!sysconfdir!!/init/piweather
+fi
+
+case "$1" in
+    start)
+        log_daemon_msg "Starting piweather station" "piweather" || true
+        if start-stop-daemon \
+            --start --quiet --background --oknodo \
+            --pidfile !!localstatedir!!/run/piweather.pid -m --exec !!bindir!!/piweather -- $PIW_OPTS
+        then
+            log_end_msg 0 || true
+        else
+            log_end_msg 1 || true
+        fi
+        ;;
+    stop)
+        log_daemon_msg "Stopping piweather station" "piweather" || true
+        if start-stop-daemon \
+            --stop --quiet --oknodo \
+            --pidfile !!localstatedir!!/run/piweather.pid
+        then
+            log_end_msg 0 || true
+        else
+            log_end_msg 1 || true
+        fi
+        ;;
+    restart)
+        log_daemon_msg "Restarting piweather station" "piweather" || true
+        start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile !!localstatedir!!/run/piweather.pid
+        if start-stop-daemon \
+            --start --quiet --background --oknodo \
+            --pidfile !!localstatedir!!/run/piweather.pid -m --exec !!bindir!!/piweather -- $PIW_OPTS
+            log_end_msg 0 || true
+        else
+            log_end_msg 1 || true
+        fi
+        ;;
+
+    status)
+        status_of_proc -p !!localstatedir!!/run/piweather.pid !!bindir!!/piweather piweather && exit 0 || exit $?
+        ;;
+    *)
+        log_action_msg "Usage: /etc/init.d/piweather {start|stop|restart|status}" || true
+        exit 1
+
+esac
+
+exit 0

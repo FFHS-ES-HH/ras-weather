@@ -1,9 +1,12 @@
 src				= $(top_srcdir)/src
 lib				= $(top_srcdir)/lib
+dist				= $(top_srcdir)/dist
 
 AM_CPPFLAGS			= -I$(src) -I$(lib)
 
 bin_PROGRAMS			= piweather
+initddir			= $(sysconfdir)/init.d
+initd_SCRIPTS			= $(dist)/piweather
 
 lib_LTLIBRARIES			= libpiweather.la
 
@@ -65,4 +68,10 @@ libpiweather_la_CXXFLAGS	= $(libpiweather_la_CFLAGS)
 libpiweather_la_LIBADD		= $(PTHREAD_LIBS) $(SQLITE3_LDFLAGS)
 LIBPIWEATHER_VERSION		= 1:0:0
 libpiweather_la_LDFLAGS		= -version-info $(LIBPIWEATHER_VERSION)
+
+CLEANFILES			= $(bin_SCRIPTS)
+
+SUBST="s|!!sysconfdir!!|${sysconfdir}|;s|!!sbindir!!|${sbindir}|;s|!!bindir!!|${bindir}|;s|!!localstatedir!!|${localstatedir}|"
+$(dist)/piweather:	$(dist)/piweather.in
+	sed $(SUBST) $< > $@
 
