@@ -18,8 +18,8 @@ umask 022
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 
 PIW_OPTS=""
-if [ -r !!sysconfdir!!/default/piweather ]; then
-    source !!sysconfdir!!/default/piweather
+if [ -r @sysconfdir@/default/piweather ]; then
+    source @sysconfdir@/default/piweather
 fi
 
 case "$1" in
@@ -27,7 +27,7 @@ case "$1" in
         log_daemon_msg "Starting piweather station" "piweather" || true
         if start-stop-daemon \
             --start --quiet --background --oknodo \
-            --pidfile !!localstatedir!!/run/piweather.pid -m --exec !!bindir!!/piweather -- $PIW_OPTS
+            --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $PIW_OPTS
         then
             log_end_msg 0 || true
         else
@@ -38,7 +38,7 @@ case "$1" in
         log_daemon_msg "Stopping piweather station" "piweather" || true
         if start-stop-daemon \
             --stop --quiet --oknodo \
-            --pidfile !!localstatedir!!/run/piweather.pid
+            --pidfile @localstatedir@/run/piweather.pid
         then
             log_end_msg 0 || true
         else
@@ -47,10 +47,10 @@ case "$1" in
         ;;
     restart)
         log_daemon_msg "Restarting piweather station" "piweather" || true
-        start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile !!localstatedir!!/run/piweather.pid
+        start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile @localstatedir@/run/piweather.pid
         if start-stop-daemon \
             --start --quiet --background --oknodo \
-            --pidfile !!localstatedir!!/run/piweather.pid -m --exec !!bindir!!/piweather -- $PIW_OPTS
+            --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $PIW_OPTS
             log_end_msg 0 || true
         else
             log_end_msg 1 || true
@@ -58,7 +58,7 @@ case "$1" in
         ;;
 
     status)
-        status_of_proc -p !!localstatedir!!/run/piweather.pid !!bindir!!/piweather piweather && exit 0 || exit $?
+        status_of_proc -p @localstatedir@/run/piweather.pid @bindir@/piweather piweather && exit 0 || exit $?
         ;;
     *)
         log_action_msg "Usage: /etc/init.d/piweather {start|stop|restart|status}" || true

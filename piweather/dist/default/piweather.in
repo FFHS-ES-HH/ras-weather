@@ -1,4 +1,4 @@
 ##
 # Command line options for piweather.
 ##
-PIW_OPTS="-h localhost -p 4223 -t 500 -c !!sysconfdir!!/piweather/piweather.conf"
+PIW_OPTS="-h localhost -p 4223 -c @sysconfdir@/piweather/piweather.conf"

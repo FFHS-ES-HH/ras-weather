@@ -4,5 +4,5 @@ SUBDIRS			= build
 piweatherdir		= $(pkgdatadir)
 piweather_DATA		= dist/schema.sql
 
-EXTRA_DIST		= $(piweather_DATA) dist/piweather.in
+EXTRA_DIST		= $(piweather_DATA)
 CLEANFILES		= *~
