@@ -18,6 +18,8 @@ piweather_SOURCES		=\
 				 $(src)/db/Values.hpp \
 				 $(src)/Application.hpp \
 				 $(src)/Application.cpp \
+				 $(src)/Configuration.hpp \
+				 $(src)/Configuration.cpp \
 				 $(src)/piw-daemon.cpp
 
 piweather_LDADD			= libpiweather.la
@@ -79,7 +81,7 @@ initdefault_DATA		= $(defaultconfigs)/piweather
 piwconfigdir			= $(sysconfdir)/piweather
 piwconfig_DATA			= $(configs)/piweather.conf
 
-SUBST="s|!!sysconfdir!!|${sysconfdir}|;s|!!sbindir!!|${sbindir}|;s|!!bindir!!|${bindir}|;s|!!localstatedir!!|${localstatedir}|"
+SUBST="s|[@]sysconfdir[@]|${sysconfdir}|;s|[@]sbindir[@]|${sbindir}|;s|[@]bindir[@]|${bindir}|;s|[@]localstatedir[@]|${localstatedir}|"
 
 $(initscripts)/piweather:	$(initscripts)/piweather.in
 	@sed $(SUBST) $< > $@
