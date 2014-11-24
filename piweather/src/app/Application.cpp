@@ -22,9 +22,9 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "Application.hpp"
+#include    "app/Application.hpp"
 
-namespace piw {
+namespace piw { namespace app {
 
     /**
      * Constructs a new Application.
@@ -51,5 +51,5 @@ namespace piw {
 
         return success;
     }
-}
+}}
 

@@ -12,15 +12,15 @@ bin_PROGRAMS			= piweather
 lib_LTLIBRARIES			= libpiweather.la
 
 piweather_SOURCES		=\
-				 $(src)/Configuration.hpp \
-				 $(src)/Configuration.cpp \
-				 $(src)/Application.hpp \
-				 $(src)/Application.cpp \
+				 $(src)/app/Configuration.hpp \
+				 $(src)/app/Configuration.cpp \
+				 $(src)/app/Application.hpp \
+				 $(src)/app/Application.cpp \
 				 $(src)/db/Values.hpp \
 				 $(src)/db/Database.hpp \
 				 $(src)/db/Database.cpp \
 				 $(src)/view/Viewable.hpp \
-				 $(src)/piw-daemon.cpp
+				 $(src)/app/daemon.cpp
 
 piweather_LDADD			= libpiweather.la
 piweather_CPPFLAGS		=\
@@ -36,13 +36,13 @@ libpiweather_la_SOURCES		=\
 				 $(src)/device/UidRegistry.cpp \
 				 $(src)/device/Observable.cpp \
 				 $(src)/device/Button.cpp \
+				 $(src)/device/Connection.cpp \
+				 $(src)/device/Lcd.hpp \
+				 $(src)/device/Lcd.cpp \
 				 $(src)/sensors/Temperature.cpp \
 				 $(src)/sensors/Barometer.cpp \
 				 $(src)/sensors/Illuminance.cpp \
-				 $(src)/sensors/Humidity.cpp \
-				 $(src)/device/Connection.cpp \
-				 $(src)/device/Lcd.hpp \
-				 $(src)/device/Lcd.cpp
+				 $(src)/sensors/Humidity.cpp
 
 libpiweather_la_includedir	= $(includedir)/piweather
 libpiweatherdevice_includedir	= $(libpiweather_la_includedir)/device
@@ -53,12 +53,13 @@ libpiweather_la_include_HEADERS	=\
 				 $(lib)/bricklet_barometer.h \
 				 $(lib)/bricklet_humidity.h \
 				 $(lib)/bricklet_lcd_20x4.h \
-				 $(lib)/ip_connection.h \
-				 $(src)/device/Connection.hpp
+				 $(lib)/ip_connection.h
 
 libpiweatherdevice_include_HEADERS =\
 				 $(src)/device/UidRegistry.hpp \
 				 $(src)/device/Observable.hpp \
+				 $(src)/device/Observer.hpp \
+				 $(src)/device/Connection.hpp \
 				 $(src)/device/Button.hpp
 
 libpiweathersensors_include_HEADERS =\

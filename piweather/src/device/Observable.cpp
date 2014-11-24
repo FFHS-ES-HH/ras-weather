@@ -22,22 +22,34 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "device/Observable.hpp"
+#include    <device/Observable.hpp>
+#include    <device/Observer.hpp>
+
+#include    <algorithm>
 
 namespace piw { namespace device {
 
     namespace {
-        typedef std::map<const void*, Observer*> Observers;
+        typedef std::vector<Observer*> Observers;
+
+        inline Observers::iterator atObserver (
+                Observers& observers,
+                const Observer* which)
+        {
+            return std::find (observers.begin (), observers.end (), which);
+        }
     }
 
     void Observable::addObserver (Observer& observer)
     {
-        observers_.insert (std::make_pair (&observer, &observer));
+        if (atObserver (observers_, &observer) == observers_.end ()) {
+            observers_.push_back (&observer);
+        }
     }
 
     void Observable::removeObserver (const Observer& observer)
     {
-        Observers::iterator existing = observers_.find (&observer);
+        Observers::iterator existing = atObserver (observers_, &observer);
 
         if (existing != observers_.end ()) {
             observers_.erase (existing);
@@ -46,9 +58,9 @@ namespace piw { namespace device {
 
     void Observable::notifyObservers ()
     {
-        for (const Observers::value_type& o : observers_) {
+        for (Observers::value_type o : observers_) {
             try {
-                o.second->valueChanged ();
+                o->valueChanged ();
             }
             catch (const std::exception&) { /* ignored */ }
         }

@@ -78,7 +78,7 @@ namespace piw { namespace sensors {
     void Barometer::valueChanged (std::int32_t v)
     {
         value (v);
-        ThresholdObservable::adjust ();
+        triggerAdjust ();
         notifyObservers ();
     }
 }}

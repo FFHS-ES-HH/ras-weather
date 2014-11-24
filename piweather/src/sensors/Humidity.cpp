@@ -79,7 +79,7 @@ namespace piw { namespace sensors {
     void Humidity::valueChanged (std::uint16_t current)
     {
         value (current);
-        ThresholdObservable::adjust ();
+        triggerAdjust ();
         notifyObservers ();
     }
 }}

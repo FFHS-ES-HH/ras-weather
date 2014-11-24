@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * piw-daemon.cpp is free software copyrighted by David Daniel.
+ * Observer.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,25 +22,19 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    <cstdlib>
-#include    <iostream>
-#include    <exception>
+#ifndef PIW_OBSERVER_INC
+#define PIW_OBSERVER_INC
 
-#include    "Application.hpp"
+namespace piw { namespace device {
 
-int main (int argc, char **argv)
-{
-    bool result = false;
+    class Observer
+    {
+        public:
+            virtual ~Observer () {}
 
-    try {
-        piw::Configuration configuration;
+            virtual void valueChanged () = 0;
+    };
+}}
 
-        piw::Application app (configuration);
-        result = app.run ();
-    }
-    catch (const std::exception& e) {
-        std::cerr << e.what () << std::endl;
-    }
+#endif /* PIW_OBSERVER_INC */
 
-    return result ? EXIT_SUCCESS : EXIT_FAILURE;
-}

@@ -22,7 +22,7 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "Configuration.hpp"
+#include    "app/Configuration.hpp"
 
 #include    <stdexcept>
 
@@ -30,7 +30,7 @@
 #include    <config.h>
 #endif
 
-namespace piw {
+namespace piw { namespace app {
 
     /**
      * Constructs a new Configuration.
@@ -45,5 +45,5 @@ namespace piw {
         dbPath_ (PIW_DEFAULT_DB_PATH)
     {
     }
-}
+}}
 

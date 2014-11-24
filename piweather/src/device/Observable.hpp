@@ -25,10 +25,11 @@
 #ifndef PIW_DEVICE_OBSERVABLE_INC
 #define PIW_DEVICE_OBSERVABLE_INC
 
-#include    <map>
-#include    <Observer.hpp>
+#include    <vector>
 
 namespace piw { namespace device {
+
+    class Observer;
 
     class Observable
     {
@@ -44,7 +45,7 @@ namespace piw { namespace device {
             virtual void notifyObservers ();
 
         private:
-            std::map<const void*, Observer*> observers_;
+            std::vector<Observer*> observers_;
     };
 }}
 

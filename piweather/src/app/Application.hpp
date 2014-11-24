@@ -33,11 +33,11 @@
 
 #include    <db/Database.hpp>
 
-#include    "Configuration.hpp"
+#include    "app/Configuration.hpp"
 
 #include    <thread>
 
-namespace piw {
+namespace piw { namespace app {
 
     class Application
     {
@@ -59,7 +59,7 @@ namespace piw {
             device::Lcd lcd;
             std::thread dbWriter;
     };
-}
+}}
 
 #endif /* PIW_APPLICATION_INC */
 

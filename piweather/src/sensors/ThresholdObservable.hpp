@@ -46,7 +46,7 @@ namespace piw { namespace sensors {
         protected:
             void init ();
             void value (T);
-            void adjust ();
+            void triggerAdjust ();
 
             static void* wrapper ();
             static void wrap (T, void*);
@@ -102,11 +102,11 @@ namespace piw { namespace sensors {
         void ThresholdObservable<T>::init ()
         {
             value (read ());
-            adjust ();
+            triggerAdjust ();
         }
 
     template<typename T>
-        void ThresholdObservable<T>::adjust ()
+        void ThresholdObservable<T>::triggerAdjust ()
         {
             T current {value ()};
             T thresh {threshold ()};
@@ -117,7 +117,7 @@ namespace piw { namespace sensors {
         void ThresholdObservable<T>::threshold (T threshold)
         {
             threshold_ = threshold;
-            adjust ();
+            triggerAdjust ();
         }
 }}
 

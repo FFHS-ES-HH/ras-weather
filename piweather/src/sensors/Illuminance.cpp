@@ -73,7 +73,7 @@ namespace piw { namespace sensors {
     void Illuminance::valueChanged (std::uint16_t current)
     {
         value (current);
-        ThresholdObservable::adjust ();
+        triggerAdjust ();
     }
 }}
 

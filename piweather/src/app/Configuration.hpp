@@ -30,7 +30,7 @@
 
 #include    <ip_connection.h>
 
-namespace piw {
+namespace piw { namespace app {
 
     class Configuration
     {
@@ -124,7 +124,7 @@ namespace piw {
         dbPath_ = std::move (path);
         return *this;
     }
-}
+}}
 
 #endif /* PIW_CONFIGURATION_INC */
 
