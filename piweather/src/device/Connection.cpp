@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * piw-daemon.cpp is free software copyrighted by David Daniel.
+ * Connection.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,25 +22,25 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    <cstdlib>
-#include    <iostream>
-#include    <exception>
+#include    <device/Connection.hpp>
 
-#include    "Application.hpp"
+#include    <stdexcept>
 
-int main (int argc, char **argv)
-{
-    bool result = false;
+namespace piw { namespace device {
 
-    try {
-        piw::Configuration configuration;
+    Connection::Connection (const std::string& host, std::uint16_t port) :
+        connection_ (new IPConnection)
+    {
+        ipcon_create (connection_.get ());
 
-        piw::Application app (configuration);
-        result = app.run ();
-    }
-    catch (const std::exception& e) {
-        std::cerr << e.what () << std::endl;
+        if (ipcon_connect (connection_.get (), host.c_str (), port) < 0) {
+            throw std::runtime_error ("Cannot connect to the device.");
+        }
     }
 
-    return result ? EXIT_SUCCESS : EXIT_FAILURE;
-}
+    Connection::~Connection ()
+    {
+        ipcon_disconnect (connection_.get ());
+        ipcon_destroy (connection_.get ());
+    }
+}}

@@ -42,45 +42,8 @@ namespace piw {
         illuminanceSensitivity_ (),
         host_ ("localhost"),
         port_ (4223),
-        dbPath_ (PIW_DB_PATH),
-        connection_ ()
+        dbPath_ (PIW_DEFAULT_DB_PATH)
     {
-        ipcon_create (&connection_);
-    }
-
-    Configuration::~Configuration ()
-    {
-        disconnect ();
-        ipcon_destroy (connection_.get ());
-    }
-
-    IPConnection* Configuration::connection () const
-    {
-        if (!connected_) {
-            throw std::runtime_error ("No connection available.");
-        }
-
-        return &connection_;
-    }
-
-    Configuration& Configuration::connect ()
-    {
-        if (!connected_) {
-            if (ipcon_connect (&conection_, host_.c_str (), port_) < 0) {
-                throw std::runtime_error ("Cannot connect to the device.");
-            }
-            connected_ = true;
-        }
-
-        return *this;
-    }
-
-    void Configuration::disconnect ()
-    {
-        if (connected_) {
-            ipcon_disconnect (&connection_);
-            connected_ = false;
-        }
     }
 }
 

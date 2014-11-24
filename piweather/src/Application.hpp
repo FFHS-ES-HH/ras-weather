@@ -25,15 +25,13 @@
 #ifndef PIW_APPLICATION_INC
 #define PIW_APPLICATION_INC
 
-#include    <memory>
+#include    <device/UidRegistry.hpp>
+#include    <device/Connection.hpp>
+#include    <device/Button.hpp>
 
-#include    <ip_connection.h>
+#include    <device/Lcd.hpp>
 
 #include    <db/Database.hpp>
-#include    <view/Lcd.hpp>
-
-#include    <device/UidRegistry.hpp>
-#include    <device/Button.hpp>
 
 #include    "Configuration.hpp"
 
@@ -55,9 +53,10 @@ namespace piw {
 
         private:
             db::Database db;
+            device::Connection connection;
             device::UidRegistry uidRegistry;
             device::Button button;
-            view::Lcd lcd;
+            device::Lcd lcd;
             std::thread dbWriter;
     };
 }

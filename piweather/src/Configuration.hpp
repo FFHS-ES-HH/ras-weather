@@ -36,7 +36,6 @@ namespace piw {
     {
         public:
             Configuration ();
-            ~Configuration ();
 
             unsigned pollInterval () const;
             Configuration& pollInterval (unsigned);
@@ -53,13 +52,6 @@ namespace piw {
             const std::string& dbPath () const;
             Configuration& dpPath (std::string);
 
-            Configuration& connect ();
-            bool connected () const;
-            IPConnection* connection () const;
-
-        private:
-            void disconnect ();
-
         private:
             unsigned pollInterval_;
             double barometerSensitivity_;
@@ -68,30 +60,10 @@ namespace piw {
             std::string host_;
             unsigned port_;
             std::string dbPath_;
-            IPConnection connection_;
-            bool connected_;
     };
 
     inline unsigned Configuration::pollInterval () const
     { return pollInterval_; }
-
-    inline double Configuration::barometerSensitivity () const
-    { return barometerSensitivity_; }
-
-    inline double Configuration::humiditySensitivity () const
-    { return humiditySensitivity_; }
-
-    inline double Configuration::illuminanceSensitivity () const
-    { return illuminanceSensitivity_; }
-
-    inline const std::string& Configuration::host () const
-    { return host_; }
-
-    inline unsigned Configuration::port () const
-    { return port_; }
-
-    inline bool Configuration::connected () const
-    { return connected_; }
 
     inline Configuration& Configuration::pollInterval (unsigned i)
     {
@@ -99,11 +71,17 @@ namespace piw {
         return *this;
     }
 
+    inline double Configuration::barometerSensitivity () const
+    { return barometerSensitivity_; }
+
     inline Configuration& Configuration::barometerSensitivity (double sensitivity)
     {
         barometerSensitivity_ = sensitivity;
         return *this;
     }
+
+    inline double Configuration::humiditySensitivity () const
+    { return humiditySensitivity_; }
 
     inline Configuration& Configuration::humiditySensitivity (double sensitivity)
     {
@@ -111,11 +89,17 @@ namespace piw {
         return *this;
     }
 
+    inline double Configuration::illuminanceSensitivity () const
+    { return illuminanceSensitivity_; }
+
     inline Configuration& Configuration::illuminanceSensitivity (double sensitivity)
     {
         illuminanceSensitivity_ = sensitivity;
         return *this;
     }
+
+    inline const std::string& Configuration::host () const
+    { return host_; }
 
     inline Configuration& Configuration::host (std::string host)
     {
@@ -123,11 +107,17 @@ namespace piw {
         return *this;
     }
 
+    inline unsigned Configuration::port () const
+    { return port_; }
+
     inline Configuration& Configuration::port (unsigned port)
     {
         port_ = port;
         return *this;
     }
+
+    inline const std::string& Configuration::dbPath () const
+    { return dbPath_; }
 
     inline Configuration& Configuration::dpPath (std::string path)
     {

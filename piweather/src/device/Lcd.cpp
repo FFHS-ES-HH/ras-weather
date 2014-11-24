@@ -22,11 +22,11 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "view/Lcd.hpp"
+#include    "device/Lcd.hpp"
 
 #include    <stdexcept>
 
-namespace piw { namespace view {
+namespace piw { namespace device {
 
     namespace {
 
@@ -37,9 +37,6 @@ namespace piw { namespace view {
         };
     }
 
-    /**
-     * Constructs a new Lcd.
-     */
     Lcd::Lcd (IPConnection* connection, const device::UidRegistry& registry) :
         lcd_ (new LCD20x4)
     {

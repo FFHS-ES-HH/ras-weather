@@ -31,9 +31,10 @@ namespace piw {
      */
     Application::Application (const Configuration& config) :
         db (config.dbPath ()),
-        uidRegistry (config.connection ()),
-        button (config.connection (), uidRegistry, 1), /* TODO chose correct button */
-        lcd (config.connection (), uidRegistry),
+        connection (config.host (), config.port ()),
+        uidRegistry (connection.get ()),
+        button (connection.get (), uidRegistry, 1), /* TODO choose correct button */
+        lcd (connection.get (), uidRegistry),
         dbWriter ()
     {}
 

@@ -22,8 +22,8 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_VIEW_LCD_INC
-#define PIW_VIEW_LCD_INC
+#ifndef PIW_DEVICE_LCD_INC
+#define PIW_DEVICE_LCD_INC
 
 #include    <bricklet_lcd_20x4.h>
 
@@ -32,7 +32,7 @@
 #include    <string>
 #include    <memory>
 
-namespace piw { namespace view {
+namespace piw { namespace device {
 
     class Lcd
     {
@@ -51,5 +51,5 @@ namespace piw { namespace view {
     };
 }}
 
-#endif /* PIW_VIEW_LCD_INC */
+#endif /* PIW_DEVICE_LCD_INC */
 
