@@ -27,15 +27,15 @@
 namespace piw { namespace device {
 
     namespace {
-        typedef std::map<const void*, Observable::Observer> Observers;
+        typedef std::map<const void*, Observer*> Observers;
     }
 
-    void Observable::addObserver (const Observable::Observer& observer)
+    void Observable::addObserver (Observer& observer)
     {
-        observers_.insert (std::make_pair (&observer, observer));
+        observers_.insert (std::make_pair (&observer, &observer));
     }
 
-    void Observable::removeObserver (const Observable::Observer& observer)
+    void Observable::removeObserver (const Observer& observer)
     {
         Observers::iterator existing = observers_.find (&observer);
 
@@ -48,7 +48,7 @@ namespace piw { namespace device {
     {
         for (const Observers::value_type& o : observers_) {
             try {
-                o.second ();
+                o.second->valueChanged ();
             }
             catch (const std::exception&) { /* ignored */ }
         }

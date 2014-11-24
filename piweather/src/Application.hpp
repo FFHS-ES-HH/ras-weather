@@ -32,6 +32,11 @@
 #include    <db/Database.hpp>
 #include    <view/Lcd.hpp>
 
+#include    <device/UidRegistry.hpp>
+#include    <device/Button.hpp>
+
+#include    "Configuration.hpp"
+
 #include    <thread>
 
 namespace piw {
@@ -39,7 +44,7 @@ namespace piw {
     class Application
     {
         public:
-            Application (int, char**);
+            Application (const Configuration&);
             Application (const Application&) = delete;
             Application& operator= (const Application&) = delete;
             ~Application ();
@@ -49,9 +54,10 @@ namespace piw {
         private:
 
         private:
-            IPConnection connection;
-            std::unique_ptr<db::Database> db;
-            std::unique_ptr<view::Lcd> lcd;
+            db::Database db;
+            device::UidRegistry uidRegistry;
+            device::Button button;
+            view::Lcd lcd;
             std::thread dbWriter;
     };
 }

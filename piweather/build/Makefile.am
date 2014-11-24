@@ -23,6 +23,9 @@ piweather_SOURCES		=\
 				 $(src)/piw-daemon.cpp
 
 piweather_LDADD			= libpiweather.la
+piweather_CPPFLAGS		=\
+				 $(AM_CPPFLAGS) \
+				 -DPIW_DB_PATH="\"@localstatedir@/piweather/piweather.sqlite3\""
 
 libpiweather_la_SOURCES		=\
 				 $(lib)/bricklet_ambient_light.c \

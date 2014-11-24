@@ -93,10 +93,13 @@ namespace piw { namespace device {
                 connection,
                 IPCON_CALLBACK_ENUMERATE,
                 reinterpret_cast<void*> (&fetch_bricklet),
-                state_.get ());
+                state_);
 
         ipcon_enumerate (connection);
     }
+
+    UidRegistry::~UidRegistry ()
+    { delete state_; }
 
     /**
      * Returns the uid of the desired device.

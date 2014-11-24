@@ -39,6 +39,7 @@ namespace piw { namespace device {
     {
         public:
             UidRegistry (IPConnection*);
+            ~UidRegistry ();
 
             UidRegistry (const UidRegistry&) = delete;
             UidRegistry& operator= (const UidRegistry&) = delete;
@@ -47,7 +48,7 @@ namespace piw { namespace device {
 
         private:
             std::map<std::uint16_t, std::string> uids_;
-            std::unique_ptr<EnumerationState> state_;
+            EnumerationState* state_;
     };
 }}
 

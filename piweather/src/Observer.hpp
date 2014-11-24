@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Application.cpp is free software copyrighted by David Daniel.
+ * Observer.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,33 +22,19 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "Application.hpp"
+#ifndef PIW_OBSERVER_INC
+#define PIW_OBSERVER_INC
 
 namespace piw {
 
-    /**
-     * Constructs a new Application.
-     */
-    Application::Application (const Configuration& config) :
-        db (config.dbPath ()),
-        uidRegistry (config.connection ()),
-        button (config.connection (), uidRegistry, 1), /* TODO chose correct button */
-        lcd (config.connection (), uidRegistry),
-        dbWriter ()
-    {}
-
-    Application::~Application ()
-    {}
-
-    /**
-     * Application::run
-     * @return  
-     */
-    bool Application::run ()
+    class Observer
     {
-        bool success = true;
-
-        return success;
-    }
+        public:
+            virtual void valueChanged () = 0;
+            virtual void hook () = 0;
+            virtual void unHook () = 0;
+    };
 }
+
+#endif /* PIW_OBSERVER_INC */
 

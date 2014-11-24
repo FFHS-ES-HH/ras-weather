@@ -26,26 +26,25 @@
 #define PIW_DEVICE_OBSERVABLE_INC
 
 #include    <map>
-#include    <functional>
+#include    <Observer.hpp>
 
 namespace piw { namespace device {
 
     class Observable
     {
         public:
-            typedef std::function<void ()> Observer;
 
         public:
             virtual ~Observable () {}
 
-            void addObserver (const Observer&);
+            void addObserver (Observer&);
             void removeObserver (const Observer&);
 
         protected:
             virtual void notifyObservers ();
 
         private:
-            std::map<const void*, Observer> observers_;
+            std::map<const void*, Observer*> observers_;
     };
 }}
 
