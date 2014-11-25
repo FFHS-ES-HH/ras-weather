@@ -50,7 +50,7 @@ namespace piw { namespace sensors {
             ::Humidity sensor;
     };
 
-    double Humidity::humidity () const
+    inline double Humidity::humidity () const
     { return value () / 10; }
 }}
 

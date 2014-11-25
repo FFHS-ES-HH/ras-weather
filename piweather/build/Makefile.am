@@ -12,6 +12,7 @@ bin_PROGRAMS			= piweather
 lib_LTLIBRARIES			= libpiweather.la
 
 piweather_SOURCES		=\
+				 $(src)/app/piweather.cpp \
 				 $(src)/app/Configuration.hpp \
 				 $(src)/app/Configuration.cpp \
 				 $(src)/app/Application.hpp \
@@ -26,8 +27,7 @@ piweather_SOURCES		=\
 				 $(src)/view/AirPressure.hpp \
 				 $(src)/view/AirPressure.cpp \
 				 $(src)/view/Humidity.hpp \
-				 $(src)/view/Humidity.cpp \
-				 $(src)/app/daemon.cpp
+				 $(src)/view/Humidity.cpp
 
 piweather_LDADD			= libpiweather.la
 piweather_CPPFLAGS		=\
