@@ -15,7 +15,7 @@
 
 			// Prüfen, ob zumindest eine Zeile zurückgegeben wurde
 			$message = "";
-			if(count($row)>0)
+			if(count($row)>0 && $row['id'] > 0)
 			{
 				$message = round($row['temperature'], 2) . " [°C] - " . date("d.m.Y", $row['created_at']) . " (" . date("H:i", $row['created_at']) . ")";
 			}
@@ -45,7 +45,7 @@
 
 			// Prüfen, ob zumindest eine Zeile zurückgegeben wurde
 			$message = "";
-			if(count($row)>0)
+			if(count($row)>0 && $row['id'] > 0)
 			{
 				$message = round($row['illuminance'], 2) . " [lx] - " . date("d.m.Y", $row['created_at']) . " (" . date("H:i", $row['created_at']) . ")";
 			}
@@ -75,7 +75,7 @@
 
 			// Prüfen, ob zumindest eine Zeile zurückgegeben wurde
 			$message = "";
-			if(count($row)>0)
+			if(count($row)>0 && $row['id'] > 0)
 			{
 				$message = round($row['humidity'], 2) . " [%] - " . date("d.m.Y", $row['created_at']) . " (" . date("H:i", $row['created_at']) . ")";
 			}
@@ -105,7 +105,7 @@
 
 			// Prüfen, ob zumindest eine Zeile zurückgegeben wurde
 			$message = "";
-			if(count($row)>0)
+			if(count($row)>0 && $row['id'] > 0)
 			{
 				$message = round($row['pressure'], 2) . " [hPa] - " . date("d.m.Y", $row['created_at']) . " (" . date("H:i", $row['created_at']) . ")";
 			}
