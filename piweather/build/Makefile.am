@@ -19,7 +19,14 @@ piweather_SOURCES		=\
 				 $(src)/db/Values.hpp \
 				 $(src)/db/Database.hpp \
 				 $(src)/db/Database.cpp \
-				 $(src)/view/Viewable.hpp \
+				 $(src)/view/Temperature.hpp \
+				 $(src)/view/Temperature.cpp \
+				 $(src)/view/Illuminance.hpp \
+				 $(src)/view/Illuminance.cpp \
+				 $(src)/view/AirPressure.hpp \
+				 $(src)/view/AirPressure.cpp \
+				 $(src)/view/Humidity.hpp \
+				 $(src)/view/Humidity.cpp \
 				 $(src)/app/daemon.cpp
 
 piweather_LDADD			= libpiweather.la

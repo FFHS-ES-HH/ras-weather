@@ -24,11 +24,60 @@
  */
 #include    "app/Application.hpp"
 
+#include    <ip_connection.h>
+
+#include    <device/Lcd.hpp>
+#include    <device/UidRegistry.hpp>
+
+#include    <sensors/Illuminance.hpp>
+#include    <sensors/Barometer.hpp>
+#include    <sensors/Humidity.hpp>
+#include    <sensors/Temperature.hpp>
+
+#include    <view/Illuminance.hpp>
+#include    <view/AirPressure.hpp>
+#include    <view/Humidity.hpp>
+#include    <view/Temperature.hpp>
+
+#include    <vector>
+
 namespace piw { namespace app {
 
-    /**
-     * Constructs a new Application.
-     */
+    using device::Lcd;
+    using device::UidRegistry;
+    using device::Observable;
+    using device::Observer;
+
+    namespace {
+        struct Observed
+        {
+            template<typename Sensor, typename Viewer>
+                Observed (Sensor*, Lcd&);
+
+            std::unique_ptr<Observable> sensor;
+            std::unique_ptr<Observer> view;
+        };
+
+        template<typename Sensor, typename Viewer, typename ...Args>
+        Observed::Observed (Sensor* s, Lcd& lcd) :
+            sensor (s),
+            view (new View (lcd, *sensor))
+        {} 
+
+        typedef std::vector<Observed> Observers;
+
+        Observers createObservers (
+                Lcd& lcd,
+                const UidRegistry& registry,
+                IPConnection* connection)
+        {
+            Observers observers {
+                Observed<sensor::Illuminance, view::Illuminance> (
+                        new sensor::Illuminance (conection, registry, 1), lcd)
+            };
+        }
+    }
+
     Application::Application (const Configuration& config) :
         db (config.dbPath ()),
         connection (config.host (), config.port ()),
@@ -41,10 +90,6 @@ namespace piw { namespace app {
     Application::~Application ()
     {}
 
-    /**
-     * Application::run
-     * @return  
-     */
     bool Application::run ()
     {
         bool success = true;
