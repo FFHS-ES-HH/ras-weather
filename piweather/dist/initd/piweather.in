@@ -14,14 +14,14 @@ set -e
 umask 022
 
 if [ -r /lib/lsb/init-functions ]; then
-    source /lib/lsb/init-functions
+    . /lib/lsb/init-functions
 fi
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 
 CMD=""
 if [ -r @sysconfdir@/default/piweather ]; then
-    source @sysconfdir@/default/piweather
+    . @sysconfdir@/default/piweather
 fi
 
 case "$1" in
@@ -46,6 +46,7 @@ case "$1" in
         else
             log_end_msg 1 || true
         fi
+        rm -f @localstatedir@/run/piweather.pid
         ;;
     restart)
         log_daemon_msg "Restarting piweather station" "piweather" || true
@@ -53,6 +54,7 @@ case "$1" in
         if start-stop-daemon \
             --start --quiet --background --oknodo \
             --pidfile @localstatedir@/run/piweather.pid -m --exec @bindir@/piweather -- $CMD
+        then
             log_end_msg 0 || true
         else
             log_end_msg 1 || true
