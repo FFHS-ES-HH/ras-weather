@@ -31,8 +31,10 @@ namespace piw { namespace view {
 
     class LcdView
     {
-        protected:
+        public:
             virtual ~LcdView () {}
+
+        protected:
             LcdView (device::Lcd&);
 
             device::Lcd& lcd ();

@@ -49,36 +49,81 @@ namespace piw { namespace app {
     using device::Observer;
 
     namespace {
+
+        typedef std::unique_ptr<Observable> ObservablePtr;
+        typedef std::unique_ptr<Observer> ObserverPtr;
+
+        template<typename T>
+            struct Id { typedef T type; };
+
         struct Observed
         {
-            template<typename Sensor, typename Viewer>
-                Observed (Sensor*, Lcd&);
+            template<typename Sensor, typename View>
+                Observed (Sensor*, Lcd&, Id<View>);
 
-            std::unique_ptr<Observable> sensor;
-            std::unique_ptr<Observer> view;
+            ObservablePtr sensor;
+            ObserverPtr view;
         };
-
-        template<typename Sensor, typename Viewer, typename ...Args>
-        Observed::Observed (Sensor* s, Lcd& lcd) :
-            sensor (s),
-            view (new View (lcd, *sensor))
-        {} 
 
         typedef std::vector<Observed> Observers;
 
+        template<typename Sensor, typename View>
+            Observed::Observed (Sensor* s, Lcd& lcd, Id<View>) :
+                sensor (s),
+                view (new View (lcd, *s))
+            {}
+
         Observers createObservers (
+                IPConnection* connection,
                 Lcd& lcd,
-                const UidRegistry& registry,
-                IPConnection* connection)
+                const Configuration& config,
+                const UidRegistry& registry)
         {
-            Observers observers {
-                Observed<sensor::Illuminance, view::Illuminance> (
-                        new sensor::Illuminance (conection, registry, 1), lcd)
-            };
+            Observers observers;
+
+            observers.emplace_back (
+                    new sensors::Illuminance (
+                        connection, registry, config.illuminanceSensitivity ()),
+                    lcd,
+                    Id<view::Illuminance> ());
+
+            observers.emplace_back (
+                    new sensors::Temperature (connection, registry),
+                    lcd,
+                    Id<view::Temperature> ());
+
+            observers.emplace_back (
+                    new sensors::Barometer (
+                        connection, registry, config.barometerSensitivity ()),
+                    lcd,
+                    Id<view::AirPressure> ());
+
+            observers.emplace_back (
+                    new sensors::Humidity (
+                        connection, registry, config.humiditySensitivity ()),
+                    lcd,
+                    Id<view::Humidity> ());
+
+            return observers;
+        }
+
+        void hookObservers (Observers& observers)
+        {
+            for (const Observed& o : observers) {
+                o.sensor->addObserver (*(o.view));
+            }
+        }
+
+        void unHookObservers (Observers& observers)
+        {
+            for (const Observed& o : observers) {
+                o.sensor->removeObserver (*(o.view));
+            }
         }
     }
 
     Application::Application (const Configuration& config) :
+        configuration (config),
         db (config.dbPath ()),
         connection (config.host (), config.port ()),
         uidRegistry (connection.get ()),
@@ -93,6 +138,11 @@ namespace piw { namespace app {
     bool Application::run ()
     {
         bool success = true;
+
+        Observers observers = createObservers (
+                connection.get (), lcd, configuration, uidRegistry);
+
+        hookObservers (observers);
 
         return success;
     }
