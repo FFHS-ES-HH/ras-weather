@@ -39,6 +39,8 @@ namespace piw { namespace app {
 
             unsigned pollInterval () const;
             Configuration& pollInterval (unsigned);
+            unsigned temperatureSensitivity () const;
+            Configuration& temperatureSensitivity (unsigned);
             double barometerSensitivity () const;
             Configuration& barometerSensitivity (double);
             double humiditySensitivity () const;
@@ -50,15 +52,19 @@ namespace piw { namespace app {
             unsigned port () const;
             Configuration& port (unsigned);
             const std::string& dbPath () const;
-            Configuration& dpPath (std::string);
+            Configuration& dbPath (std::string);
+            Configuration& button (unsigned);
+            unsigned button () const;
 
         private:
             unsigned pollInterval_;
+            double temperatureSensitivity_;
             double barometerSensitivity_;
             double humiditySensitivity_;
             double illuminanceSensitivity_;
             std::string host_;
             unsigned port_;
+            unsigned button_;
             std::string dbPath_;
     };
 
@@ -119,11 +125,29 @@ namespace piw { namespace app {
     inline const std::string& Configuration::dbPath () const
     { return dbPath_; }
 
-    inline Configuration& Configuration::dpPath (std::string path)
+    inline Configuration& Configuration::dbPath (std::string path)
     {
         dbPath_ = std::move (path);
         return *this;
     }
+
+    inline unsigned Configuration::temperatureSensitivity () const
+    { return temperatureSensitivity_; }
+
+    inline Configuration& Configuration::temperatureSensitivity (unsigned sensitivity)
+    {
+        temperatureSensitivity_ = sensitivity;
+        return *this;
+    }
+
+    inline Configuration& Configuration::button (unsigned which)
+    {
+        button_ = which;
+        return *this;
+    }
+
+    inline unsigned Configuration::button () const
+    { return button_; }
 }}
 
 #endif /* PIW_CONFIGURATION_INC */

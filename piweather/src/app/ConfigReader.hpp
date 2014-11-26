@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Configuration.cpp is free software copyrighted by David Daniel.
+ * ConfigReader.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,29 +22,10 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "app/Configuration.hpp"
+#ifndef PIW_APP_CONFIGREADER_INC
+#define PIW_APP_CONFIGREADER_INC
 
-#include    <stdexcept>
 
-#ifdef      CONFIG_H
-#include    <config.h>
-#endif
+#endif /* PIW_APP_CONFIGREADER_INC */
 
-namespace piw { namespace app {
-
-    /**
-     * Constructs a new Configuration.
-     */
-    Configuration::Configuration () :
-        pollInterval_ (500),
-        barometerSensitivity_ (),
-        humiditySensitivity_ (),
-        illuminanceSensitivity_ (),
-        host_ ("localhost"),
-        port_ (4223),
-        button_ (1),
-        dbPath_ (PIW_DEFAULT_DB_PATH)
-    {
-    }
-}}
 

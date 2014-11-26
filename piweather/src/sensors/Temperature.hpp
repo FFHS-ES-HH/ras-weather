@@ -40,7 +40,7 @@ namespace piw { namespace sensors {
         friend class ThresholdObservable;
 
         public:
-            Temperature (IPConnection*, const device::UidRegistry&, std::int16_t = 10);
+            Temperature (IPConnection*, const device::UidRegistry&, std::int16_t = 10, unsigned = 500);
             virtual ~Temperature ();
 
             double celsius () const;

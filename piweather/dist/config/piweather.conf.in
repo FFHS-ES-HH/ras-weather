@@ -4,6 +4,9 @@
 host = localhost
 port = 4223
 
+## The sensitivity for the temperature.
+temperature-sensitivity = 0.1
+
 ## The sensitivity for the barometer.
 barometer-sensitivity = 20.0
 
@@ -15,3 +18,9 @@ humidity-sensitivity = 2.0
 
 ## The polling interval in msecs.
 poll-interval = 500
+
+## The button to listen to
+button = 1
+
+## The path to the database
+db-path = @localstatedir@/piweather/piweather.sqlite3

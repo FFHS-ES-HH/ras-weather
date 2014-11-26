@@ -112,7 +112,10 @@ namespace piw { namespace app {
                         Id<view::Illuminance> ())
 
                 .add (
-                        new sensors::Temperature (connection, registry),
+                        new sensors::Temperature (
+                            connection, registry,
+                            config.temperatureSensitivity (),
+                            config.pollInterval ()),
                         Id<view::Temperature> ())
 
                 .add (
@@ -148,7 +151,7 @@ namespace piw { namespace app {
         db (config.dbPath ()),
         connection (config.host (), config.port ()),
         uidRegistry (connection.get ()),
-        button (connection.get (), uidRegistry, 1), /* TODO choose correct button */
+        button (connection.get (), uidRegistry, config.button ()),
         lcd (connection.get (), uidRegistry),
         dbWriter ()
     {}
