@@ -73,6 +73,29 @@ namespace piw { namespace app {
                 view (new View (lcd, *s))
             {}
 
+        struct ObserverAdder
+        {
+            ObserverAdder (Observers&, Lcd&);
+
+            template<typename Sensor, typename View>
+                ObserverAdder& add (Sensor*, Id<View>);
+
+            Observers& observers;
+            Lcd& lcd;
+        };
+
+        ObserverAdder::ObserverAdder (Observers& o, Lcd& l) :
+            observers (o),
+            lcd (l)
+        {}
+
+        template<typename Sensor, typename View>
+            ObserverAdder& ObserverAdder::add (Sensor* sensor, Id<View> viewId)
+        {
+            observers.emplace_back (sensor, lcd, viewId);
+            return *this;
+        }
+
         Observers createObservers (
                 IPConnection* connection,
                 Lcd& lcd,
@@ -80,29 +103,27 @@ namespace piw { namespace app {
                 const UidRegistry& registry)
         {
             Observers observers;
+            ObserverAdder adder (observers, lcd);
 
-            observers.emplace_back (
-                    new sensors::Illuminance (
-                        connection, registry, config.illuminanceSensitivity ()),
-                    lcd,
-                    Id<view::Illuminance> ());
+            adder
+                .add (
+                        new sensors::Illuminance (
+                            connection, registry, config.illuminanceSensitivity ()),
+                        Id<view::Illuminance> ())
 
-            observers.emplace_back (
-                    new sensors::Temperature (connection, registry),
-                    lcd,
-                    Id<view::Temperature> ());
+                .add (
+                        new sensors::Temperature (connection, registry),
+                        Id<view::Temperature> ())
 
-            observers.emplace_back (
-                    new sensors::Barometer (
-                        connection, registry, config.barometerSensitivity ()),
-                    lcd,
-                    Id<view::AirPressure> ());
+                .add (
+                        new sensors::Barometer (
+                            connection, registry, config.barometerSensitivity ()),
+                        Id<view::AirPressure> ())
 
-            observers.emplace_back (
-                    new sensors::Humidity (
-                        connection, registry, config.humiditySensitivity ()),
-                    lcd,
-                    Id<view::Humidity> ());
+                .add (
+                        new sensors::Humidity (
+                            connection, registry, config.humiditySensitivity ()),
+                        Id<view::Humidity> ());
 
             return observers;
         }
