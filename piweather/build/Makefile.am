@@ -15,6 +15,9 @@ piweather_SOURCES		=\
 				 $(src)/app/piweather.cpp \
 				 $(src)/app/Configuration.hpp \
 				 $(src)/app/Configuration.cpp \
+				 $(src)/app/Configuration.cpp \
+				 $(src)/app/ConfigReader.hpp \
+				 $(src)/app/ConfigReader.cpp \
 				 $(src)/app/Application.hpp \
 				 $(src)/app/Application.cpp \
 				 $(src)/db/Values.hpp \

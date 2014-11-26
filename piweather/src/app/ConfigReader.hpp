@@ -25,6 +25,27 @@
 #ifndef PIW_APP_CONFIGREADER_INC
 #define PIW_APP_CONFIGREADER_INC
 
+#include    "app/Configuration.hpp"
+
+#include    <string>
+
+namespace piw { namespace app {
+
+    class ConfigReader
+    {
+        public:
+            ConfigReader (const std::string&);
+
+            void read (Configuration&);
+
+        private:
+            std::string path;
+    };
+
+    inline ConfigReader::ConfigReader (const std::string& p) :
+        path (p)
+    {}
+}}
 
 #endif /* PIW_APP_CONFIGREADER_INC */
 
