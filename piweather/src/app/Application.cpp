@@ -108,24 +108,24 @@ namespace piw { namespace app {
             adder
                 .add (
                         new sensors::Illuminance (
-                            connection, registry, config.illuminanceSensitivity ()),
+                            connection, registry, config.illuminanceSensitivity),
                         Id<view::Illuminance> ())
 
                 .add (
                         new sensors::Temperature (
                             connection, registry,
-                            config.temperatureSensitivity (),
-                            config.pollInterval ()),
+                            config.temperatureSensitivity,
+                            config.pollInterval),
                         Id<view::Temperature> ())
 
                 .add (
                         new sensors::Barometer (
-                            connection, registry, config.barometerSensitivity ()),
+                            connection, registry, config.barometerSensitivity),
                         Id<view::AirPressure> ())
 
                 .add (
                         new sensors::Humidity (
-                            connection, registry, config.humiditySensitivity ()),
+                            connection, registry, config.humiditySensitivity),
                         Id<view::Humidity> ());
 
             return observers;
@@ -148,10 +148,10 @@ namespace piw { namespace app {
 
     Application::Application (const Configuration& config) :
         configuration (config),
-        db (config.dbPath ()),
-        connection (config.host (), config.port ()),
+        db (config.dbPath),
+        connection (config.host, config.port),
         uidRegistry (connection.get ()),
-        button (connection.get (), uidRegistry, config.button ()),
+        button (connection.get (), uidRegistry, config.button),
         lcd (connection.get (), uidRegistry),
         dbWriter ()
     {}

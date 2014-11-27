@@ -32,19 +32,55 @@
 
 namespace piw { namespace app {
 
-    /**
-     * Constructs a new Configuration.
-     */
+    namespace {
+
+        template<typename T>
+            inline void mergeValue (T& first, const T& second, bool overwrite)
+            {
+                if ((overwrite && second) || !first) {
+                    first = second;
+                }
+            }
+
+        template<>
+            inline void mergeValue<std::string> (std::string& first, const std::string& second, bool overwrite)
+            {
+                if ((overwrite && !second.empty ()) || first.empty ()) {
+                    first = second;
+                }
+            }
+    }
+
     Configuration::Configuration () :
-        pollInterval_ (500),
-        barometerSensitivity_ (),
-        humiditySensitivity_ (),
-        illuminanceSensitivity_ (),
-        host_ ("localhost"),
-        port_ (4223),
-        button_ (1),
-        dbPath_ (PIW_DEFAULT_DB_PATH)
+        pollInterval (500),
+        barometerSensitivity (),
+        humiditySensitivity (),
+        illuminanceSensitivity (),
+        host ("localhost"),
+        port (4223),
+        button (1),
+        dbPath (PIW_DEFAULT_DB_PATH)
+    {}
+
+    /**
+     * Merges this configuration with the given one.
+     * @param other the configuration to merge with
+     * @param overwrite whether the values from other should overwrite existing
+     *                  values from this configuration
+     * @return this configuration
+     */
+    Configuration& Configuration::merge (const Configuration& other, bool overwrite)
     {
+        mergeValue (pollInterval, other.pollInterval, overwrite);
+        mergeValue (barometerSensitivity, other.barometerSensitivity, overwrite);
+        mergeValue (humiditySensitivity, other.humiditySensitivity, overwrite);
+        mergeValue (illuminanceSensitivity, other.illuminanceSensitivity, overwrite);
+        mergeValue (host, other.host, overwrite);
+        mergeValue (port, other.port, overwrite);
+        mergeValue (button, other.button, overwrite);
+        mergeValue (dbPath, other.dbPath, overwrite);
+
+        return *this;
     }
 }}
 
