@@ -28,6 +28,7 @@
 #include    <memory>
 #include    <stdexcept>
 #include    <functional>
+#include    <map>
 
 namespace piw { namespace app {
 
@@ -61,37 +62,59 @@ namespace piw { namespace app {
             }
 
         template<typename T>
-             void setConfigValue (
-                     std::istream& input,
-                     Configuration& config,
-                     typename ConfigSetter<T>::type setter)
+             void readValue (std::istream& input, T& value)
             {
-                T value;
                 input >> value;
-                ConfigSetter<T>::set (value, setter, config);
             }
 
         class ConfigEntry
         {
             public:
                 template<typename T>
-                    ConfigEntry (typename ConfigSetter<T>::type);
+                    ConfigEntry (T&);
 
-                void operator() (std::istream&, Configuration&) const;
+                void operator() (std::istream&) const;
 
             private:
-                std::function<void (std::istream&, Configuration&)> setter;
+                std::function<void (std::istream&)> setter;
         };
 
         using namespace std::placeholders;
 
         template<typename T>
-            ConfigEntry::ConfigEntry (typename ConfigSetter<T>::type s) :
-                setter (std::bind (&setConfigValue<T>, _1, _2, s))
+            ConfigEntry::ConfigEntry (T& value) :
+                setter (std::bind (&readValue<T>, _1, std::ref (value)))
             {}
 
-        void ConfigEntry::operator() (std::istream& input, Configuration& config) const
-        { setter (input, config); }
+        void ConfigEntry::operator() (std::istream& input) const
+        { setter (input); }
+
+        typedef std::map<std::string, ConfigEntry> ConfigMap;
+
+        ConfigMap getConfigMap (Configuration& config)
+        {
+            ConfigMap map {
+                { "host", ConfigEntry (config.host) }
+
+            // host = localhost
+            // port = 4223
+            // temperature-sensitivity = 0.1
+
+            // barometer-sensitivity = 20.0
+
+            // illuminance-sensitivity = 2.0
+
+            // humidity-sensitivity = 2.0
+
+            // poll-interval = 500
+
+            // button = 1
+
+            // db-path = /home/fidel/usr/var/piweather/piweather.sqlite3
+            };
+
+            return map;
+        }
     }
 
     void ConfigReader::read (Configuration& config)
@@ -102,8 +125,9 @@ namespace piw { namespace app {
         }
 
         std::unique_ptr<std::ifstream, IfstreamCloser> input (&ifs);
-
         input->exceptions (std::ifstream::failbit | std::ifstream::badbit);
+
+        ConfigMap map = getConfigMap (config);
     }
 }}
 
