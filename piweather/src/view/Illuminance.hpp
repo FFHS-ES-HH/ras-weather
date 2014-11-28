@@ -27,7 +27,6 @@
 
 #include    <sensors/Illuminance.hpp>
 #include    <device/Observer.hpp>
-
 #include    "view/LcdView.hpp"
 
 namespace piw { namespace view {

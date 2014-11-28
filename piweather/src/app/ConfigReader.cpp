@@ -25,22 +25,31 @@
 #include    "app/ConfigReader.hpp"
 
 #include    <fstream>
+#include    <sstream>
 #include    <memory>
 #include    <stdexcept>
 #include    <functional>
 #include    <map>
+#include    <vector>
+#include    <iterator>
+#include    <iostream>
+
+#include    <getopt.h>
 
 namespace piw { namespace app {
 
     namespace {
 
-        void trim (std::string& value) {
+        std::string& trim (std::string& value)
+        {
             value.erase (0, value.find_first_not_of (' '));
 
             std::string::size_type pos = value.find_last_not_of (' ');
-            if (pos < value.size ()) {
+            if ((pos + 1) < value.size ()) {
                 value.erase (pos);
             }
+
+            return value;
         }
 
         struct IfstreamCloser
@@ -105,14 +114,44 @@ namespace piw { namespace app {
                 { "temperature-sensitivity", ConfigEntry (config.temperatureSensitivity) },
                 { "illuminance-sensitivity", ConfigEntry (config.illuminanceSensitivity) },
                 { "button", ConfigEntry (config.button) },
-                { "db-path", ConfigEntry (config.dbPath) }
+                { "database", ConfigEntry (config.dbPath) }
             };
 
             return map;
         }
+
+        void handleConfig (const ConfigMap& configMap, const std::string& name, std::istream& input)
+        {
+            ConfigMap::const_iterator entry = configMap.find (name);
+            if (entry == configMap.end ()) {
+                throw std::runtime_error ("The requested configuration entry does not exist.");
+            }
+
+            entry->second (input);
+        }
+
+        void usage ()
+        {
+            std::vector<const char*> lines {
+                { "Usage: piweather [-h] [-c {Configuration}] [-d {Database}] [-H {Host}] [-p {Port}]" },
+                { "" },
+                { "-c {Configuration}   The path to the configuration file." },
+                { "-h                   Print this help and exit." },
+                { "-p {Port}            The port to connect to." },
+                { "-H {Host}            The host to connect to." },
+                { "-d {Database}        The path to the database to use." },
+                { "" }
+            };
+
+            std::copy (
+                    lines.begin (),
+                    lines.end (),
+                    std::ostream_iterator<const char*> (
+                        std::cout, "\n"));
+        }
     }
 
-    void ConfigReader::read (Configuration& config, const std::string& path)
+    void ConfigReader::read (Configuration& config, const std::string& path) const
     {
         std::ifstream ifs (path.c_str ());
         if (!ifs.is_open ()) {
@@ -145,7 +184,7 @@ namespace piw { namespace app {
                 case '=':
                     {
                         atName = false;
-                        ConfigMap::iterator value = configMap.find (name);
+                        ConfigMap::iterator value = configMap.find (trim (name));
                         if (value != configMap.end ()) {
                             value->second (*input);
                         }
@@ -160,22 +199,52 @@ namespace piw { namespace app {
         }
     }
 
-    void ConfigReader::parse (Configuration& config, int argc, char** argv)
+    ConfigReader::UserAction ConfigReader::parse (Configuration& config, int argc, char** argv) const
     {
-        option options [] = {
-            { "host", 1, 0, 'h' },
-
-                // { "port", ConfigEntry (config.port) },
-                // { "barometer-sensitivity", ConfigEntry (config.barometerSensitivity) },
-                // { "humidity-sensitivity", ConfigEntry (config.humiditySensitivity) },
-                // { "poll-interval", ConfigEntry (config.pollInterval) },
-                // { "temperature-sensitivity", ConfigEntry (config.temperatureSensitivity) },
-                // { "illuminance-sensitivity", ConfigEntry (config.illuminanceSensitivity) },
-                // { "button", ConfigEntry (config.button) },
-                // { "db-path", ConfigEntry (config.dbPath) }
+        const option options [] = {
+            { "configuration", 1, 0, 'c' },
+            { "host", 1, 0, 'H' },
+            { "port", 1, 0, 'p' },
+            { "database", 1, 0, 'd' },
+            { "help", 1, 0, 'h' },
+            { 0, 0, 0, 0 },
         };
 
-        return {+return_value+};
+        int index;
+        int current;
+        std::istringstream input;
+        std::string configFile;
+        UserAction action = Run;
+        ConfigMap configMap = getConfigMap (config);
+
+        while ((current = getopt_long (argc, argv, "c:H:p:d:h", options, &index)) != -1) {
+            switch (current) {
+                case 'c':
+                    configFile = optarg;
+                    break;
+                case 'H':
+                    input.str (optarg);
+                    handleConfig (configMap, "host", input);
+                    break;
+                case 'p':
+                    input.str (optarg);
+                    handleConfig (configMap, "port", input);
+                    break;
+                case 'd':
+                    input.str (optarg);
+                    handleConfig (configMap, "database", input);
+                    break;
+                case 'h':
+                    action = ShowUsage;
+                    usage ();
+                    break;
+                default:
+                    action = Unknown;
+                    break;
+            }
+        }
+
+        return action;
     }
 }}
 

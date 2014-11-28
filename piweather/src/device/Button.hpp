@@ -28,8 +28,8 @@
 #include    <ip_connection.h>
 #include    <bricklet_lcd_20x4.h>
 
-#include    "device/Observable.hpp"
-#include    "device/UidRegistry.hpp"
+#include    <device/Observable.hpp>
+#include    <device/UidRegistry.hpp>
 
 #include    <cstdint>
 #include    <memory>

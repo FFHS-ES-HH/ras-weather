@@ -25,11 +25,11 @@
 #ifndef PIW_SENSORS_BAROMETER_INC
 #define PIW_SENSORS_BAROMETER_INC
 
-#include    "device/UidRegistry.hpp"
-#include    "sensors/ThresholdObservable.hpp"
+#include    <device/UidRegistry.hpp>
+#include    <sensors/ThresholdObservable.hpp>
 
-#include    "ip_connection.h"
-#include    "bricklet_barometer.h"
+#include    <ip_connection.h>
+#include    <bricklet_barometer.h>
 
 namespace piw { namespace sensors {
 

@@ -25,10 +25,10 @@
 #ifndef PIW_SENSORS_TEMPERATURE_INC
 #define PIW_SENSORS_TEMPERATURE_INC
 
-#include    "device/Observable.hpp"
-#include    "device/UidRegistry.hpp"
+#include    <device/Observable.hpp>
+#include    <device/UidRegistry.hpp>
 
-#include    "sensors/ThresholdObservable.hpp"
+#include    <sensors/ThresholdObservable.hpp>
 
 #include    <bricklet_barometer.h>
 #include    <ip_connection.h>

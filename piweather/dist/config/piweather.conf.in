@@ -23,4 +23,4 @@ poll-interval = 500
 button = 1
 
 ## The path to the database
-db-path = @localstatedir@/piweather/piweather.sqlite3
+database = @localstatedir@/piweather/piweather.sqlite3

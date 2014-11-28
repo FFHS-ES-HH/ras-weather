@@ -43,7 +43,10 @@ namespace piw { namespace app {
             }
 
         template<>
-            inline void mergeValue<std::string> (std::string& first, const std::string& second, bool overwrite)
+            inline void mergeValue<std::string> (
+                    std::string& first,
+                    const std::string& second,
+                    bool overwrite)
             {
                 if ((overwrite && !second.empty ()) || first.empty ()) {
                     first = second;

@@ -22,7 +22,7 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "sensors/Humidity.hpp"
+#include    <sensors/Humidity.hpp>
 
 #include    <stdexcept>
 

@@ -34,8 +34,15 @@ namespace piw { namespace app {
     class ConfigReader
     {
         public:
+            enum UserAction
+            {
+                ShowUsage,
+                Run,
+                Unknown
+            };
+
             void read (Configuration&, const std::string&) const;
-            void parse (Configuration&, int, char**) const;
+            UserAction parse (Configuration&, int, char**) const;
     };
 }}
 

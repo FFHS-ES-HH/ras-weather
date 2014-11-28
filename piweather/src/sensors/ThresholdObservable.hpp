@@ -28,7 +28,7 @@
 #include    <stdexcept>
 #include    <cstdint>
 
-#include    "device/Observable.hpp"
+#include    <device/Observable.hpp>
 
 namespace piw { namespace sensors {
 

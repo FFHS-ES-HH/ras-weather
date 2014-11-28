@@ -22,7 +22,7 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "view/Illuminance.hpp"
+#include    "Illuminance.hpp"
 
 #include    <sstream>
 

@@ -22,7 +22,7 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "device/Lcd.hpp"
+#include    <device/Lcd.hpp>
 
 #include    <stdexcept>
 

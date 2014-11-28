@@ -26,7 +26,7 @@
 #define PIW_VIEW_AIRPRESSURE_INC
 
 #include    <device/Observer.hpp>
-#include    <view/LcdView.hpp>
+#include    "view/LcdView.hpp"
 
 #include    <sensors/Barometer.hpp>
 
