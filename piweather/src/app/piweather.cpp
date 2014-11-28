@@ -30,6 +30,9 @@
 
 using piw::app::Configuration;
 
+namespace {
+}
+
 int main (int argc, char **argv)
 {
     bool result = false;

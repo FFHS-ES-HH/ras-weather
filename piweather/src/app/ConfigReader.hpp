@@ -34,17 +34,9 @@ namespace piw { namespace app {
     class ConfigReader
     {
         public:
-            ConfigReader (const std::string&);
-
-            void read (Configuration&);
-
-        private:
-            std::string path;
+            void read (Configuration&, const std::string&) const;
+            void parse (Configuration&, int, char**) const;
     };
-
-    inline ConfigReader::ConfigReader (const std::string& p) :
-        path (p)
-    {}
 }}
 
 #endif /* PIW_APP_CONFIGREADER_INC */
