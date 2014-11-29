@@ -56,56 +56,56 @@ namespace piw { namespace app {
         template<typename T>
             struct Id { typedef T type; };
 
-        struct Observed
+        struct SensorView
         {
             template<typename Sensor, typename View>
-                Observed (Sensor*, Lcd&, Id<View>);
+                SensorView (Sensor*, Lcd&, Id<View>);
 
             ObservablePtr sensor;
             ObserverPtr view;
         };
 
-        typedef std::vector<Observed> Observers;
+        typedef std::vector<SensorView> SensorViews;
 
         template<typename Sensor, typename View>
-            Observed::Observed (Sensor* s, Lcd& lcd, Id<View>) :
+            SensorView::SensorView (Sensor* s, Lcd& lcd, Id<View>) :
                 sensor (s),
                 view (new View (lcd, *s))
             {}
 
-        struct ObserverAdder
+        struct SensorViewCollector
         {
-            ObserverAdder (Observers&, Lcd&);
+            SensorViewCollector (SensorViews&, Lcd&);
 
             template<typename Sensor, typename View>
-                ObserverAdder& add (Sensor*, Id<View>);
+                SensorViewCollector& add (Sensor*, Id<View>);
 
-            Observers& observers;
+            SensorViews& sensorViews;
             Lcd& lcd;
         };
 
-        ObserverAdder::ObserverAdder (Observers& o, Lcd& l) :
-            observers (o),
+        SensorViewCollector::SensorViewCollector (SensorViews& o, Lcd& l) :
+            sensorViews (o),
             lcd (l)
         {}
 
         template<typename Sensor, typename View>
-            ObserverAdder& ObserverAdder::add (Sensor* sensor, Id<View> viewId)
+            SensorViewCollector& SensorViewCollector::add (Sensor* sensor, Id<View> viewId)
         {
-            observers.emplace_back (sensor, lcd, viewId);
+            sensorViews.emplace_back (sensor, lcd, viewId);
             return *this;
         }
 
-        Observers createObservers (
+        SensorViews createSensorViews (
                 IPConnection* connection,
                 Lcd& lcd,
                 const Configuration& config,
                 const UidRegistry& registry)
         {
-            Observers observers;
-            ObserverAdder adder (observers, lcd);
+            SensorViews sensorViews;
+            SensorViewCollector collector (sensorViews, lcd);
 
-            adder
+            collector
                 .add (
                         new sensors::Illuminance (
                             connection, registry, config.illuminanceSensitivity),
@@ -128,19 +128,19 @@ namespace piw { namespace app {
                             connection, registry, config.humiditySensitivity),
                         Id<view::Humidity> ());
 
-            return observers;
+            return sensorViews;
         }
 
-        void hookObservers (Observers& observers)
+        void hookView (SensorViews& sensorViews)
         {
-            for (const Observed& o : observers) {
+            for (const SensorView& o : sensorViews) {
                 o.sensor->addObserver (*(o.view));
             }
         }
 
-        void unHookObservers (Observers& observers)
+        void unHookView (SensorViews& sensorViews)
         {
-            for (const Observed& o : observers) {
+            for (const SensorView& o : sensorViews) {
                 o.sensor->removeObserver (*(o.view));
             }
         }
@@ -163,10 +163,10 @@ namespace piw { namespace app {
     {
         bool success = true;
 
-        Observers observers = createObservers (
+        SensorViews sensorViews = createSensorViews (
                 connection.get (), lcd, configuration, uidRegistry);
 
-        hookObservers (observers);
+        hookView (sensorViews);
 
         return success;
     }
