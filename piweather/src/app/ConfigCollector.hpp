@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * ConfigReader.hpp is free software copyrighted by David Daniel.
+ * ConfigCollector.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_APP_CONFIGREADER_INC
-#define PIW_APP_CONFIGREADER_INC
+#ifndef PIW_APP_CONFIGCOLLECTOR_INC
+#define PIW_APP_CONFIGCOLLECTOR_INC
 
 #include    "app/Configuration.hpp"
 
@@ -31,7 +31,7 @@
 
 namespace piw { namespace app {
 
-    class ConfigReader
+    class ConfigCollector
     {
         public:
             enum UserAction
@@ -41,11 +41,13 @@ namespace piw { namespace app {
                 Unknown
             };
 
-            void read (Configuration&, const std::string&) const;
-            UserAction parse (Configuration&, int, char**) const;
+            UserAction collect (Configuration&, int, char**) const;
+
+        private:
+            Configuration read (const std::string&) const;
     };
 }}
 
-#endif /* PIW_APP_CONFIGREADER_INC */
+#endif /* PIW_APP_CONFIGCOLLECTOR_INC */
 
 

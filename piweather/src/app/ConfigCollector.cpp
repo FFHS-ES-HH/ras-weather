@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * ConfigReader.cpp is free software copyrighted by David Daniel.
+ * ConfigCollector.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,19 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "app/ConfigReader.hpp"
+#include    "app/ConfigCollector.hpp"
 
 #include    <fstream>
 #include    <sstream>
-#include    <memory>
 #include    <stdexcept>
+#include    <limits>
+
+#include    <memory>
+
 #include    <functional>
 #include    <map>
-#include    <vector>
+
+#include    <array>
 #include    <iterator>
 #include    <iostream>
 
@@ -45,7 +49,7 @@ namespace piw { namespace app {
             value.erase (0, value.find_first_not_of (' '));
 
             std::string::size_type pos = value.find_last_not_of (' ');
-            if ((pos + 1) < value.size ()) {
+            if (pos != std::string::npos && ++pos < value.size ()) {
                 value.erase (pos);
             }
 
@@ -75,8 +79,22 @@ namespace piw { namespace app {
                 value.clear ();
                 std::getline (input, value, '\n');
 
-                value.erase (value.find_first_of ('#'));
+                std::string::size_type pos = value.find_first_of ('#');
+                if (pos != std::string::npos) {
+                    value.erase (pos);
+                }
+
                 trim (value);
+
+                pos = value.find_first_of ('"');
+                if (pos != std::string::npos) {
+                    value.erase (0, ++pos);
+
+                    pos = value.find_last_of ('"');
+                    if (pos != std::string::npos) {
+                        value.erase (pos);
+                    }
+                }
             }
 
         class ConfigEntry
@@ -120,7 +138,7 @@ namespace piw { namespace app {
             return map;
         }
 
-        void handleConfig (const ConfigMap& configMap, const std::string& name, std::istream& input)
+        void handleParam (const ConfigMap& configMap, const std::string& name, std::istream& input)
         {
             ConfigMap::const_iterator entry = configMap.find (name);
             if (entry == configMap.end ()) {
@@ -128,19 +146,20 @@ namespace piw { namespace app {
             }
 
             entry->second (input);
+            input.clear ();
         }
 
         void usage ()
         {
-            std::vector<const char*> lines {
-                { "Usage: piweather [-h] [-c {Configuration}] [-d {Database}] [-H {Host}] [-p {Port}]" },
-                { "" },
-                { "-c {Configuration}   The path to the configuration file." },
-                { "-h                   Print this help and exit." },
-                { "-p {Port}            The port to connect to." },
-                { "-H {Host}            The host to connect to." },
-                { "-d {Database}        The path to the database to use." },
-                { "" }
+            std::array<const char*, 7> lines {
+
+                "Usage: piweather [-h] [-c {Configuration}] [-d {Database}] [-H {Host}] [-p {Port}]",
+                "",
+                "-c|--configuration {Configuration}     The path to the configuration file.",
+                "-h|--help                              Print this help and exit.",
+                "-p|--port {Port}                       Connect to port {Port}.",
+                "-H|--host {Host}                       Connect to host {Host}.",
+                "-d|--database {Database}               The path to the database to use."
             };
 
             std::copy (
@@ -148,10 +167,12 @@ namespace piw { namespace app {
                     lines.end (),
                     std::ostream_iterator<const char*> (
                         std::cout, "\n"));
+
+            std::cout << std::endl;
         }
     }
 
-    void ConfigReader::read (Configuration& config, const std::string& path) const
+    Configuration ConfigCollector::read (const std::string& path) const
     {
         std::ifstream ifs (path.c_str ());
         if (!ifs.is_open ()) {
@@ -161,29 +182,26 @@ namespace piw { namespace app {
         std::unique_ptr<std::ifstream, IfstreamCloser> input (&ifs);
         input->exceptions (std::ifstream::failbit | std::ifstream::badbit);
 
+        Configuration config = Configuration ();
         ConfigMap configMap = getConfigMap (config);
 
         char eof = std::char_traits<char>::eof ();
-        while (input->peek () != eof) {
-            std::string name;
-            bool atName = false;
+        std::string name;
+        constexpr std::streamsize ignoreCount = std::numeric_limits<std::streamsize>::max ();
 
-            char next = input->get ();
-            switch (next) {
+        while (input->peek () != eof) {
+
+            char next;
+            switch ((next = input->get ())) {
                 case '\n':
-                    input->ignore (' ');
-                    atName = input->peek () != '#';
-                    break;
                 case ' ':
-                    input->ignore (' ');
                     break;
                 case '#':
-                    input->ignore ('\n');
-                    atName = input->peek () != '#';
+                    input->ignore (ignoreCount, '\n');
                     break;
                 case '=':
+                    input->ignore (ignoreCount, ' ');
                     {
-                        atName = false;
                         ConfigMap::iterator value = configMap.find (trim (name));
                         if (value != configMap.end ()) {
                             value->second (*input);
@@ -192,14 +210,14 @@ namespace piw { namespace app {
                     }
                     break;
                 default:
-                    if (atName) {
-                        name += next;
-                    }
+                    name += next;
             }
         }
+
+        return config;
     }
 
-    ConfigReader::UserAction ConfigReader::parse (Configuration& config, int argc, char** argv) const
+    ConfigCollector::UserAction ConfigCollector::collect (Configuration& config, int argc, char** argv) const
     {
         const option options [] = {
             { "configuration", 1, 0, 'c' },
@@ -224,15 +242,15 @@ namespace piw { namespace app {
                     break;
                 case 'H':
                     input.str (optarg);
-                    handleConfig (configMap, "host", input);
+                    handleParam (configMap, "host", input);
                     break;
                 case 'p':
                     input.str (optarg);
-                    handleConfig (configMap, "port", input);
+                    handleParam (configMap, "port", input);
                     break;
                 case 'd':
                     input.str (optarg);
-                    handleConfig (configMap, "database", input);
+                    handleParam (configMap, "database", input);
                     break;
                 case 'h':
                     action = ShowUsage;
@@ -241,6 +259,23 @@ namespace piw { namespace app {
                 default:
                     action = Unknown;
                     break;
+            }
+        }
+
+        if (action == Run) {
+            const char* path = 0;
+            if (!configFile.empty ()) {
+                path = configFile.c_str ();
+            }
+#ifdef      DEFAULT_CONFIG_PATH
+            else {
+                path = DEFAULT_CONFIG_PATH;
+            }
+#endif
+
+            if (path != 0) {
+                Configuration fromFile = read (path);
+                config.merge (fromFile);
             }
         }
 

@@ -37,7 +37,7 @@ namespace piw { namespace app {
         template<typename T>
             inline void mergeValue (T& first, const T& second, bool overwrite)
             {
-                if ((overwrite && second) || !first) {
+                if (!first || (overwrite && second)) {
                     first = second;
                 }
             }
@@ -48,22 +48,11 @@ namespace piw { namespace app {
                     const std::string& second,
                     bool overwrite)
             {
-                if ((overwrite && !second.empty ()) || first.empty ()) {
+                if (first.empty () || (overwrite && !second.empty ())) {
                     first = second;
                 }
             }
     }
-
-    Configuration::Configuration () :
-        pollInterval (500),
-        barometerSensitivity (),
-        humiditySensitivity (),
-        illuminanceSensitivity (),
-        host ("localhost"),
-        port (4223),
-        button (1),
-        dbPath (PIW_DEFAULT_DB_PATH)
-    {}
 
     /**
      * Merges this configuration with the given one.
@@ -75,6 +64,7 @@ namespace piw { namespace app {
     Configuration& Configuration::merge (const Configuration& other, bool overwrite)
     {
         mergeValue (pollInterval, other.pollInterval, overwrite);
+        mergeValue (temperatureSensitivity, other.barometerSensitivity, overwrite);
         mergeValue (barometerSensitivity, other.barometerSensitivity, overwrite);
         mergeValue (humiditySensitivity, other.humiditySensitivity, overwrite);
         mergeValue (illuminanceSensitivity, other.illuminanceSensitivity, overwrite);

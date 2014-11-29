@@ -50,8 +50,6 @@ namespace piw { namespace app {
             bool run ();
 
         private:
-
-        private:
             Configuration configuration;
             db::Database db;
             device::Connection connection;

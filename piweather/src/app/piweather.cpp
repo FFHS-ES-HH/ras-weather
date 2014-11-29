@@ -27,24 +27,33 @@
 #include    <exception>
 
 #include    "app/Application.hpp"
+#include    "app/ConfigCollector.hpp"
 
-using piw::app::Configuration;
+using namespace piw::app;
 
-namespace {
-}
-
-int main (int argc, char **argv)
+int main (int argc, char** argv)
 {
-    bool result = false;
+    bool result = true;
 
     try {
-        Configuration configuration;
+        Configuration configuration = Configuration ();
 
-        piw::app::Application app (configuration);
-        result = app.run ();
+        typedef ConfigCollector Collector;
+        Collector collector;
+        Collector::UserAction action = collector.collect (configuration, argc, argv);
+
+        if (action == Collector::Run) {
+
+            Application application (configuration);
+            result = application.run ();
+        }
+        else if (action == Collector::Unknown) {
+            result = false;
+        }
     }
-    catch (const std::exception& e) {
-        std::cerr << e.what () << std::endl;
+    catch (const std::exception& error) {
+        result = false;
+        std::cerr << error.what () << std::endl;
     }
 
     return result ? EXIT_SUCCESS : EXIT_FAILURE;

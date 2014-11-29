@@ -15,8 +15,8 @@ piweather_SOURCES		=\
 				 $(src)/app/piweather.cpp \
 				 $(src)/app/Configuration.hpp \
 				 $(src)/app/Configuration.cpp \
-				 $(src)/app/ConfigReader.hpp \
-				 $(src)/app/ConfigReader.cpp \
+				 $(src)/app/ConfigCollector.hpp \
+				 $(src)/app/ConfigCollector.cpp \
 				 $(src)/app/Application.hpp \
 				 $(src)/app/Application.cpp \
 				 $(src)/db/Values.hpp \
@@ -34,7 +34,7 @@ piweather_SOURCES		=\
 piweather_LDADD			= libpiweather.la
 piweather_CPPFLAGS		=\
 				 $(AM_CPPFLAGS) \
-				 -DPIW_DEFAULT_DB_PATH="\"@localstatedir@/piweather/piweather.sqlite3\""
+				 -DDEFAULT_CONFIG_PATH="\"@sysconfdir@/piweather/piweather.conf\""
 
 libpiweather_la_SOURCES		=\
 				 $(lib)/ip_connection.c \
