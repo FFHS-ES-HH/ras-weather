@@ -1,0 +1,34 @@
+piweather
+=========
+
+piweather is an application that runs on the Raspberry Pi that is connected to a weather
+station from tinkerforge. The application displays the following weather related values on
+the LCD:
+
+* temperature
+* humidity
+* air pressure
+* illuminance
+
+Besides displaying thos values, piweather stores them in an sqlite3 database.
+
+Configuration
+-------------
+
+The application is configured by the configuration file `/etc/piweather/piweather.conf`.
+The file is self explanatory and it allows the configuration of the sensor sensitivities,
+the location of the database and so on. The most important things are the host and the
+port of the connected weather station.
+
+Database
+--------
+
+The database contains all measured values. A record contains the following fields:
+
+* `id`, the primary key in ascending order. INTEGER
+* `temperature`, the temperature in Grad Celsius. REAL NOT NULL
+* `humidity`, the humidity in %, REAL NOT NULL
+* `pressure` the air pressure in mbar, REAL NOT NULL
+* `illuminance`, the illuminance in lux, REAL NOT NULL
+* `created_at`, the timestamp of creation of this record, INTEGER NOT NULL
+
