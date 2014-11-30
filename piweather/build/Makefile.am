@@ -109,3 +109,5 @@ CLEANFILES			=\
 				 $(initd_SCRIPTS) \
 				 $(initdefault_DATA) \
 				 $(piwconfig_DATA)
+
+MAINTAINERCLEANFILES		= Makefile.in

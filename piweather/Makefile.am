@@ -4,5 +4,12 @@ SUBDIRS			= build
 piweatherdir		= $(pkgdatadir)
 piweather_DATA		= dist/schema.sql
 
-EXTRA_DIST		= $(piweather_DATA)
+piweathersqlitedbdir	= $(localstatedir)/piweather
+piweathersqlitedb_DATA	= dist/piweather.sqlite3
+
+EXTRA_DIST		=\
+			 $(piweather_DATA) \
+			 $(piweathersqlitedb_DATA)
+
 CLEANFILES		= *~
+MAINTAINERCLEANFILES	= Makefile.in
