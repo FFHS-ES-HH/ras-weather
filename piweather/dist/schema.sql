@@ -1,4 +1,4 @@
-CREATE TABLE piw_values IF NOT EXISTS (
+CREATE TABLE IF NOT EXISTS piw_values (
     id INTEGER PRIMARY KEY ASC,
     temperature REAL NOT NULL,
     humidity REAL NOT NULL,
