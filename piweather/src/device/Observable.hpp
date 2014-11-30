@@ -43,6 +43,7 @@ namespace piw { namespace device {
 
         protected:
             virtual void notifyObservers ();
+            virtual void notifyError (const std::exception&);
 
         private:
             std::vector<Observer*> observers_;

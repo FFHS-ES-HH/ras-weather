@@ -27,6 +27,7 @@
 
 #include    <stdexcept>
 #include    <cstdint>
+#include    <atomic>
 
 #include    <device/Observable.hpp>
 
@@ -39,7 +40,6 @@ namespace piw { namespace sensors {
             ThresholdObservable (T);
             virtual ~ThresholdObservable () {}
 
-            virtual void threshold (T);
             virtual T threshold () const;
             virtual T value () const;
 
@@ -55,10 +55,11 @@ namespace piw { namespace sensors {
             virtual T read () = 0;
             virtual void adjust (T min, T max) = 0;
             virtual void valueChanged (T) = 0;
+            virtual void onError (const std::exception&) {}
 
         private:
-            T threshold_;
-            T value_;
+            const T threshold_;
+            std::atomic<T> value_;
     };
 
     /**
@@ -75,11 +76,11 @@ namespace piw { namespace sensors {
 
     template<typename T>
         inline T ThresholdObservable<T>::value () const
-        { return value_; }
+        { return value_.load (); }
 
     template<typename T>
         inline void ThresholdObservable<T>::value (T value)
-        { value_ = value; }
+        { value_.store (value); }
 
     template<typename T>
         void ThresholdObservable<T>::wrap (T value, void* user_data)
@@ -89,7 +90,9 @@ namespace piw { namespace sensors {
             try {
                 derived->valueChanged (value);
             }
-            catch (const std::exception&) { /* ignored */ }
+            catch (const std::exception& error) {
+                derived->onError (error);
+            }
         }
 
     template<typename T>
@@ -111,13 +114,6 @@ namespace piw { namespace sensors {
             T current {value ()};
             T thresh {threshold ()};
             adjust (current - thresh, current + thresh);
-        }
-
-    template<typename T>
-        void ThresholdObservable<T>::threshold (T threshold)
-        {
-            threshold_ = threshold;
-            triggerAdjust ();
         }
 }}
 

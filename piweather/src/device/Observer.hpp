@@ -25,6 +25,8 @@
 #ifndef PIW_OBSERVER_INC
 #define PIW_OBSERVER_INC
 
+#include    <stdexcept>
+
 namespace piw { namespace device {
 
     class Observer
@@ -33,6 +35,7 @@ namespace piw { namespace device {
             virtual ~Observer () {}
 
             virtual void valueChanged () = 0;
+            virtual void onError (const std::exception&) = 0;
     };
 }}
 

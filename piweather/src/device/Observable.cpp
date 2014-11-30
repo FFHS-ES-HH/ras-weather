@@ -62,7 +62,17 @@ namespace piw { namespace device {
             try {
                 o->valueChanged ();
             }
-            catch (const std::exception&) { /* ignored */ }
+            catch (...) { /* ignored */ }
+        }
+    }
+
+    void Observable::notifyError (const std::exception& error)
+    {
+        for (Observers::value_type o : observers_) {
+            try {
+                o->onError (error);
+            }
+            catch (...) { /* ignored */ }
         }
     }
 }}

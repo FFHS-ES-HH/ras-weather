@@ -46,7 +46,6 @@ namespace piw { namespace view {
     inline Illuminance::Illuminance (device::Lcd& lcd, sensors::Illuminance& illuminance) :
         LcdView (lcd),
         sensor (illuminance)
-        
     {}
 }}
 
