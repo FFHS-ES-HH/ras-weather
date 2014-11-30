@@ -133,15 +133,15 @@ namespace piw { namespace app {
 
         void hookView (SensorViews& sensorViews)
         {
-            for (const SensorView& o : sensorViews) {
-                o.sensor->addObserver (*(o.view));
+            for (const SensorView& s : sensorViews) {
+                s.sensor->addObserver (*(s.view));
             }
         }
 
         void unHookView (SensorViews& sensorViews)
         {
-            for (const SensorView& o : sensorViews) {
-                o.sensor->removeObserver (*(o.view));
+            for (const SensorView& s : sensorViews) {
+                s.sensor->removeObserver (*(s.view));
             }
         }
     }

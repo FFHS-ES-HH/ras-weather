@@ -30,9 +30,9 @@ namespace piw { namespace view {
 
     void Illuminance::valueChanged ()
     {
-        std::ostringstream current;
+        std::wostringstream current;
 
-        current << sensor.lux () << " l";
+        current << sensor.lux () << L" l";
 
         lcd ().write (1, 0, current.str ());
     }

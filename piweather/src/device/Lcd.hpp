@@ -31,6 +31,7 @@
 
 #include    <string>
 #include    <memory>
+#include    <mutex>
 
 namespace piw { namespace device {
 
@@ -40,7 +41,7 @@ namespace piw { namespace device {
             Lcd (IPConnection*, const device::UidRegistry&);
             ~Lcd ();
 
-            Lcd& write (unsigned, unsigned, const std::string&);
+            Lcd& write (unsigned, unsigned, const std::wstring&);
             Lcd& backlightOn ();
             Lcd& backlightOff ();
             bool isBacklightOn () const;
@@ -48,6 +49,7 @@ namespace piw { namespace device {
 
         private:
             std::unique_ptr<LCD20x4> lcd_;
+            mutable std::mutex mutex_;
     };
 }}
 

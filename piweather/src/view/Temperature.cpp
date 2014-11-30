@@ -30,9 +30,9 @@ namespace piw { namespace view {
 
     void Temperature::valueChanged ()
     {
-        std::ostringstream current;
+        std::wostringstream current;
 
-        current << temperature_.celsius () << " °C";
+        current << temperature_.celsius () << L" °C";
 
         lcd ().write (0, 0, current.str ());
     }

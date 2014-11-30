@@ -30,9 +30,9 @@ namespace piw { namespace view {
 
     void Humidity::valueChanged ()
     {
-        std::ostringstream current;
+        std::wostringstream current;
 
-        current << sensor.humidity () << " %";
+        current << sensor.humidity () << L" %";
 
         lcd ().write (3, 0, current.str ());
     }

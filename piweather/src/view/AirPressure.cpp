@@ -30,9 +30,9 @@ namespace piw { namespace view {
 
     void AirPressure::valueChanged ()
     {
-        std::ostringstream current;
+        std::wostringstream current;
 
-        current << sensor.mbar () << " mbar";
+        current << sensor.mbar () << L" mbar";
 
         lcd ().write (1, 0, current.str ());
     }
