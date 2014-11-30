@@ -28,7 +28,7 @@ The database contains all measured values. A record contains the following field
 * `id`, the primary key in ascending order. INTEGER
 * `temperature`, the temperature in Grad Celsius. REAL NOT NULL
 * `humidity`, the humidity in %, REAL NOT NULL
-* `pressure` the air pressure in mbar, REAL NOT NULL
+* `pressure`, the air pressure in mbar, REAL NOT NULL
 * `illuminance`, the illuminance in lux, REAL NOT NULL
 * `created_at`, the timestamp of creation of this record, INTEGER NOT NULL
 

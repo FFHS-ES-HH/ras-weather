@@ -97,11 +97,11 @@ namespace piw { namespace app {
                 }
             }
 
-        class ConfigEntry
+        class Param
         {
             public:
                 template<typename T>
-                    ConfigEntry (T&);
+                    Param (T&);
 
                 void operator() (std::istream&) const;
 
@@ -112,36 +112,36 @@ namespace piw { namespace app {
         using namespace std::placeholders;
 
         template<typename T>
-            ConfigEntry::ConfigEntry (T& value) :
+            Param::Param (T& value) :
                 setter (std::bind (&readValue<T>, _1, std::ref (value)))
             {}
 
-        void ConfigEntry::operator() (std::istream& input) const
+        void Param::operator() (std::istream& input) const
         { setter (input); }
 
-        typedef std::map<std::string, ConfigEntry> ConfigMap;
+        typedef std::map<std::string, Param> Params;
 
-        ConfigMap getConfigMap (Configuration& config)
+        Params getConfigParams (Configuration& config)
         {
-            ConfigMap map {
-                { "host", ConfigEntry (config.host) },
-                { "port", ConfigEntry (config.port) },
-                { "barometer-sensitivity", ConfigEntry (config.barometerSensitivity) },
-                { "humidity-sensitivity", ConfigEntry (config.humiditySensitivity) },
-                { "poll-interval", ConfigEntry (config.pollInterval) },
-                { "temperature-sensitivity", ConfigEntry (config.temperatureSensitivity) },
-                { "illuminance-sensitivity", ConfigEntry (config.illuminanceSensitivity) },
-                { "button", ConfigEntry (config.button) },
-                { "database", ConfigEntry (config.dbPath) }
+            Params params {
+                { "host", Param (config.host) },
+                { "port", Param (config.port) },
+                { "barometer-sensitivity", Param (config.barometerSensitivity) },
+                { "humidity-sensitivity", Param (config.humiditySensitivity) },
+                { "poll-interval", Param (config.pollInterval) },
+                { "temperature-sensitivity", Param (config.temperatureSensitivity) },
+                { "illuminance-sensitivity", Param (config.illuminanceSensitivity) },
+                { "button", Param (config.button) },
+                { "database", Param (config.dbPath) }
             };
 
-            return map;
+            return params;
         }
 
-        void handleParam (const ConfigMap& configMap, const std::string& name, std::istream& input)
+        void handleParam (const Params& params, const std::string& name, std::istream& input)
         {
-            ConfigMap::const_iterator entry = configMap.find (name);
-            if (entry == configMap.end ()) {
+            Params::const_iterator entry = params.find (name);
+            if (entry == params.end ()) {
                 throw std::runtime_error ("The requested configuration entry does not exist.");
             }
 
@@ -183,28 +183,34 @@ namespace piw { namespace app {
         input->exceptions (std::ifstream::failbit | std::ifstream::badbit);
 
         Configuration config = Configuration ();
-        ConfigMap configMap = getConfigMap (config);
+        Params params = getConfigParams (config);
 
-        char eof = std::char_traits<char>::eof ();
+        constexpr char Eof = std::char_traits<char>::eof ();
+        constexpr std::streamsize MaximumSize = std::numeric_limits<std::streamsize>::max ();
         std::string name;
-        constexpr std::streamsize ignoreCount = std::numeric_limits<std::streamsize>::max ();
 
-        while (input->peek () != eof) {
+        while (input->peek () != Eof) {
 
-            char next;
-            switch ((next = input->get ())) {
+            char next = input->get ();
+            switch (next) {
                 case '\n':
+                case '\r':
+                case '\t':
+                case '\v':
+                case '\f':
+                case '\a':
+                case '\b':
                 case ' ':
                     break;
                 case '#':
-                    input->ignore (ignoreCount, '\n');
+                    input->ignore (MaximumSize, '\n');
                     break;
                 case '=':
-                    input->ignore (ignoreCount, ' ');
+                    input->ignore (MaximumSize, ' ');
                     {
-                        ConfigMap::iterator value = configMap.find (trim (name));
-                        if (value != configMap.end ()) {
-                            value->second (*input);
+                        Params::iterator atParam = params.find (trim (name));
+                        if (atParam != params.end ()) {
+                            atParam->second (*input);
                         }
                         name.clear ();
                     }
@@ -233,7 +239,7 @@ namespace piw { namespace app {
         std::istringstream input;
         std::string configFile;
         UserAction action = Run;
-        ConfigMap configMap = getConfigMap (config);
+        Params params = getConfigParams (config);
 
         while ((current = getopt_long (argc, argv, "c:H:p:d:h", options, &index)) != -1) {
             switch (current) {
@@ -242,15 +248,15 @@ namespace piw { namespace app {
                     break;
                 case 'H':
                     input.str (optarg);
-                    handleParam (configMap, "host", input);
+                    handleParam (params, "host", input);
                     break;
                 case 'p':
                     input.str (optarg);
-                    handleParam (configMap, "port", input);
+                    handleParam (params, "port", input);
                     break;
                 case 'd':
                     input.str (optarg);
-                    handleParam (configMap, "database", input);
+                    handleParam (params, "database", input);
                     break;
                 case 'h':
                     action = ShowUsage;
@@ -274,8 +280,7 @@ namespace piw { namespace app {
 #endif
 
             if (path != 0) {
-                Configuration fromFile = read (path);
-                config.merge (fromFile);
+                config.merge (read (path));
             }
         }
 
