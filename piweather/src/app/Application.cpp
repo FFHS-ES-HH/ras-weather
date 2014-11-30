@@ -34,10 +34,10 @@
 #include    <sensors/Humidity.hpp>
 #include    <sensors/Temperature.hpp>
 
-#include    <view/Illuminance.hpp>
-#include    <view/AirPressure.hpp>
-#include    <view/Humidity.hpp>
-#include    <view/Temperature.hpp>
+#include    "view/Illuminance.hpp"
+#include    "view/AirPressure.hpp"
+#include    "view/Humidity.hpp"
+#include    "view/Temperature.hpp"
 
 #include    <vector>
 

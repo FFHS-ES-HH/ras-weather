@@ -28,12 +28,10 @@
 #include    <device/UidRegistry.hpp>
 #include    <device/Connection.hpp>
 #include    <device/Button.hpp>
-
 #include    <device/Lcd.hpp>
 
-#include    <db/Database.hpp>
-
 #include    "app/Configuration.hpp"
+#include    "db/Database.hpp"
 
 #include    <thread>
 
