@@ -30,51 +30,41 @@ namespace piw { namespace view {
     class Dimensions
     {
         public:
-            Dimensions (unsigned, unsigned, unsigned, unsigned);
+            Dimensions (unsigned, unsigned, unsigned);
 
-            unsigned topLeftX () const;
-            unsigned topLeftY () const;
-            unsigned bottomRightX () const;
-            unsigned bottomRightY () const;
+            unsigned line () const;
+
+            unsigned begin () const;
+            unsigned end () const;
+
+            unsigned first () const;
+            unsigned last () const;
+
             unsigned width () const;
-            unsigned height () const;
 
         private:
-            unsigned topLeftX_;
-            unsigned topLeftY_;
-            unsigned bottomRightX_;
-            unsigned bottomRightY_;
+            unsigned line_;
+            unsigned begin_;
+            unsigned end_;
     };
 
-    inline Dimensions::Dimensions (
-            unsigned topLeftX,
-            unsigned topLeftY,
-            unsigned bottomRightX,
-            unsigned bottomRightY) :
+    inline unsigned Dimensions::line () const
+    { return line_; }
 
-        topLeftX_ (topLeftX),
-        topLeftY_ (topLeftY),
-        bottomRightX_ (bottomRightX),
-        bottomRightY_ (bottomRightY)
-    {}
+    inline unsigned Dimensions::begin () const
+    { return begin_; }
 
-    inline unsigned Dimensions::topLeftX () const
-    { return topLeftX_; }
+    inline unsigned Dimensions::end () const
+    { return end_; }
 
-    inline unsigned Dimensions::topLeftY () const
-    { return topLeftY_; }
+    inline unsigned Dimensions::first () const
+    { return begin_; }
 
-    inline unsigned Dimensions::bottomRightX () const
-    { return bottomRightX_; }
-
-    inline unsigned Dimensions::bottomRightY () const
-    { return bottomRightY_; }
+    inline unsigned Dimensions::last () const
+    { return end_ - 1; }
 
     inline unsigned Dimensions::width () const
-    { return bottomRightX_ - topLeftX_; }
-
-    inline unsigned Dimensions::height () const
-    { return bottomRightY_ - topLeftY_; }
+    { return end_ - begin_; }
 }}
 
 #endif /* PIW_VIEW_DIMENSIONS_INC */

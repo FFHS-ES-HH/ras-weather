@@ -38,6 +38,14 @@ namespace piw { namespace device {
     class Lcd
     {
         public:
+
+            struct Metrics
+            {
+                static constexpr unsigned Lines = 4;
+                static constexpr unsigned Columns = 20;
+            };
+
+        public:
             Lcd (IPConnection*, const device::UidRegistry&);
             ~Lcd ();
 

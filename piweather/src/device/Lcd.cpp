@@ -33,12 +33,6 @@ namespace piw { namespace device {
 
         typedef std::unique_lock<std::mutex> Lock;
 
-        struct LcdMetrics
-        {
-            static const unsigned Lines = 4;
-            static const unsigned Columns = 20;
-        };
-
         size_t wchar_to_ks0066u(const wchar_t* wchar, char* ks0066u, size_t ks0066u_length)
         {
             const wchar_t *s = wchar;
@@ -182,12 +176,12 @@ namespace piw { namespace device {
 
     Lcd& Lcd::write (unsigned line, unsigned column, const std::wstring& text)
     {
-        if (line > LcdMetrics::Lines || column > LcdMetrics::Columns) {
+        if (line > Metrics::Lines || column > Metrics::Columns) {
             throw std::invalid_argument (
                     "The given position to write on the lcd is beyond borders.");
         }
 
-        std::vector<char> buffer (LcdMetrics::Lines * LcdMetrics::Columns + 1);
+        std::vector<char> buffer (Metrics::Lines * Metrics::Columns + 1);
         wchar_to_ks0066u (text.c_str (), &buffer [0], buffer.size ());
 
         Lock lock (mutex_);
