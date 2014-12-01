@@ -22,7 +22,9 @@ piweather_SOURCES		=\
 				 $(src)/db/Values.hpp \
 				 $(src)/db/Database.hpp \
 				 $(src)/db/Database.cpp \
+				 $(src)/view/Dimensions.hpp \
 				 $(src)/view/LcdView.hpp \
+				 $(src)/view/LcdView.cpp \
 				 $(src)/view/Temperature.hpp \
 				 $(src)/view/Temperature.cpp \
 				 $(src)/view/Illuminance.hpp \
