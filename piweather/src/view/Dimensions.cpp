@@ -32,6 +32,15 @@ namespace piw { namespace view {
 
     namespace {
 
+        unsigned checkLine (unsigned line)
+        {
+            if (line > Lcd::Metrics::Lines) {
+                throw std::out_of_range {
+                    "Invalid line given, the line must not exceed the number of "
+                        "available lines on the lcd."};
+            }
+        }
+
         unsigned checkBegin (unsigned begin, unsigned end)
         {
             if (!(begin < end)) {
@@ -40,7 +49,7 @@ namespace piw { namespace view {
                         "than its `end'."};
             }
 
-            if (end > (Lcd::Metrics::Lines + 2)) {
+            if (end > (Lcd::Metrics::Columns + 2)) {
                 throw std::out_of_range {
                     "Invalid `end' for a dimensions range given, `end' must not "
                         "exceed one past the last available column."};
