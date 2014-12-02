@@ -31,10 +31,10 @@
 
 namespace piw { namespace view {
 
-    class Illuminance : public device::Observer, public LcdView
+    class Illuminance : public LcdView
     {
         public:
-            Illuminance (device::Lcd&, sensors::Illuminance&);
+            Illuminance (device::Lcd&, sensors::Illuminance&, Dimensions);
             virtual ~Illuminance () {}
 
             virtual void valueChanged ();
@@ -43,8 +43,12 @@ namespace piw { namespace view {
             sensors::Illuminance& sensor;
     };
 
-    inline Illuminance::Illuminance (device::Lcd& lcd, sensors::Illuminance& illuminance) :
-        LcdView (lcd),
+    inline Illuminance::Illuminance (
+            device::Lcd& lcd,
+            sensors::Illuminance& illuminance,
+            Dimensions dimensions) :
+
+        LcdView (lcd, dimensions),
         sensor (illuminance)
     {}
 }}

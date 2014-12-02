@@ -34,10 +34,10 @@
 
 namespace piw { namespace view {
 
-    class Humidity : public device::Observer, public LcdView
+    class Humidity : public LcdView
     {
         public:
-            Humidity (device::Lcd&, sensors::Humidity&);
+            Humidity (device::Lcd&, sensors::Humidity&, Dimensions);
             virtual ~Humidity () {}
 
             virtual void valueChanged ();
@@ -46,8 +46,11 @@ namespace piw { namespace view {
             sensors::Humidity& sensor;
     };
 
-    inline Humidity::Humidity (device::Lcd& lcd, sensors::Humidity& humidity) :
-        LcdView (lcd),
+    inline Humidity::Humidity (
+            device::Lcd& lcd,
+            sensors::Humidity& humidity,
+            Dimensions dimensions) :
+        LcdView (lcd, dimensions),
         sensor (humidity)
     {}
 }}

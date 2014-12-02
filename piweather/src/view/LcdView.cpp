@@ -33,7 +33,9 @@ namespace piw { namespace view {
 
     void LcdView::write (std::wstring text)
     {
-        text.erase (width ());
-        lcd ().write (topLeftX (), topLeftY (), text);
+        const Dimensions& dim = dimensions ();
+
+        text.erase (dim.width ());
+        lcd ().write (dim.line (), dim.begin (), text);
     }
 }}

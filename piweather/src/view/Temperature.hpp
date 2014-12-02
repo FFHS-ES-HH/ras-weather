@@ -34,10 +34,10 @@
 
 namespace piw { namespace view {
 
-    class Temperature : public device::Observer, public LcdView
+    class Temperature : public LcdView
     {
         public:
-            Temperature (device::Lcd&, sensors::Temperature&);
+            Temperature (device::Lcd&, sensors::Temperature&, Dimensions);
             virtual ~Temperature () {}
 
             virtual void valueChanged ();
@@ -46,8 +46,11 @@ namespace piw { namespace view {
             sensors::Temperature& temperature_;
     };
 
-    inline Temperature::Temperature (device::Lcd& lcd, sensors::Temperature& temperature) :
-        LcdView (lcd),
+    inline Temperature::Temperature (
+            device::Lcd& lcd,
+            sensors::Temperature& temperature,
+            Dimensions dimensions) :
+        LcdView (lcd, dimensions),
         temperature_ (temperature)
     {}
 }}

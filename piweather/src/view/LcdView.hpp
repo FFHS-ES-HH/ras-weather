@@ -26,13 +26,12 @@
 #define PIW_VIEW_LCDVIEW_INC
 
 #include    <device/Lcd.hpp>
+#include    <device/Observer.hpp>
 #include    "view/Dimensions.hpp"
-
-#include    <utility>
 
 namespace piw { namespace view {
 
-    class LcdView
+    class LcdView : public device::Observer
     {
         public:
             virtual ~LcdView () {}
@@ -56,7 +55,7 @@ namespace piw { namespace view {
 
     inline LcdView::LcdView (device::Lcd& lcd, Dimensions dimensions) :
         lcd_ (lcd),
-        dimensions_ (std::move (dimensions))
+        dimensions_ (dimensions)
     {}
 
     inline device::Lcd& LcdView::lcd ()
@@ -65,7 +64,7 @@ namespace piw { namespace view {
     inline const device::Lcd& LcdView::lcd () const
     { return lcd_; }
 
-    const Dimensions& LcdView::dimensions () const
+    inline const Dimensions& LcdView::dimensions () const
     { return dimensions_; }
 }}
 

@@ -32,10 +32,10 @@
 
 namespace piw { namespace view {
 
-    class AirPressure : public device::Observer, public LcdView
+    class AirPressure : public LcdView
     {
         public:
-            AirPressure (device::Lcd&, sensors::Barometer&);
+            AirPressure (device::Lcd&, sensors::Barometer&, Dimensions);
             virtual ~AirPressure () {}
 
             virtual void valueChanged ();
@@ -44,8 +44,11 @@ namespace piw { namespace view {
             sensors::Barometer& sensor;
     };
 
-    inline AirPressure::AirPressure (device::Lcd& lcd, sensors::Barometer& barometer) :
-        LcdView (lcd),
+    inline AirPressure::AirPressure (
+            device::Lcd& lcd,
+            sensors::Barometer& barometer,
+            Dimensions dimensions) :
+        LcdView (lcd, dimensions),
         sensor (barometer)
     {}
 }}

@@ -32,6 +32,8 @@ namespace piw { namespace view {
 
     namespace {
 
+        using device::Lcd;
+
         unsigned checkLine (unsigned line)
         {
             if (line > Lcd::Metrics::Lines) {
@@ -39,6 +41,8 @@ namespace piw { namespace view {
                     "Invalid line given, the line must not exceed the number of "
                         "available lines on the lcd."};
             }
+
+            return line;
         }
 
         unsigned checkBegin (unsigned begin, unsigned end)
@@ -60,7 +64,7 @@ namespace piw { namespace view {
     }
 
     Dimensions::Dimensions (unsigned line, unsigned begin, unsigned end) :
-        line_ (line),
+        line_ (checkLine (line)),
         begin_ (checkBegin (begin, end)),
         end_ (end)
     {}

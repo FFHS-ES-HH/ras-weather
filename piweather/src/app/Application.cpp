@@ -59,7 +59,7 @@ namespace piw { namespace app {
         struct SensorView
         {
             template<typename Sensor, typename View>
-                SensorView (Sensor*, Lcd&, Id<View>);
+                SensorView (Sensor*, Lcd&, Id<View>, view::Dimensions);
 
             ObservablePtr sensor;
             ObserverPtr view;
@@ -68,9 +68,14 @@ namespace piw { namespace app {
         typedef std::vector<SensorView> SensorViews;
 
         template<typename Sensor, typename View>
-            SensorView::SensorView (Sensor* s, Lcd& lcd, Id<View>) :
+            SensorView::SensorView (
+                    Sensor* s,
+                    Lcd& lcd,
+                    Id<View>,
+                    view::Dimensions dimensions) :
+
                 sensor (s),
-                view (new View (lcd, *s))
+                view (new View (lcd, *s, dimensions))
             {}
 
         struct SensorViewCollector
@@ -82,17 +87,34 @@ namespace piw { namespace app {
 
             SensorViews& sensorViews;
             Lcd& lcd;
+            size_t position;
         };
 
         SensorViewCollector::SensorViewCollector (SensorViews& o, Lcd& l) :
             sensorViews (o),
-            lcd (l)
+            lcd (l),
+            position (0)
         {}
 
         template<typename Sensor, typename View>
             SensorViewCollector& SensorViewCollector::add (Sensor* sensor, Id<View> viewId)
         {
-            sensorViews.emplace_back (sensor, lcd, viewId);
+            unsigned column = 0;
+            unsigned end = Lcd::Metrics::Columns / 2;
+
+            if (++position % 2 == 0) {
+                column = Lcd::Metrics::Columns / 2;
+                end = Lcd::Metrics::Columns;
+            }
+
+            unsigned line = position / 2;
+
+            sensorViews.emplace_back (
+                    sensor,
+                    lcd,
+                    viewId,
+                    view::Dimensions (line, column, end));
+
             return *this;
         }
 
