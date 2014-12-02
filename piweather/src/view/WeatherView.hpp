@@ -38,7 +38,7 @@ namespace piw { namespace view {
 
             virtual void storeValue (db::Values&) = 0;
     };
-}
+}}
 
 #endif /* PIW_VIEW_WEATHERVIEW_INC */
 
