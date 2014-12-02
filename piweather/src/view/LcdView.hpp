@@ -26,13 +26,15 @@
 #define PIW_VIEW_LCDVIEW_INC
 
 #include    <device/Lcd.hpp>
+
 #include    "view/Dimensions.hpp"
+#include    "view/WeatherView.hpp"
 
 #include    <utility>
 
 namespace piw { namespace view {
 
-    class LcdView
+    class LcdView : public WeatherView
     {
         public:
             virtual ~LcdView () {}
@@ -42,7 +44,7 @@ namespace piw { namespace view {
             const Dimensions& dimensions () const;
 
         protected:
-            LcdView (device::Lcd&, Dimensions);
+            LcdView (device::Lcd&, const Dimensions&);
 
             device::Lcd& lcd ();
             const device::Lcd& lcd () const;
@@ -54,9 +56,9 @@ namespace piw { namespace view {
             Dimensions dimensions_;
     };
 
-    inline LcdView::LcdView (device::Lcd& lcd, Dimensions dimensions) :
+    inline LcdView::LcdView (device::Lcd& lcd, const Dimensions& dimensions) :
         lcd_ (lcd),
-        dimensions_ (std::move (dimensions))
+        dimensions_ (dimensions)
     {}
 
     inline device::Lcd& LcdView::lcd ()

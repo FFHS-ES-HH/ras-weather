@@ -36,5 +36,10 @@ namespace piw { namespace view {
 
         lcd ().write (0, 0, current.str ());
     }
+
+    void Temperature::storeValue (db::Values& values)
+    {
+        values.temperature = temperature_.celsius ();
+    }
 }}
 

@@ -24,34 +24,35 @@
  */
 #include    "app/Application.hpp"
 
-#include    <ip_connection.h>
-
-#include    <device/Lcd.hpp>
+#include    <device/Connection.hpp>
 #include    <device/UidRegistry.hpp>
 
-#include    <sensors/Illuminance.hpp>
-#include    <sensors/Barometer.hpp>
-#include    <sensors/Humidity.hpp>
-#include    <sensors/Temperature.hpp>
+#include    <device/Button.hpp>
+#include    <device/Lcd.hpp>
 
 #include    "view/Illuminance.hpp"
 #include    "view/AirPressure.hpp"
 #include    "view/Humidity.hpp"
 #include    "view/Temperature.hpp"
 
+#include    "db/Database.hpp"
+
 #include    <vector>
+#include    <thread>
 
 namespace piw { namespace app {
 
     using device::Lcd;
     using device::UidRegistry;
-    using device::Observable;
     using device::Observer;
+    using device::Button;
+
+    using view::WeatherView;
 
     namespace {
 
         typedef std::unique_ptr<Observable> ObservablePtr;
-        typedef std::unique_ptr<Observer> ObserverPtr;
+        typedef std::unique_ptr<WeatherView> WeatherViewPtr;
 
         template<typename T>
             struct Id { typedef T type; };
@@ -62,7 +63,7 @@ namespace piw { namespace app {
                 SensorView (Sensor*, Lcd&, Id<View>);
 
             ObservablePtr sensor;
-            ObserverPtr view;
+            WeatherViewPtr view;
         };
 
         typedef std::vector<SensorView> SensorViews;
@@ -131,29 +132,107 @@ namespace piw { namespace app {
             return sensorViews;
         }
 
-        void hookView (SensorViews& sensorViews)
+        void hookView (const SensorViews& sensorViews)
         {
             for (const SensorView& s : sensorViews) {
                 s.sensor->addObserver (*(s.view));
             }
         }
 
-        void unHookView (SensorViews& sensorViews)
+        void unHookView (const SensorViews& sensorViews)
         {
             for (const SensorView& s : sensorViews) {
                 s.sensor->removeObserver (*(s.view));
             }
         }
+
+        class Listener : public device::Observer
+        {
+            public:
+                virtual ~Listener () {}
+                Listener () = default;
+
+                template<typename V, typename E>
+                    Listener (V, E);
+
+                virtual void valueChanged ();
+                virtual void onError ();
+
+            private:
+                std::function<void ()> valueListener;
+                std::function<void (const std::exception&)> errorListener;
+        };
+
+        template<typename V, typename E>
+            inline Listener::Listener (V v, E e) :
+                valueListener (v),
+                errorListener (e)
+            {}
+
+        void Listener::valueChanged ()
+        {
+            if (valueListener) {
+                valueListener ();
+            }
+        }
+
+        void Listener::onError (const std::exception& error)
+        {
+            if (errorListener) {
+                errorListener (error);
+            }
+        }
+
+        class StateHandler
+        {
+            public:
+                virtual ~StateHandler () {}
+                StateHandler (const Connection&);
+
+            private:
+                static void wrapDisconnect (std::uint8_t, void*);
+
+            private:
+                void onDisconnect (std::uint8_t);
+                void onButtonPressed ();
+                void onLcdTimeout ();
+                void onStoreValues ();
+
+            private:
+                device::Connection connection;
+                device::UidRegistry uidRegistry;
+                device::Button button;
+                device::Lcd lcd;
+                db::Database db;
+                SensorViews sensorViews;
+                Listener buttonListener;
+        };
+
+        StateHandler::StateHandler (const Configuration& config) :
+            connection (config.host, config.port),
+            uidRegistry (connection.get ()),
+            button (connection.get (), uidRegistry, config.button),
+            lcd (connection.get (), uidRegistry),
+            db (config.dbPath),
+            sensorViews (createSensorViews (connection.get (), lcd, config, uidRegistry)),
+            buttonListener (std::bind (&StateHandler::onButtonPressed, this))
+        {
+            button.addObserver (buttonListener);
+            hookView (sensorViews);
+            ipcon_register_callback (
+                    connection, IPCON_CALLBACK_DISCONNECTED,
+                    reinterpret_cast<void*> (&StateHandler::wrapDisconnect), this);
+        }
+
+        void StateHandler::wrapDisconnect (std::uint8_t reason, void* s)
+        {
+            StateHandler* self = static_cast<StateHandler*> (s);
+            self->onDisconnect (reason);
+        }
     }
 
     Application::Application (const Configuration& config) :
-        configuration (config),
-        db (config.dbPath),
-        connection (config.host, config.port),
-        uidRegistry (connection.get ()),
-        button (connection.get (), uidRegistry, config.button),
-        lcd (connection.get (), uidRegistry),
-        dbWriter ()
+        configuration (config)
     {}
 
     Application::~Application ()
@@ -163,10 +242,7 @@ namespace piw { namespace app {
     {
         bool success = true;
 
-        SensorViews sensorViews = createSensorViews (
-                connection.get (), lcd, configuration, uidRegistry);
-
-        hookView (sensorViews);
+        StateHandler handler (config);
 
         return success;
     }

@@ -36,5 +36,10 @@ namespace piw { namespace view {
 
         lcd ().write (3, 0, current.str ());
     }
+
+    void Humidity::storeValue (db::Values& values)
+    {
+        values.humidity = sensor.humidity ();
+    }
 }}
 

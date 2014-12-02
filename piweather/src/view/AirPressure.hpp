@@ -25,20 +25,20 @@
 #ifndef PIW_VIEW_AIRPRESSURE_INC
 #define PIW_VIEW_AIRPRESSURE_INC
 
-#include    <device/Observer.hpp>
 #include    <sensors/Barometer.hpp>
 
 #include    "view/LcdView.hpp"
 
 namespace piw { namespace view {
 
-    class AirPressure : public device::Observer, public LcdView
+    class AirPressure : public LcdView
     {
         public:
             AirPressure (device::Lcd&, sensors::Barometer&);
             virtual ~AirPressure () {}
 
             virtual void valueChanged ();
+            virtual void storeValue (db::Values&);
 
         private:
             sensors::Barometer& sensor;

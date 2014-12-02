@@ -25,22 +25,20 @@
 #ifndef PIW_VIEW_HUMIDITY_INC
 #define PIW_VIEW_HUMIDITY_INC
 
-#include    <device/Observer.hpp>
-#include    <device/Lcd.hpp>
-
 #include    <sensors/Humidity.hpp>
 
 #include    "view/LcdView.hpp"
 
 namespace piw { namespace view {
 
-    class Humidity : public device::Observer, public LcdView
+    class Humidity : public LcdView
     {
         public:
             Humidity (device::Lcd&, sensors::Humidity&);
             virtual ~Humidity () {}
 
             virtual void valueChanged ();
+            virtual void storeValue (db::Values&);
 
         private:
             sensors::Humidity& sensor;

@@ -25,15 +25,7 @@
 #ifndef PIW_APPLICATION_INC
 #define PIW_APPLICATION_INC
 
-#include    <device/UidRegistry.hpp>
-#include    <device/Connection.hpp>
-#include    <device/Button.hpp>
-#include    <device/Lcd.hpp>
-
 #include    "app/Configuration.hpp"
-#include    "db/Database.hpp"
-
-#include    <thread>
 
 namespace piw { namespace app {
 
@@ -41,20 +33,12 @@ namespace piw { namespace app {
     {
         public:
             Application (const Configuration&);
-            Application (const Application&) = delete;
-            Application& operator= (const Application&) = delete;
             ~Application ();
 
             bool run ();
 
         private:
             Configuration configuration;
-            db::Database db;
-            device::Connection connection;
-            device::UidRegistry uidRegistry;
-            device::Button button;
-            device::Lcd lcd;
-            std::thread dbWriter;
     };
 }}
 
