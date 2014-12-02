@@ -36,5 +36,10 @@ namespace piw { namespace view {
 
         lcd ().write (1, 0, current.str ());
     }
+
+    void AirPressure::storeValue (Values& value)
+    {
+        value.pressure = sensor.mbar ();
+    }
 }}
 

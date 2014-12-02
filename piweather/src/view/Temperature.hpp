@@ -25,9 +25,6 @@
 #ifndef PIW_VIEW_TEMPERATURE_INC
 #define PIW_VIEW_TEMPERATURE_INC
 
-#include    <device/Observer.hpp>
-#include    <device/Lcd.hpp>
-
 #include    <sensors/Temperature.hpp>
 
 #include    "view/LcdView.hpp"
@@ -41,6 +38,7 @@ namespace piw { namespace view {
             virtual ~Temperature () {}
 
             virtual void valueChanged ();
+            virtual void storeValue (db::Values&);
 
         private:
             sensors::Temperature& temperature_;

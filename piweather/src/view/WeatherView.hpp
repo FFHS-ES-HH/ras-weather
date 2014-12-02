@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Viewable.hpp is free software copyrighted by David Daniel.
+ * WeatherView.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,19 +22,23 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_VIEW_VIEWABLE_INC
-#define PIW_VIEW_VIEWABLE_INC
+#ifndef PIW_VIEW_WEATHERVIEW_INC
+#define PIW_VIEW_WEATHERVIEW_INC
+
+#include    <device/Observer.hpp>
+
+#include    "db/Values.hpp"
 
 namespace piw { namespace view {
 
-    class Viewable
+    class WeatherView : public device::Observer
     {
         public:
-            virtual ~Viewable () {}
+            virtual ~WeatherView () {}
 
-            virtual display (Lcd&) = 0;
+            virtual void storeValue (db::Values&) = 0;
     };
 }}
 
-#endif /* PIW_VIEW_VIEWABLE_INC */
+#endif /* PIW_VIEW_WEATHERVIEW_INC */
 

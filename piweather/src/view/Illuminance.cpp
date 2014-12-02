@@ -36,5 +36,10 @@ namespace piw { namespace view {
 
         lcd ().write (1, 0, current.str ());
     }
+
+    void Illuminance::storeValue (db::Values& values)
+    {
+        values.illuminance = sensor.lux ();
+    }
 }}
 

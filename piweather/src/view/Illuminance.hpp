@@ -26,7 +26,7 @@
 #define PIW_VIEW_ILLUMINANCE_INC
 
 #include    <sensors/Illuminance.hpp>
-#include    <device/Observer.hpp>
+
 #include    "view/LcdView.hpp"
 
 namespace piw { namespace view {
@@ -38,6 +38,7 @@ namespace piw { namespace view {
             virtual ~Illuminance () {}
 
             virtual void valueChanged ();
+            virtual void storeValue (db::Values&);
 
         private:
             sensors::Illuminance& sensor;
