@@ -32,13 +32,7 @@ namespace piw { namespace app {
     class Application
     {
         public:
-            Application (const Configuration&);
-            ~Application ();
-
-            bool run ();
-
-        private:
-            Configuration configuration;
+            bool run (const Configuration&);
     };
 }}
 

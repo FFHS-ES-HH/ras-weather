@@ -67,7 +67,7 @@ namespace piw { namespace view {
     inline const device::Lcd& LcdView::lcd () const
     { return lcd_; }
 
-    const Dimensions& LcdView::dimensions () const
+    inline const Dimensions& LcdView::dimensions () const
     { return dimensions_; }
 }}
 

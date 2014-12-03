@@ -29,6 +29,7 @@
 
 #include    <device/Button.hpp>
 #include    <device/Lcd.hpp>
+#include    <device/Observable.hpp>
 
 #include    "view/Illuminance.hpp"
 #include    "view/AirPressure.hpp"
@@ -51,7 +52,7 @@ namespace piw { namespace app {
 
     namespace {
 
-        typedef std::unique_ptr<Observable> ObservablePtr;
+        typedef std::unique_ptr<device::Observable> ObservablePtr;
         typedef std::unique_ptr<WeatherView> WeatherViewPtr;
 
         template<typename T>
@@ -178,7 +179,7 @@ namespace piw { namespace app {
                     Listener (V, E);
 
                 virtual void valueChanged ();
-                virtual void onError ();
+                virtual void onError (const std::exception&);
 
             private:
                 std::function<void ()> valueListener;
@@ -209,7 +210,7 @@ namespace piw { namespace app {
         {
             public:
                 virtual ~StateHandler () {}
-                StateHandler (const Connection&);
+                StateHandler (const Configuration&);
 
             private:
                 static void wrapDisconnect (std::uint8_t, void*);
@@ -237,12 +238,12 @@ namespace piw { namespace app {
             lcd (connection.get (), uidRegistry),
             db (config.dbPath),
             sensorViews (createSensorViews (connection.get (), lcd, config, uidRegistry)),
-            buttonListener (std::bind (&StateHandler::onButtonPressed, this))
+            buttonListener (std::bind (&StateHandler::onButtonPressed, this), nullptr)
         {
             button.addObserver (buttonListener);
             hookView (sensorViews);
             ipcon_register_callback (
-                    connection, IPCON_CALLBACK_DISCONNECTED,
+                    connection.get (), IPCON_CALLBACK_DISCONNECTED,
                     reinterpret_cast<void*> (&StateHandler::wrapDisconnect), this);
         }
 
@@ -251,16 +252,17 @@ namespace piw { namespace app {
             StateHandler* self = static_cast<StateHandler*> (s);
             self->onDisconnect (reason);
         }
+
+        void StateHandler::onDisconnect (std::uint8_t)
+        {
+        }
+
+        void StateHandler::onButtonPressed ()
+        {
+        }
     }
 
-    Application::Application (const Configuration& config) :
-        configuration (config)
-    {}
-
-    Application::~Application ()
-    {}
-
-    bool Application::run ()
+    bool Application::run (const Configuration& config)
     {
         bool success = true;
 

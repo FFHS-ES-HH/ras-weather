@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * AirPressure.cpp is free software copyrighted by David Daniel.
+ * IpAddress.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,24 +22,28 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "view/AirPressure.hpp"
+#ifndef PIW_DEVICE_IPADDRESS_INC
+#define PIW_DEVICE_IPADDRESS_INC
 
-#include    <sstream>
-
-namespace piw { namespace view {
-
-    void AirPressure::valueChanged ()
+namespace piw { namespace device {
+    class IpAddress
     {
-        std::wostringstream current;
+        public:
+            IpAddress ();
 
-        current << sensor.mbar () << L" mbar";
+            const std::string& get () const;
+            IpAddress& reset ();
 
-        lcd ().write (1, 0, current.str ());
-    }
+        private:
+            std::string address;
+    };
 
-    void AirPressure::storeValue (db::Values& value)
-    {
-        value.pressure = sensor.mbar ();
-    }
+    inline IpAddress::IpAddress ()
+    { reset (); }
+
+    inline const std::string& IpAddress::get () const
+    { return address; }
 }}
+
+#endif /* PIW_DEVICE_IPADDRESS_INC */
 

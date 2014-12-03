@@ -44,8 +44,8 @@ int main (int argc, char** argv)
 
         if (action == Collector::Run) {
 
-            Application application (configuration);
-            result = application.run ();
+            Application application;
+            result = application.run (configuration);
         }
         else if (action == Collector::Unknown) {
             result = false;
