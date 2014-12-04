@@ -24,6 +24,7 @@
  */
 #ifndef PIW_DEVICE_IPADDRESS_INC
 #define PIW_DEVICE_IPADDRESS_INC
+#include    <string>
 
 namespace piw { namespace device {
     class IpAddress

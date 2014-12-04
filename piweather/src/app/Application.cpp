@@ -30,6 +30,7 @@
 #include    <device/Button.hpp>
 #include    <device/Lcd.hpp>
 #include    <device/Observable.hpp>
+#include    <device/IpAddress.hpp>
 
 #include    "view/Illuminance.hpp"
 #include    "view/AirPressure.hpp"
@@ -52,8 +53,8 @@ namespace piw { namespace app {
 
     namespace {
 
-        typedef std::unique_ptr<device::Observable> ObservablePtr;
-        typedef std::unique_ptr<WeatherView> WeatherViewPtr;
+        typedef std::unique_ptr<device::Observable> SensorPtr;
+        typedef std::unique_ptr<WeatherView> ViewPtr;
 
         template<typename T>
             struct Id { typedef T type; };
@@ -63,8 +64,8 @@ namespace piw { namespace app {
             template<typename Sensor, typename View>
                 SensorView (Sensor*, Lcd&, Id<View>, view::Dimensions);
 
-            ObservablePtr sensor;
-            WeatherViewPtr view;
+            SensorPtr sensor;
+            ViewPtr view;
         };
 
         typedef std::vector<SensorView> SensorViews;

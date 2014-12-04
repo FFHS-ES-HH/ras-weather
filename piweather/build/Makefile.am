@@ -53,7 +53,6 @@ libpiweather_la_SOURCES		=\
 				 $(src)/device/Connection.cpp \
 				 $(src)/device/Lcd.hpp \
 				 $(src)/device/Lcd.cpp \
-				 $(src)/device/IpAddress.hpp \
 				 $(src)/device/IpAddress.cpp \
 				 $(src)/sensors/Temperature.cpp \
 				 $(src)/sensors/Barometer.cpp \
@@ -76,6 +75,7 @@ libpiweatherdevice_include_HEADERS =\
 				 $(src)/device/Observable.hpp \
 				 $(src)/device/Observer.hpp \
 				 $(src)/device/Connection.hpp \
+				 $(src)/device/IpAddress.hpp \
 				 $(src)/device/Button.hpp
 
 libpiweathersensors_include_HEADERS =\

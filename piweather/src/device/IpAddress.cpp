@@ -26,40 +26,71 @@
 
 #include    <stdexcept>
 
-#include    <unistd.h>
+#include    <net/if.h>
+#include    <sys/types.h>
+#include    <ifaddrs.h>
+#include    <sys/socket.h>
 #include    <netdb.h>
-#include    <arpa/inet.h>
 
 namespace piw { namespace device {
 
+    namespace {
+        struct AddrFree
+        {
+            AddrFree (struct ifaddrs*);
+            ~AddrFree ();
+
+            struct ifaddrs* address;
+        };
+
+        AddrFree::AddrFree (struct ifaddrs* a) :
+            address (a)
+        {}
+
+        AddrFree::~AddrFree ()
+        { freeifaddrs (address); }
+    }
+
     IpAddress& IpAddress::reset ()
     {
-        char hostname [128];
+        struct ifaddrs* addresses;
+        char ip [NI_MAXHOST] = {0};
 
-        if (gethostname (hostname, sizeof hostname) < 0) {
-            throw std::runtime_error ("Cannot get the hostname of the device.");
+        if (getifaddrs (&addresses) < 0) {
+            throw std::runtime_error ("Cannot reach the interfaces.");
         }
 
-        struct hostent host;
-        struct hostent* result;
-        char buffer [128];
-        int error;
+        AddrFree a (addresses);
 
-        if (gethostbyname_r (hostname, &host, buffer, sizeof buffer, &result, &error) != 0
-                || result == nullptr)
-        {
-            std::cerr << std::strerror (error) << std::endl;
-            throw std::runtime_error ("Cannot get the host by name.");
+        const std::string lo {"lo"};
+
+        for (struct ifaddrs* current = addresses; current != nullptr; current = current->ifa_next) {
+
+            if (!current->ifa_addr) {
+                continue;
+            }
+
+            int family = current->ifa_addr->sa_family;
+
+            if (family != AF_INET /* && family != AF_INET6 */) {
+                continue;
+            }
+
+            if (lo.compare (0, 2, current->ifa_name) == 0) continue;
+
+            int result = getnameinfo (current->ifa_addr,
+                    family == AF_INET
+                    ? sizeof (struct sockaddr_in)
+                    : sizeof (struct sockaddr_in6),
+                    ip, sizeof ip, nullptr, 0, NI_NUMERICHOST);
+
+            if (result) {
+                throw std::runtime_error ("Cannot get the ip address.");
+            }
+
+            address = ip;
+            break;
         }
-
-        char ip [INET_ADDRSTRLEN + 1] = { 0 };
-
-        if (!inet_ntop (AF_INET, result->h_addr, ip, sizeof ip)) {
-            throw std::runtime_error (
-                    "Cannot convert the ip address to a human readable string.");
-        }
-
-        address = ip;
 
         return *this;
     }
