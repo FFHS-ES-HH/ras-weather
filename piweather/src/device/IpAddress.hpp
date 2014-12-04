@@ -33,14 +33,10 @@ namespace piw { namespace device {
             IpAddress ();
 
             const std::string& get () const;
-            IpAddress& reset ();
 
         private:
             std::string address;
     };
-
-    inline IpAddress::IpAddress ()
-    { reset (); }
 
     inline const std::string& IpAddress::get () const
     { return address; }

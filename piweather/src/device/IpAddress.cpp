@@ -26,72 +26,70 @@
 
 #include    <stdexcept>
 
-#include    <net/if.h>
-#include    <sys/types.h>
 #include    <ifaddrs.h>
-#include    <sys/socket.h>
 #include    <netdb.h>
 
 namespace piw { namespace device {
 
     namespace {
-        struct AddrFree
-        {
-            AddrFree (struct ifaddrs*);
-            ~AddrFree ();
 
-            struct ifaddrs* address;
+        struct IfaceCloser
+        {
+            IfaceCloser (ifaddrs*&);
+            ~IfaceCloser ();
+
+            ifaddrs*& ifaces;
         };
 
-        AddrFree::AddrFree (struct ifaddrs* a) :
-            address (a)
+        inline IfaceCloser::IfaceCloser (ifaddrs*& interfaces) :
+            ifaces (interfaces)
         {}
 
-        AddrFree::~AddrFree ()
-        { freeifaddrs (address); }
+        inline IfaceCloser::~IfaceCloser ()
+        { freeifaddrs (ifaces); }
     }
 
-    IpAddress& IpAddress::reset ()
+    IpAddress::IpAddress () :
+        address {}
     {
-        struct ifaddrs* addresses;
-        char ip [NI_MAXHOST] = {0};
+        ifaddrs* interfaces;
 
-        if (getifaddrs (&addresses) < 0) {
-            throw std::runtime_error ("Cannot reach the interfaces.");
+        if (getifaddrs (&interfaces) < 0) {
+            throw std::runtime_error (
+                    "Cannot reach the network interfaces in order to get the ip address.");
         }
 
-        AddrFree a (addresses);
+        IfaceCloser c {interfaces};
+        const std::string loopback {"lo"};
 
-        const std::string lo {"lo"};
+        for (ifaddrs* iface = interfaces; iface != nullptr; iface = iface->ifa_next) {
 
-        for (struct ifaddrs* current = addresses; current != nullptr; current = current->ifa_next) {
-
-            if (!current->ifa_addr) {
+            if (!iface->ifa_addr) {
                 continue;
             }
 
-            int family = current->ifa_addr->sa_family;
+            int family = iface->ifa_addr->sa_family;
 
             if (family != AF_INET /* && family != AF_INET6 */) {
                 continue;
             }
 
-            if (lo.compare (0, 2, current->ifa_name) == 0) continue;
+            if (loopback.compare (0, 2, iface->ifa_name) == 0) {
+                continue;
+            }
 
-            int result = getnameinfo (current->ifa_addr,
-                    family == AF_INET
-                    ? sizeof (struct sockaddr_in)
-                    : sizeof (struct sockaddr_in6),
+            char ip [128] = {0};
+
+            int error = getnameinfo (iface->ifa_addr,
+                    family == AF_INET ? sizeof (sockaddr_in) : sizeof (sockaddr_in6),
                     ip, sizeof ip, nullptr, 0, NI_NUMERICHOST);
 
-            if (result) {
-                throw std::runtime_error ("Cannot get the ip address.");
+            if (error) {
+                throw std::runtime_error ("Cannot get the ip address of the interface.");
             }
 
             address = ip;
             break;
         }
-
-        return *this;
     }
 }}
