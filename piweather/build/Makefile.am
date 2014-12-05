@@ -33,6 +33,10 @@ piweather_SOURCES		=\
 				 $(src)/view/Illuminance.cpp \
 				 $(src)/view/AirPressure.hpp \
 				 $(src)/view/AirPressure.cpp \
+				 $(src)/view/IpView.hpp \
+				 $(src)/view/IpView.cpp \
+				 $(src)/view/ErrorView.hpp \
+				 $(src)/view/ErrorView.cpp \
 				 $(src)/view/Humidity.hpp \
 				 $(src)/view/Humidity.cpp
 

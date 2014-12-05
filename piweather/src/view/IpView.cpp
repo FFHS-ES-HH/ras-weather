@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * IpAddress.hpp is free software copyrighted by David Daniel.
+ * IpView.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,25 +22,25 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_DEVICE_IPADDRESS_INC
-#define PIW_DEVICE_IPADDRESS_INC
+#include    "view/IpView.hpp"
+
+#include    <device/IpAddress.hpp>
+
 #include    <string>
 
-namespace piw { namespace device {
-    class IpAddress
+namespace piw { namespace view {
+
+    void IpView::display ()
     {
-        public:
-            IpAddress ();
+        using device::Lcd;
+        typedef Lcd::Metrics Metrics;
 
-            const std::wstring& get () const;
+        device::IpAddress ip;
+        std::wstring address = ip.get ();
 
-        private:
-            std::wstring address;
-    };
+        const unsigned column = (Metrics::Columns - address.size ()) / 2;
 
-    inline const std::wstring& IpAddress::get () const
-    { return address; }
+        lcd.write (2, column, address);
+    }
 }}
-
-#endif /* PIW_DEVICE_IPADDRESS_INC */
 

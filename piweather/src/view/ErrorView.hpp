@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * IpAddress.hpp is free software copyrighted by David Daniel.
+ * ErrorView.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,25 +22,27 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_DEVICE_IPADDRESS_INC
-#define PIW_DEVICE_IPADDRESS_INC
-#include    <string>
+#ifndef PIW_VIEW_ERRORVIEW_INC
+#define PIW_VIEW_ERRORVIEW_INC
 
-namespace piw { namespace device {
-    class IpAddress
+#include    <device/Lcd.hpp>
+
+namespace piw { namespace view {
+    class ErrorView
     {
         public:
-            IpAddress ();
+            ErrorView (device::Lcd&);
 
-            const std::wstring& get () const;
+            void display (const std::wstring&);
 
         private:
-            std::wstring address;
+            device::Lcd& lcd;
     };
 
-    inline const std::wstring& IpAddress::get () const
-    { return address; }
+    inline ErrorView::ErrorView (device::Lcd& l) :
+        lcd (l)
+    {}
 }}
 
-#endif /* PIW_DEVICE_IPADDRESS_INC */
+#endif /* PIW_VIEW_ERRORVIEW_INC */
 

@@ -88,7 +88,11 @@ namespace piw { namespace device {
                 throw std::runtime_error ("Cannot get the ip address of the interface.");
             }
 
-            address = ip;
+            address.clear ();
+            for (char c : ip) {
+                address += c;
+            }
+
             break;
         }
     }

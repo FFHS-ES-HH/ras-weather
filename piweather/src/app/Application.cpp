@@ -30,12 +30,13 @@
 #include    <device/Button.hpp>
 #include    <device/Lcd.hpp>
 #include    <device/Observable.hpp>
-#include    <device/IpAddress.hpp>
 
 #include    "view/Illuminance.hpp"
 #include    "view/AirPressure.hpp"
 #include    "view/Humidity.hpp"
 #include    "view/Temperature.hpp"
+#include    "view/IpView.hpp"
+#include    "view/ErrorView.hpp"
 
 #include    "db/Database.hpp"
 
@@ -209,6 +210,13 @@ namespace piw { namespace app {
 
         class StateHandler
         {
+            enum ViewState
+            {
+                Normal,
+                Ip,
+                Error
+            };
+
             public:
                 virtual ~StateHandler () {}
                 StateHandler (const Configuration&);
@@ -223,6 +231,9 @@ namespace piw { namespace app {
                 void onStoreValues ();
 
             private:
+                void displayIp ();
+
+            private:
                 device::Connection connection;
                 device::UidRegistry uidRegistry;
                 device::Button button;
@@ -230,6 +241,7 @@ namespace piw { namespace app {
                 db::Database db;
                 SensorViews sensorViews;
                 Listener buttonListener;
+                ViewState viewState;
         };
 
         StateHandler::StateHandler (const Configuration& config) :
@@ -239,7 +251,8 @@ namespace piw { namespace app {
             lcd (connection.get (), uidRegistry),
             db (config.dbPath),
             sensorViews (createSensorViews (connection.get (), lcd, config, uidRegistry)),
-            buttonListener (std::bind (&StateHandler::onButtonPressed, this), nullptr)
+            buttonListener (std::bind (&StateHandler::onButtonPressed, this), nullptr),
+            viewState (Normal)
         {
             button.addObserver (buttonListener);
             hookView (sensorViews);
@@ -254,12 +267,50 @@ namespace piw { namespace app {
             self->onDisconnect (reason);
         }
 
-        void StateHandler::onDisconnect (std::uint8_t)
+        void StateHandler::onDisconnect (std::uint8_t reason)
         {
+            std::wstring error;
+
+            switch (reason) {
+                case IPCON_DISCONNECT_REASON_REQUEST:
+                    error = L"Device disconnected";
+                    break;
+                case IPCON_DISCONNECT_REASON_ERROR:
+                    error = L"Device not available";
+                    break;
+                case IPCON_DISCONNECT_REASON_SHUTDOWN:
+                    error = L"Device shutting down";
+                    break;
+            }
+
+            view::ErrorView view (lcd);
+            view.display (error);
+            viewState = Error;
         }
 
         void StateHandler::onButtonPressed ()
         {
+            switch (viewState) {
+                case Normal:
+                    unHookView (sensorViews);
+                    displayIp ();
+                    viewState = Ip;
+                    break;
+                case Ip:
+                    hookView (sensorViews);
+                    viewState = Normal;
+                    break;
+                case Error:
+                    hookView (sensorViews);
+                    viewState = Normal;
+                    break;
+            }
+        }
+
+        void StateHandler::displayIp ()
+        {
+            view::IpView ip (lcd);
+            ip.display ();
         }
     }
 
