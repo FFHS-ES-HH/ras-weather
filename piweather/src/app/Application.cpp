@@ -232,6 +232,7 @@ namespace piw { namespace app {
 
             private:
                 void displayIp ();
+                void installLcdTimeout ();
 
             private:
                 device::Connection connection;
@@ -283,13 +284,17 @@ namespace piw { namespace app {
                     break;
             }
 
+            lcd.backlightOn ();
             view::ErrorView view (lcd);
             view.display (error);
             viewState = Error;
+            installLcdTimeout ();
         }
 
         void StateHandler::onButtonPressed ()
         {
+            lcd.backlightOn ();
+
             switch (viewState) {
                 case Normal:
                     unHookView (sensorViews);
@@ -305,13 +310,32 @@ namespace piw { namespace app {
                     viewState = Normal;
                     break;
             }
+
+            installLcdTimeout ();
         }
 
         void StateHandler::displayIp ()
         {
+            lcd.backlightOn ();
             view::IpView ip (lcd);
             ip.display ();
+            installLcdTimeout ();
         }
+
+        void StateHandler::onStoreValues ()
+        {
+            db::Values values = db::Values ();
+            values.created_at = std::chrono::system_clock::now ();
+
+            for (const SensorViews::value_type& s : sensorViews) {
+                s.view->storeValue (values);
+            }
+
+            db.storeValues (values);
+        }
+
+        void StateHandler::onLcdTimeout ()
+        { lcd.backlightOff (); }
     }
 
     bool Application::run (const Configuration& config)
