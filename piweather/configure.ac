@@ -19,6 +19,11 @@ AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
 AX_PTHREAD
 AX_LIB_SQLITE3([3.0.0])
 
+# For having full support of c++11 on the host machine
+# currently static linking of the underlying libraries
+# is necessary, since wheezy won't go above gcc-4.6.
+LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++"
+
 # Checks for libraries.
 
 # Checks for header files.

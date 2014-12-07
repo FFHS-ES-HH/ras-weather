@@ -23,6 +23,7 @@
  * under certain conditions.
  */
 #include    "app/Application.hpp"
+#include    "app/AsyncTimer.hpp"
 
 #include    <device/Connection.hpp>
 #include    <device/UidRegistry.hpp>
@@ -42,6 +43,7 @@
 
 #include    <vector>
 #include    <thread>
+#include    <iostream>
 
 namespace piw { namespace app {
 
@@ -221,6 +223,8 @@ namespace piw { namespace app {
                 virtual ~StateHandler () {}
                 StateHandler (const Configuration&);
 
+                void block ();
+
             private:
                 static void wrapDisconnect (std::uint8_t, void*);
 
@@ -232,6 +236,7 @@ namespace piw { namespace app {
 
             private:
                 void displayIp ();
+                void backlightOn ();
 
             private:
                 device::Connection connection;
@@ -239,26 +244,49 @@ namespace piw { namespace app {
                 device::Button button;
                 device::Lcd lcd;
                 db::Database db;
+                const Configuration& configuration;
                 SensorViews sensorViews;
                 Listener buttonListener;
                 ViewState viewState;
+                AsyncTimer dbWriter;
+                AsyncTimer lcdDimmer;
         };
 
         StateHandler::StateHandler (const Configuration& config) :
-            connection (config.host, config.port),
-            uidRegistry (connection.get ()),
-            button (connection.get (), uidRegistry, config.button),
-            lcd (connection.get (), uidRegistry),
-            db (config.dbPath),
-            sensorViews (createSensorViews (connection.get (), lcd, config, uidRegistry)),
-            buttonListener (std::bind (&StateHandler::onButtonPressed, this), nullptr),
-            viewState (Normal)
+            connection {config.host, config.port},
+            uidRegistry {connection.get ()},
+            button {connection.get (), uidRegistry, config.button},
+            lcd {connection.get (), uidRegistry},
+            db {config.dbPath},
+            configuration (config),
+            sensorViews {createSensorViews (connection.get (), lcd, config, uidRegistry)},
+            buttonListener {std::bind (&StateHandler::onButtonPressed, this), nullptr},
+            viewState {Normal},
+            dbWriter {std::bind (&StateHandler::onStoreValues, this)},
+            lcdDimmer {std::bind (&Lcd::backlightOff, &lcd)}
         {
-            button.addObserver (buttonListener);
+            backlightOn ();
             hookView (sensorViews);
+
+            button.addObserver (buttonListener);
+
             ipcon_register_callback (
                     connection.get (), IPCON_CALLBACK_DISCONNECTED,
                     reinterpret_cast<void*> (&StateHandler::wrapDisconnect), this);
+
+            dbWriter.start (
+                    std::chrono::duration_cast<std::chrono::milliseconds> (
+                        config.saveInterval)
+                    .count ());
+        }
+
+
+        void StateHandler::block ()
+        {
+            std::mutex mutex;
+            std::unique_lock<std::mutex> lock (mutex);
+            std::condition_variable condition;
+            condition.wait (lock);
         }
 
         void StateHandler::wrapDisconnect (std::uint8_t reason, void* s)
@@ -273,30 +301,26 @@ namespace piw { namespace app {
 
             switch (reason) {
                 case IPCON_DISCONNECT_REASON_REQUEST:
-                    error = L"Device disconnected";
+                    // error = L"Device disconnected";
                     break;
                 case IPCON_DISCONNECT_REASON_ERROR:
-                    error = L"Device not available";
+                    // error = L"Device not available";
                     break;
                 case IPCON_DISCONNECT_REASON_SHUTDOWN:
-                    error = L"Device shutting down";
+                    // error = L"Device shutting down";
                     break;
             }
 
-            lcd.backlightOn ();
-            view::ErrorView view (lcd);
-            view.display (error);
             viewState = Error;
         }
 
         void StateHandler::onButtonPressed ()
         {
-            lcd.backlightOn ();
+            backlightOn ();
 
             switch (viewState) {
                 case Normal:
                     unHookView (sensorViews);
-                    displayIp ();
                     viewState = Ip;
                     break;
                 case Ip:
@@ -308,12 +332,10 @@ namespace piw { namespace app {
                     viewState = Normal;
                     break;
             }
-
         }
 
         void StateHandler::displayIp ()
         {
-            lcd.backlightOn ();
             view::IpView ip (lcd);
             ip.display ();
         }
@@ -340,13 +362,44 @@ namespace piw { namespace app {
             }
             catch (const std::exception& /* ignored */) {}
         }
+
+        void StateHandler::backlightOn ()
+        {
+            lcd.backlightOn ();
+            if (configuration.lcdTimeout > std::chrono::milliseconds::zero ()) {
+                lcdDimmer.start (
+                        std::chrono::duration_cast<std::chrono::milliseconds> (
+                            configuration.lcdTimeout).count (),
+                        true);
+            }
+        }
     }
 
     bool Application::run (const Configuration& config)
     {
         bool success = true;
+        size_t errorCounter = 0;
 
-        StateHandler handler (config);
+        while (true) {
+
+            try {
+                StateHandler handler (config);
+                handler.block ();
+            }
+            catch (const std::exception& e) {
+                success = false;
+                std::cerr
+                    << "Error in application execution: " << e.what () << std::endl;
+
+                if (++errorCounter > 5) {
+                    break;
+                }
+
+                // try to reconnect
+                std::this_thread::sleep_for (
+                        std::chrono::milliseconds {500});
+            }
+        }
 
         return success;
     }

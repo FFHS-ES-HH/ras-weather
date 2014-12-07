@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * AbortableTimer.hpp is free software copyrighted by David Daniel.
+ * AsyncTimer.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,63 +31,52 @@
 #include    <mutex>
 #include    <condition_variable>
 #include    <atomic>
+#include    <stdexcept>
 
 namespace piw { namespace app {
 
-    class AbortableTimer
+    class AsyncTimer
     {
         public:
-            AbortableTimer ();
-            ~AbortableTimer ();
+            template<typename Func>
+                AsyncTimer (Func&&);
 
-            template<typename T>
-                AbortableTimer& start (T, std::size_t);
+            AsyncTimer () = delete;
+            ~AsyncTimer ();
 
-            template<typename T>
-                AbortableTimer& startOnce (T, std::size_t);
+            AsyncTimer (const AsyncTimer&) = delete;
+            AsyncTimer& operator= (const AsyncTimer&) = delete;
 
-            AbortableTimer& shutdown ();
+            AsyncTimer& start (std::size_t, bool = false);
+            AsyncTimer& stop ();
+
             bool running () const;
 
         private:
-            static std::thread createThread (const std::function<void ()>&);
             void run ();
 
         private:
+            bool isRunning;
+            bool isAlive;
+            bool onlyOnce;
+            std::size_t msecs;
             std::function<void ()> event;
-            std::atomic_bool running;
-            std::thread thread;
-            std::mutex mutex;
+            mutable std::mutex mutex;
             std::condition_variable condition;
+            std::thread thread;
     };
 
-    /**
-     * Constructs a new AbortableTimer.
-     */
-    template<typename T>
-        AbortableTimer::AbortableTimer () : 
-            event {},
-            running {false},
+    template<typename Func>
+        AsyncTimer::AsyncTimer (Func&& fn) :
+            isRunning {false},
+            isAlive {true},
+            onlyOnce {false},
             msecs {0},
-            thread {},
+            event {std::forward<Func> (fn)},
             mutex {},
-            condition {}
+            condition {},
+            thread {&AsyncTimer::run, this}
     {}
-
-    /**
-     * Constructs a new AbortableTimer.
-     */
-        AbortableTimer::AbortableTimer () :
-            event {},
-            running {false},
-            msecs {0},
-            thread {},
-            mutex {},
-            condition {}
-    {}
-
-    inline AbortableTimer::operator bool () const
-    { return event; }
 }}
 
 #endif /* PIW_APP_ABORTABLETIMER_INC */

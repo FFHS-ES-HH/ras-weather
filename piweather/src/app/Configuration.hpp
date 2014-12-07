@@ -26,6 +26,7 @@
 #define PIW_CONFIGURATION_INC
 
 #include    <string>
+#include    <chrono>
 
 namespace piw { namespace app {
 
@@ -39,9 +40,11 @@ namespace piw { namespace app {
         double humiditySensitivity;
         double illuminanceSensitivity;
         std::string host;
-        unsigned port;
-        unsigned button;
+        std::uint16_t port;
+        std::uint8_t button;
         std::string dbPath;
+        std::chrono::seconds saveInterval;
+        std::chrono::seconds lcdTimeout;
     };
 }}
 

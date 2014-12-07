@@ -74,6 +74,14 @@ namespace piw { namespace app {
             }
 
         template<>
+            void readValue (std::istream& input, std::chrono::seconds& value)
+            {
+                std::size_t seconds;
+                input >> seconds;
+                value = std::chrono::seconds {seconds};
+            }
+
+        template<>
             void readValue<std::string> (std::istream& input, std::string& value)
             {
                 value.clear ();
@@ -132,7 +140,9 @@ namespace piw { namespace app {
                 { "temperature-sensitivity", Param (config.temperatureSensitivity) },
                 { "illuminance-sensitivity", Param (config.illuminanceSensitivity) },
                 { "button", Param (config.button) },
-                { "database", Param (config.dbPath) }
+                { "database", Param (config.dbPath) },
+                { "save-interval", Param (config.saveInterval) },
+                { "lcd-timeout", Param (config.lcdTimeout) }
             };
 
             return params;

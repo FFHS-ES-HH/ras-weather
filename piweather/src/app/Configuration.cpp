@@ -34,21 +34,39 @@ namespace piw { namespace app {
 
     namespace {
 
-        template<typename T>
-            inline void mergeValue (T& first, const T& second, bool overwrite)
+            struct UnaryBool
             {
-                if (!first || (overwrite && second)) {
-                    first = second;
-                }
-            }
+                template<typename T>
+                    static bool value (T&&);
+            };
+
+        template<typename T>
+            bool UnaryBool::value (T&& v)
+            { return v; }
 
         template<>
-            inline void mergeValue<std::string> (
-                    std::string& first,
-                    const std::string& second,
-                    bool overwrite)
+            bool UnaryBool::value (const std::string& v)
+            { return !v.empty (); }
+
+        template<>
+            bool UnaryBool::value (std::string& v)
+            { return !v.empty (); }
+
+        template<>
+            bool UnaryBool::value (const std::chrono::seconds& v)
+            { return v != std::chrono::seconds::zero (); }
+
+        template<>
+            bool UnaryBool::value (std::chrono::seconds& v)
+            { return v != std::chrono::seconds::zero (); }
+
+        template<typename T>
+            void mergeValue (T& first, const T& second, bool overwrite)
             {
-                if (first.empty () || (overwrite && !second.empty ())) {
+                bool f = UnaryBool::value (first);
+                bool s = UnaryBool::value (second);
+
+                if (!f || (overwrite && s)) {
                     first = second;
                 }
             }
@@ -72,6 +90,8 @@ namespace piw { namespace app {
         mergeValue (port, other.port, overwrite);
         mergeValue (button, other.button, overwrite);
         mergeValue (dbPath, other.dbPath, overwrite);
+        mergeValue (saveInterval, other.saveInterval, overwrite);
+        mergeValue (lcdTimeout, other.lcdTimeout, overwrite);
 
         return *this;
     }

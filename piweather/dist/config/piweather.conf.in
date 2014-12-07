@@ -24,3 +24,9 @@ button = 1
 
 ## The path to the database
 database = @localstatedir@/piweather/piweather.sqlite3
+
+## The Interval in seconds to store the values.
+store-interval = 300
+
+## LCD Timeout in seconds
+lcd-timeout = 180

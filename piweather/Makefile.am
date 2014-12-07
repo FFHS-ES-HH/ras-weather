@@ -13,3 +13,12 @@ EXTRA_DIST		=\
 
 CLEANFILES		= *~
 MAINTAINERCLEANFILES	= Makefile.in
+
+BINFILE			= $(PACKAGE)-$(PACKAGE_VERSION).bin.tar.gz
+BININST			= /tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+bindist:		all
+	@echo "Creating $(BINFILE)..."
+	rm -rf $(BININST) $(BINFIILE)
+	$(MAKE) DESTDIR=$(BININST) install
+	tar -cvzf $(BINFILE) -C $(BININST) .
+	find $(BININST) -type f | sed 's|$(BININST)||' > $(PACKAGE)-$(PACKAGE_VERSION).bin.files
