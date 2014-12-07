@@ -17,6 +17,8 @@ piweather_SOURCES		=\
 				 $(src)/app/Configuration.cpp \
 				 $(src)/app/ConfigCollector.hpp \
 				 $(src)/app/ConfigCollector.cpp \
+				 $(src)/app/AbortableTimer.hpp \
+				 $(src)/app/AbortableTimer.cpp \
 				 $(src)/app/Application.hpp \
 				 $(src)/app/Application.cpp \
 				 $(src)/db/Values.hpp \
