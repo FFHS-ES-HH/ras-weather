@@ -30,9 +30,8 @@
 
 namespace piw { namespace device {
 
-    typedef std::map<std::uint16_t, std::string> UidMap;
-
     namespace {
+        typedef std::map<std::uint16_t, std::string> UidMap;
 
         typedef std::unique_lock<std::mutex> Lock;
 
@@ -74,9 +73,10 @@ namespace piw { namespace device {
 
             if (enumeration_type != IPCON_ENUMERATION_TYPE_DISCONNECTED) {
 
-                state->map.emplace (device_identifier, uid);
+                std::pair<UidMap::iterator, bool> result
+                    = state->map.emplace (device_identifier, uid);
 
-                if (--(state->counter) == 0) {
+                if (result.second && --(state->counter) == 0) {
 
                     state->ready.store (true);
                     state->condition.notify_all ();
