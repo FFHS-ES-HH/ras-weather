@@ -42,6 +42,8 @@ namespace piw { namespace view {
 
             unsigned width () const;
 
+            static Dimensions byPosition (unsigned);
+
         private:
             unsigned line_;
             unsigned begin_;

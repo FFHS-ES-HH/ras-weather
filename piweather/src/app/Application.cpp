@@ -105,21 +105,11 @@ namespace piw { namespace app {
         template<typename Sensor, typename View>
             SensorViewCollector& SensorViewCollector::add (Sensor* sensor, Id<View> viewId)
         {
-            unsigned column = 0;
-            unsigned end = Lcd::Metrics::Columns / 2;
-
-            if (++position % 2 == 0) {
-                column = Lcd::Metrics::Columns / 2;
-                end = Lcd::Metrics::Columns;
-            }
-
-            unsigned line = position / 2;
-
             sensorViews.emplace_back (
                     sensor,
                     lcd,
                     viewId,
-                    view::Dimensions (line, column, end));
+                    view::Dimensions::byPosition (++position));
 
             return *this;
         }
