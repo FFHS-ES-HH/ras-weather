@@ -28,6 +28,10 @@
 
 namespace piw { namespace sensors {
 
+    namespace {
+        device::DeviceRegistration deviceRegistration {HUMIDITY_DEVICE_IDENTIFIER};
+    }
+
     /**
      * Constructs a new Humidity.
      */

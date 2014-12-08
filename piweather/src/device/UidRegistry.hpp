@@ -28,6 +28,7 @@
 #include    <map>
 #include    <cstdint>
 #include    <memory>
+#include    <set>
 
 #include    <ip_connection.h>
 
@@ -37,6 +38,8 @@ namespace piw { namespace device {
 
     class UidRegistry
     {
+        friend struct EnumerationState;
+
         public:
             UidRegistry (IPConnection*);
             ~UidRegistry ();
@@ -44,12 +47,28 @@ namespace piw { namespace device {
             UidRegistry (const UidRegistry&) = delete;
             UidRegistry& operator= (const UidRegistry&) = delete;
 
+            static void registerDevice (std::uint16_t);
+
             const std::string& getUid (std::uint16_t) const;
 
         private:
             std::map<std::uint16_t, std::string> uids_;
             EnumerationState* state_;
+
+        private:
+            static std::set<std::uint16_t>& getDeviceIds ();
     };
+
+    inline void UidRegistry::registerDevice (std::uint16_t id)
+    { getDeviceIds ().insert (id); }
+
+    struct DeviceRegistration
+    {
+        DeviceRegistration (std::uint16_t);
+    };
+
+    inline DeviceRegistration::DeviceRegistration (std::uint16_t id)
+    { UidRegistry::registerDevice (id); }
 }}
 
 #endif /* PIW_DEVICE_UIDREGISTRY_INC */

@@ -31,6 +31,8 @@ namespace piw { namespace device {
 
     namespace {
 
+        const DeviceRegistration lcdRegistration {LCD_20X4_DEVICE_IDENTIFIER};
+
         typedef std::lock_guard<std::mutex> Lock;
 
         size_t wchar_to_ks0066u(const wchar_t* wchar, char* ks0066u, size_t ks0066u_length)

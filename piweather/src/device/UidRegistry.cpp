@@ -34,24 +34,24 @@ namespace piw { namespace device {
         typedef std::map<std::uint16_t, std::string> UidMap;
 
         typedef std::unique_lock<std::mutex> Lock;
-
-        const size_t NrOfBricklets = 4;
     }
 
     struct EnumerationState
     {
-        EnumerationState (UidMap&);
+        EnumerationState (UidRegistry&);
 
         UidMap& map;
+        const std::set<std::uint16_t>& ids;
         std::atomic_size_t counter;
         std::atomic_bool ready;
         std::mutex mutex;
         std::condition_variable condition;
     };
 
-    EnumerationState::EnumerationState (UidMap& m) :
-        map (m),
-        counter (NrOfBricklets),
+    EnumerationState::EnumerationState (UidRegistry& registry) :
+        map (registry.uids_),
+        ids (registry.getDeviceIds ()),
+        counter (ids.size ()),
         ready (false),
         mutex (),
         condition ()
@@ -73,11 +73,15 @@ namespace piw { namespace device {
 
             if (enumeration_type != IPCON_ENUMERATION_TYPE_DISCONNECTED) {
 
+                Lock lock (state->mutex);
+
                 std::pair<UidMap::iterator, bool> result
                     = state->map.emplace (device_identifier, uid);
 
-                if (result.second && --(state->counter) == 0) {
-
+                if (result.second
+                    && state->ids.find (device_identifier) != state->ids.end ()
+                    && --(state->counter) == 0)
+                {
                     state->ready.store (true);
                     state->condition.notify_all ();
                 }
@@ -87,7 +91,7 @@ namespace piw { namespace device {
 
     UidRegistry::UidRegistry (IPConnection* connection) :
         uids_ (),
-        state_ (new EnumerationState (uids_))
+        state_ (new EnumerationState (*this))
     {
         ipcon_register_callback (
                 connection,
@@ -100,6 +104,12 @@ namespace piw { namespace device {
 
     UidRegistry::~UidRegistry ()
     { delete state_; }
+
+    std::set<std::uint16_t>& UidRegistry::getDeviceIds ()
+    {
+        static std::set<std::uint16_t> deviceIds;
+        return deviceIds;
+    }
 
     /**
      * Returns the uid of the desired device.

@@ -26,6 +26,10 @@
 
 namespace piw { namespace sensors {
 
+    namespace {
+        device::DeviceRegistration deviceRegistration {AMBIENT_LIGHT_DEVICE_IDENTIFIER};
+    }
+
     Illuminance::Illuminance (
             IPConnection* connection,
             const device::UidRegistry& registry,

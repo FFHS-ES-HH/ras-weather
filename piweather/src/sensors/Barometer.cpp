@@ -28,6 +28,10 @@
 
 namespace piw { namespace sensors {
 
+    namespace {
+        const device::DeviceRegistration deviceRegistration {BAROMETER_DEVICE_IDENTIFIER};
+    }
+
     /**
      * Constructs a new Barometer.
      */
