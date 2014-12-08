@@ -1,0 +1,32 @@
+##
+# Configuration for piweather.
+##
+host = localhost
+port = 4223
+
+## The sensitivity for the temperature.
+temperature-sensitivity = 1
+
+## The sensitivity for the barometer.
+barometer-sensitivity = 5
+
+## The illuminance sensitivity
+illuminance-sensitivity = 1
+
+## The humidity sensitivity
+humidity-sensitivity = 2.0
+
+## The polling interval in msecs.
+poll-interval = 500
+
+## The button to listen to
+button = 1
+
+## The path to the database
+database = @localstatedir@/piweather/piweather.sqlite3
+
+## The Interval in seconds to store the values.
+store-interval = 300
+
+## LCD Timeout in seconds
+lcd-timeout = 180

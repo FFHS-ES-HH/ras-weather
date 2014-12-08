@@ -1,0 +1,4 @@
+##
+# Command line options for piweather.
+##
+CMD="-c @sysconfdir@/piweather/piweather.conf"
