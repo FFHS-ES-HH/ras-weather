@@ -32,9 +32,9 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << sensor.humidity () << L" %";
+        current << "RH: " << sensor.humidity () << L" %";
 
-        lcd ().write (3, 0, current.str ());
+        write (current.str ());
     }
 
     void Humidity::storeValue (db::Values& values)

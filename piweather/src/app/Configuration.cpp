@@ -38,6 +38,12 @@ namespace piw { namespace app {
             {
                 template<typename T>
                     static bool value (T&&);
+
+                template<typename Rep, typename Period>
+                    static bool value (const std::chrono::duration<Rep, Period>&);
+
+                template<typename Rep, typename Period>
+                    static bool value (std::chrono::duration<Rep, Period>&);
             };
 
         template<typename T>
@@ -59,6 +65,14 @@ namespace piw { namespace app {
         template<>
             bool UnaryBool::value (std::chrono::seconds& v)
             { return v != std::chrono::seconds::zero (); }
+
+        template<typename Rep, typename Period>
+            bool UnaryBool::value (const std::chrono::duration<Rep, Period>& v)
+            { return v != std::chrono::duration<Rep, Period>::zero (); }
+
+        template<typename Rep, typename Period>
+            bool UnaryBool::value (std::chrono::duration<Rep, Period>& v)
+            { return value (const_cast<const std::chrono::duration<Rep, Period>&> (v)); }
 
         template<typename T>
             void mergeValue (T& first, const T& second, bool overwrite)

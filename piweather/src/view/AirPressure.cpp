@@ -32,9 +32,9 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << sensor.mbar () << L" mbar";
+        current << "AP: " << sensor.mbar () << L" mbar";
 
-        lcd ().write (1, 0, current.str ());
+        write (current.str ());
     }
 
     void AirPressure::storeValue (db::Values& value)

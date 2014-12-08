@@ -153,6 +153,7 @@ namespace piw { namespace app {
         {
             for (const SensorView& s : sensorViews) {
                 s.sensor->addObserver (*(s.view));
+                s.view->valueChanged ();
             }
         }
 

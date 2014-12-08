@@ -32,9 +32,9 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << sensor.lux () << L" l";
+        current << "I:  " << sensor.lux () << L" l";
 
-        lcd ().write (1, 0, current.str ());
+        write (current.str ());
     }
 
     void Illuminance::storeValue (db::Values& values)

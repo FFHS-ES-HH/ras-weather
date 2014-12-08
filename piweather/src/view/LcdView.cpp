@@ -35,7 +35,10 @@ namespace piw { namespace view {
     {
         const Dimensions& dim = dimensions ();
 
-        text.erase (dim.width ());
+        if (text.size () > dim.width ()) {
+            text.erase (dim.width ());
+        }
+
         lcd ().write (dim.line (), dim.begin (), text);
     }
 }}

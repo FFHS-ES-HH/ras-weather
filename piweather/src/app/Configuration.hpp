@@ -34,7 +34,7 @@ namespace piw { namespace app {
     {
         Configuration& merge (const Configuration&, bool = false);
 
-        unsigned pollInterval;
+        std::chrono::milliseconds pollInterval;
         double temperatureSensitivity;
         double barometerSensitivity;
         double humiditySensitivity;

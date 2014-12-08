@@ -94,7 +94,7 @@ namespace piw { namespace db {
 
         const std::string Sql::insert {
 
-            "INSERT INTO piwvalues ("
+            "INSERT INTO piw_values ("
 
                 "temperature, humidity, pressure, illuminance, created_at"
 
@@ -152,7 +152,7 @@ namespace piw { namespace db {
             bind_value (values.illuminance, ++i, stmt);
             bind_reference (values.created_at, ++i, stmt);
 
-            if (sqlite3_step (statement.get ()) != SQLITE_OK) {
+            if (sqlite3_step (statement.get ()) == SQLITE_ERROR) {
                 throw std::runtime_error ("Error on inserting values.");
             }
 

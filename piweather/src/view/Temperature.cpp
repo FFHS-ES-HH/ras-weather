@@ -32,9 +32,9 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << temperature_.celsius () << L" °C";
+        current << "T:  " << temperature_.celsius () << L" °C";
 
-        lcd ().write (0, 0, current.str ());
+        write (current.str ());
     }
 
     void Temperature::storeValue (db::Values& values)

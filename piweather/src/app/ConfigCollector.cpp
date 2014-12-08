@@ -28,6 +28,7 @@
 #include    <sstream>
 #include    <stdexcept>
 #include    <limits>
+#include    <chrono>
 
 #include    <memory>
 
@@ -74,17 +75,8 @@ namespace piw { namespace app {
             }
 
         template<>
-            void readValue (std::istream& input, std::chrono::seconds& value)
-            {
-                std::size_t seconds;
-                input >> seconds;
-                value = std::chrono::seconds {seconds};
-            }
-
-        template<>
             void readValue<std::string> (std::istream& input, std::string& value)
             {
-                value.clear ();
                 std::getline (input, value, '\n');
 
                 std::string::size_type pos = value.find_first_of ('#');
@@ -105,11 +97,22 @@ namespace piw { namespace app {
                 }
             }
 
+        template<typename Rep, typename Period>
+            void readValue (std::istream& input, std::chrono::duration<Rep, Period>& value)
+            {
+                Rep count;
+                input >> count;
+                value = std::chrono::duration<Rep, Period> {count};
+            }
+
         class Param
         {
             public:
                 template<typename T>
                     Param (T&);
+
+                template<typename T, typename O, template<typename, typename> class Compound>
+                    Param (Compound<T, O>&);
 
                 void operator() (std::istream&) const;
 
@@ -122,6 +125,11 @@ namespace piw { namespace app {
         template<typename T>
             Param::Param (T& value) :
                 setter (std::bind (&readValue<T>, _1, std::ref (value)))
+            {}
+
+        template<typename T, typename V, template<typename, typename> class Compound>
+            Param::Param (Compound<T, V>& value) :
+                setter (std::bind (&readValue<T, V>, _1, std::ref (value)))
             {}
 
         void Param::operator() (std::istream& input) const
@@ -141,7 +149,7 @@ namespace piw { namespace app {
                 { "illuminance-sensitivity", Param (config.illuminanceSensitivity) },
                 { "button", Param (config.button) },
                 { "database", Param (config.dbPath) },
-                { "save-interval", Param (config.saveInterval) },
+                { "store-interval", Param (config.saveInterval) },
                 { "lcd-timeout", Param (config.lcdTimeout) }
             };
 

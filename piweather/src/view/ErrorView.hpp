@@ -28,6 +28,7 @@
 #include    <device/Lcd.hpp>
 
 namespace piw { namespace view {
+
     class ErrorView
     {
         public:

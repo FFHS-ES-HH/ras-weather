@@ -35,7 +35,7 @@ namespace piw { namespace sensors {
             IPConnection* connection,
             const device::UidRegistry& registry,
             std::int16_t threshold,
-            unsigned interval) :
+            const std::chrono::milliseconds& interval) :
 
         ThresholdObservable {threshold}
     {
@@ -46,7 +46,7 @@ namespace piw { namespace sensors {
 
         init ();
 
-        if (barometer_set_air_pressure_callback_period (&barometer, interval) < 0) {
+        if (barometer_set_air_pressure_callback_period (&barometer, interval.count ()) < 0) {
             throw std::runtime_error ("Cannot set the temperature callback period.");
         }
 

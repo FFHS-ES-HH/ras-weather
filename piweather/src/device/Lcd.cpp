@@ -137,6 +137,9 @@ namespace piw { namespace device {
                 lcd_.get (),
                 registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
                 connection);
+
+        backlightOn ();
+        lcd_20x4_clear_display (lcd_.get ());
     }
 
     Lcd::~Lcd ()

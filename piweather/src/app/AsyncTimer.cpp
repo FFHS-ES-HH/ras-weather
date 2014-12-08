@@ -37,7 +37,7 @@ namespace piw { namespace app {
     AsyncTimer::~AsyncTimer ()
     {
         try {
-            ULock lock (mutex);
+            ULock lock {mutex};
 
             isAlive = false;
             isRunning = false;
@@ -54,7 +54,7 @@ namespace piw { namespace app {
      */
     AsyncTimer& AsyncTimer::stop ()
     {
-        Lock lock (mutex);
+        Lock lock {mutex};
 
         if (isRunning) {
             isRunning = false;
@@ -66,7 +66,7 @@ namespace piw { namespace app {
 
     bool AsyncTimer::running () const
     {
-        Lock lock (mutex);
+        Lock lock {mutex};
         return isRunning;
     }
 
@@ -76,7 +76,7 @@ namespace piw { namespace app {
             stop ();
         }
 
-        Lock lock (mutex);
+        Lock lock {mutex};
 
         this->msecs = msecs;
         this->onlyOnce = onlyOnce;
@@ -87,16 +87,13 @@ namespace piw { namespace app {
         return *this;
     }
 
-    /**
-     * AsyncTimer::run
-     */
     void AsyncTimer::run ()
     {
         std::size_t ms = 0;
         bool stillAlive = false;
 
         {
-            Lock lock (mutex);
+            Lock lock {mutex};
             ms = msecs;
             stillAlive = isAlive;
         }
@@ -114,7 +111,7 @@ namespace piw { namespace app {
 
             Status status = Status::timeout;
             {
-                ULock lock (mutex);
+                ULock lock {mutex};
 
                 stillRunning = isRunning;
                 stillAlive = isAlive;
@@ -137,7 +134,7 @@ namespace piw { namespace app {
 
                     event ();
 
-                    Lock lock (mutex);
+                    Lock lock {mutex};
 
                     stillAlive = isAlive;
                     ms = msecs;

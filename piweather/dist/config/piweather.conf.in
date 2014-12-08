@@ -5,13 +5,13 @@ host = localhost
 port = 4223
 
 ## The sensitivity for the temperature.
-temperature-sensitivity = 0.1
+temperature-sensitivity = 1
 
 ## The sensitivity for the barometer.
-barometer-sensitivity = 20.0
+barometer-sensitivity = 5
 
 ## The illuminance sensitivity
-illuminance-sensitivity = 2.0
+illuminance-sensitivity = 1
 
 ## The humidity sensitivity
 humidity-sensitivity = 2.0
