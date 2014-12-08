@@ -47,6 +47,9 @@ namespace piw { namespace app {
             AsyncTimer (const AsyncTimer&) = delete;
             AsyncTimer& operator= (const AsyncTimer&) = delete;
 
+            template<typename Rep, typename Period>
+                AsyncTimer& start (const std::chrono::duration<Rep, Period>&, bool = false);
+
             AsyncTimer& start (std::size_t, bool = false);
             AsyncTimer& stop ();
 
@@ -77,6 +80,14 @@ namespace piw { namespace app {
             condition {},
             thread {&AsyncTimer::run, this}
     {}
+
+    template<typename Rep, typename Period>
+        AsyncTimer& AsyncTimer::start (const std::chrono::duration<Rep, Period>& d, bool once)
+        {
+            return start (
+                    std::chrono::duration_cast<std::chrono::milliseconds> (d).count (),
+                    once);
+        }
 }}
 
 #endif /* PIW_APP_ABORTABLETIMER_INC */

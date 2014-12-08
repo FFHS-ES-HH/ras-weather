@@ -264,10 +264,7 @@ namespace piw { namespace app {
                     connection.get (), IPCON_CALLBACK_DISCONNECTED,
                     reinterpret_cast<void*> (&StateHandler::wrapDisconnect), this);
 
-            dbWriter.start (
-                    std::chrono::duration_cast<std::chrono::milliseconds> (
-                        config.saveInterval)
-                    .count ());
+            dbWriter.start (config.saveInterval);
         }
 
 
@@ -357,10 +354,7 @@ namespace piw { namespace app {
         {
             lcd.backlightOn ();
             if (configuration.lcdTimeout > std::chrono::milliseconds::zero ()) {
-                lcdDimmer.start (
-                        std::chrono::duration_cast<std::chrono::milliseconds> (
-                            configuration.lcdTimeout).count (),
-                        true);
+                lcdDimmer.start (configuration.lcdTimeout, true);
             }
         }
     }
