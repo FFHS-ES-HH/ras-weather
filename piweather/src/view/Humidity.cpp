@@ -25,6 +25,7 @@
 #include    "view/Humidity.hpp"
 
 #include    <sstream>
+#include    <iomanip>
 
 namespace piw { namespace view {
 
@@ -32,7 +33,10 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << "RH: " << sensor.humidity () << L" %";
+        current
+            << "Rel-Hum.: "
+            << std::setw (8) << std::right << std::setprecision (1) << std::fixed
+            << sensor.humidity () << L" %";
 
         write (current.str ());
     }

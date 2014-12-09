@@ -35,7 +35,7 @@ namespace piw { namespace sensors {
             const device::UidRegistry& registry,
             std::uint16_t threshold) :
 
-        ThresholdObservable {threshold}
+        ThresholdObservable {std::uint16_t (threshold * 10)}
     {
         ambient_light_create (
                 &sensor,

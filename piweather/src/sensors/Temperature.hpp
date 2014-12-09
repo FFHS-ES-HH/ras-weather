@@ -38,8 +38,6 @@ namespace piw { namespace sensors {
 
     class Temperature : public ThresholdObservable<std::int16_t>
     {
-        friend class ThresholdObservable;
-
         public:
             Temperature (
                     IPConnection*,
@@ -65,7 +63,7 @@ namespace piw { namespace sensors {
     };
 
     inline double Temperature::celsius () const
-    { return value () / 100; }
+    { return value () / 100.0; }
 }}
 
 #endif /* PIW_SENSORS_TEMPERATURE_INC */

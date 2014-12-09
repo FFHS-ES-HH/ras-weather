@@ -23,8 +23,12 @@
  * under certain conditions.
  */
 #include    "view/LcdView.hpp"
+#include    <sstream>
+#include    <iomanip>
 
 namespace piw { namespace view {
+
+    using device::Lcd;
 
     void LcdView::onError (const std::exception&)
     {
@@ -40,5 +44,24 @@ namespace piw { namespace view {
         }
 
         lcd ().write (dim.line (), dim.begin (), text);
+    }
+
+    void LcdView::write (const std::wstring& label, const std::wstring& text)
+    {
+        std::wostringstream out;
+
+        out << label;
+        std::size_t labelLength = label.size ();
+
+        unsigned left
+            = labelLength > Lcd::Metrics::Columns
+            ? 0
+            : Lcd::Metrics::Columns - labelLength;
+
+        if (left > 0) {
+            out << std::setw (left) << std::right << text;
+        }
+
+        write (out.str ());
     }
 }}

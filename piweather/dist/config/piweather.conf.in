@@ -4,17 +4,17 @@
 host = localhost
 port = 4223
 
-## The sensitivity for the temperature.
+## The sensitivity for the temperature in °Celsius.
 temperature-sensitivity = 1
 
-## The sensitivity for the barometer.
-barometer-sensitivity = 5
+## The sensitivity for the barometer in mbar.
+barometer-sensitivity = 1
 
-## The illuminance sensitivity
+## The illuminance sensitivity in lux
 illuminance-sensitivity = 1
 
-## The humidity sensitivity
-humidity-sensitivity = 2.0
+## The humidity sensitivity in %
+humidity-sensitivity = 1.0
 
 ## The polling interval in msecs.
 poll-interval = 500

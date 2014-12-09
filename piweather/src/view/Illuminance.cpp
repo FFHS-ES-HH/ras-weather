@@ -25,6 +25,7 @@
 #include    "view/Illuminance.hpp"
 
 #include    <sstream>
+#include    <iomanip>
 
 namespace piw { namespace view {
 
@@ -32,7 +33,10 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << "I:  " << sensor.lux () << L" l";
+        current
+            << "Illum.: "
+            << std::setw (8) << std::right << std::setprecision (1) << std::fixed
+            << sensor.lux () << L" lux";
 
         write (current.str ());
     }
