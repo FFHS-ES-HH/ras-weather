@@ -25,6 +25,7 @@
 #include    "view/Illuminance.hpp"
 
 #include    <sstream>
+#include    <iomanip>
 
 namespace piw { namespace view {
 

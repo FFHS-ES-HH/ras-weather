@@ -124,12 +124,12 @@ namespace piw { namespace app {
 
         template<typename T>
             Param::Param (T& value) :
-                setter (std::bind (&readValue<T>, _1, std::ref (value)))
+                setter {std::bind (&readValue<T>, _1, std::ref (value))}
             {}
 
         template<typename T, typename V, template<typename, typename> class Compound>
             Param::Param (Compound<T, V>& value) :
-                setter (std::bind (&readValue<T, V>, _1, std::ref (value)))
+                setter {std::bind (&readValue<T, V>, _1, std::ref (value))}
             {}
 
         void Param::operator() (std::istream& input) const
@@ -169,7 +169,7 @@ namespace piw { namespace app {
 
         void usage ()
         {
-            std::array<const char*, 7> lines {
+            const char* const lines [] = {
 
                 "Usage: piweather [-h] [-c {Configuration}] [-d {Database}] [-H {Host}] [-p {Port}]",
                 "",
@@ -181,10 +181,9 @@ namespace piw { namespace app {
             };
 
             std::copy (
-                    lines.begin (),
-                    lines.end (),
-                    std::ostream_iterator<const char*> (
-                        std::cout, "\n"));
+                    lines,
+                    lines + (sizeof lines / sizeof lines [0]),
+                    std::ostream_iterator<const char*> (std::cout, "\n"));
 
             std::cout << std::endl;
         }

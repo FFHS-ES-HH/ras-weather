@@ -25,6 +25,7 @@
 #include    "view/Humidity.hpp"
 
 #include    <sstream>
+#include    <iomanip>
 
 namespace piw { namespace view {
 

@@ -38,8 +38,6 @@ namespace piw { namespace sensors {
 
     class Temperature : public ThresholdObservable<std::int16_t>
     {
-        friend class ThresholdObservable;
-
         public:
             Temperature (
                     IPConnection*,
