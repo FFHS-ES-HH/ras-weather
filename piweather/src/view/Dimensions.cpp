@@ -76,16 +76,6 @@ namespace piw { namespace view {
                 "The positions of the dimensions go from 1 to 4."};
         }
 
-        // constexpr unsigned width = Lcd::Metrics::Columns / 2;
-        // unsigned line = (position - 1) / 2 + 1;
-        // unsigned column = 0;
-
-        // if (position % 2 == 0) {
-            // column = width;
-        // }
-
-        // return Dimensions (line, column, column + width - 1);
-
-        return Dimensions {position, 0, Lcd::Metrics::Columns - 1};
+        return Dimensions {position - 1, 0, Lcd::Metrics::Columns};
     }
 }}

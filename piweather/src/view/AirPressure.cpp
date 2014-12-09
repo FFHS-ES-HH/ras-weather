@@ -34,9 +34,9 @@ namespace piw { namespace view {
         std::wostringstream current;
 
         current
-            << "Pressure:"
-            << std::setw (10) << std::right << 
-            sensor.mbar () << L" mbar";
+            << "Pressure: "
+            << std::setw (5) << std::right << std::setprecision (0) << std::fixed
+            << sensor.mbar () << L" mbar";
 
         write (current.str ());
     }

@@ -53,7 +53,7 @@ namespace piw { namespace sensors {
     };
 
     inline double Barometer::mbar () const
-    { return value () / 1000; }
+    { return value () / 1000.0; }
 }}
 
 #endif /* PIW_SENSORS_BAROMETER_INC */

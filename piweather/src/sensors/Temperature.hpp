@@ -63,7 +63,7 @@ namespace piw { namespace sensors {
     };
 
     inline double Temperature::celsius () const
-    { return value () / 100; }
+    { return value () / 100.0; }
 }}
 
 #endif /* PIW_SENSORS_TEMPERATURE_INC */

@@ -25,6 +25,7 @@
 #include    "view/Temperature.hpp"
 
 #include    <sstream>
+#include    <iomanip>
 
 namespace piw { namespace view {
 
@@ -32,7 +33,10 @@ namespace piw { namespace view {
     {
         std::wostringstream current;
 
-        current << "T:  " << temperature_.celsius () << L" °C";
+        current
+            << "Temp.: "
+            << std::setw (10) << std::right << std::setprecision (1) << std::fixed
+            << temperature_.celsius () << L" °C";
 
         write (current.str ());
     }

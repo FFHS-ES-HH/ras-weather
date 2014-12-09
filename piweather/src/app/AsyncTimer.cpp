@@ -109,7 +109,7 @@ namespace piw { namespace app {
             typedef std::cv_status Status;
             using std::chrono::milliseconds;
 
-            Status status = Status::timeout;
+            Status status = Status::no_timeout;
             {
                 ULock lock {mutex};
 
@@ -118,6 +118,13 @@ namespace piw { namespace app {
 
                 if (isRunning) {
                     status = condition.wait_for (lock, milliseconds {ms});
+
+                    if (status != Status::timeout) {
+                        ms -= std::chrono::duration_cast<milliseconds> (
+                                Clock::now () - start)
+                            .count ();
+                    }
+
                     stillRunning = isRunning;
                     stillAlive = isAlive;
                 }
@@ -125,6 +132,7 @@ namespace piw { namespace app {
                     condition.wait (lock);
                     stillRunning = isRunning;
                     stillAlive = isAlive;
+                    ms = msecs;
                 }
             }
 
@@ -145,11 +153,6 @@ namespace piw { namespace app {
                     else {
                         stillRunning = isRunning;
                     }
-                }
-                else {
-                    ms -= std::chrono::duration_cast<milliseconds> (
-                            Clock::now () - start)
-                        .count ();
                 }
             }
         }
