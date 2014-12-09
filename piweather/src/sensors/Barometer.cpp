@@ -40,7 +40,7 @@ namespace piw { namespace sensors {
             const device::UidRegistry& registry,
             std::int32_t threshold) :
 
-        ThresholdObservable {threshold}
+        ThresholdObservable {threshold * 1000}
     {
         barometer_create (
                 &barometer,

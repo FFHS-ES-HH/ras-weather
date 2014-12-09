@@ -37,7 +37,7 @@ namespace piw { namespace sensors {
             std::int16_t threshold,
             const std::chrono::milliseconds& interval) :
 
-        ThresholdObservable {threshold}
+        ThresholdObservable {threshold * 100}
     {
         barometer_create (
                 &barometer,

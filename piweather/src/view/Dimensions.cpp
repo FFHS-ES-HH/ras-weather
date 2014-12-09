@@ -71,19 +71,21 @@ namespace piw { namespace view {
 
     Dimensions Dimensions::byPosition (unsigned position)
     {
-        if (position < 1 || position > 6) {
+        if (position < 1 || position > 4) {
             throw std::range_error {
-                "The positions of the dimensions go from 1 to 6."};
+                "The positions of the dimensions go from 1 to 4."};
         }
 
-        constexpr unsigned width = Lcd::Metrics::Columns / 2;
-        unsigned line = (position - 1) / 2 + 1;
-        unsigned column = 0;
+        // constexpr unsigned width = Lcd::Metrics::Columns / 2;
+        // unsigned line = (position - 1) / 2 + 1;
+        // unsigned column = 0;
 
-        if (position % 2 == 0) {
-            column = width;
-        }
+        // if (position % 2 == 0) {
+            // column = width;
+        // }
 
-        return Dimensions (line, column, column + width - 1);
+        // return Dimensions (line, column, column + width - 1);
+
+        return Dimensions {position, 0, Lcd::Metrics::Columns - 1};
     }
 }}
