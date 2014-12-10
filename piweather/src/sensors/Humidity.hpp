@@ -29,14 +29,15 @@
 #include    <ip_connection.h>
 
 #include    <device/UidRegistry.hpp>
+#include    <device/ConnectedDevice.hpp>
 #include    <sensors/ThresholdObservable.hpp>
 
 namespace piw { namespace sensors {
 
-    class Humidity : public ThresholdObservable<std::uint16_t>
+    class Humidity : public ThresholdObservable<std::uint16_t>, public ConnectedDevice
     {
         public:
-            Humidity (IPConnection*, const device::UidRegistry&, std::uint16_t);
+            Humidity (const Connection&, const device::UidRegistry&, std::uint16_t);
             virtual ~Humidity ();
 
             double humidity () const;

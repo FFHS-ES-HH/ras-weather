@@ -27,6 +27,7 @@
 
 #include    <device/Observable.hpp>
 #include    <device/UidRegistry.hpp>
+#include    <device/ConnectedDevice.hpp>
 
 #include    <sensors/ThresholdObservable.hpp>
 
@@ -36,11 +37,11 @@
 
 namespace piw { namespace sensors {
 
-    class Temperature : public ThresholdObservable<std::int16_t>
+    class Temperature : public ThresholdObservable<std::int16_t>, public ConnectedDevice
     {
         public:
             Temperature (
-                    IPConnection*,
+                    const Connection&,
                     const device::UidRegistry&,
                     std::int16_t = 10,
                     const std::chrono::milliseconds& = std::chrono::milliseconds {500});

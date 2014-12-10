@@ -30,13 +30,14 @@
 
 #include    <device/Observable.hpp>
 #include    <device/UidRegistry.hpp>
+#include    <device/ConnectedDevice.hpp>
 
 #include    <cstdint>
 #include    <memory>
 
 namespace piw { namespace device {
 
-    class Button : public Observable
+    class Button : public Observable, public ConnectedDevice
     {
         public:
             enum class Sensitivity
@@ -47,7 +48,7 @@ namespace piw { namespace device {
 
         public:
             Button (
-                    IPConnection*,
+                    const Connection&,
                     const UidRegistry&,
                     std::uint8_t,
                     Sensitivity = Sensitivity::OnPressure);

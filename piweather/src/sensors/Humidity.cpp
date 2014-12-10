@@ -36,16 +36,17 @@ namespace piw { namespace sensors {
      * Constructs a new Humidity.
      */
     Humidity::Humidity (
-            IPConnection* connection,
+            const Connection& connection,
             const device::UidRegistry& registry,
             std::uint16_t threshold) :
 
+        ConnectedDevice (connection),
         ThresholdObservable {std::uint16_t (threshold * 10)}
     {
         humidity_create (
                 &sensor,
                 registry.getUid (HUMIDITY_DEVICE_IDENTIFIER).c_str (),
-                connection);
+                connection ());
 
         init ();
 
