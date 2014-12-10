@@ -89,8 +89,8 @@ namespace piw { namespace device {
             }
 
             address.clear ();
-            for (char c : ip) {
-                address += c;
+            for (const char* current = ip; *current != '\0'; ++current) {
+                address += *current;
             }
 
             break;

@@ -22,6 +22,8 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
+#include    <ip_connection.h>
+
 #include    <device/UidRegistry.hpp>
 
 #include    <atomic>

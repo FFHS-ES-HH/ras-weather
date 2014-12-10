@@ -304,21 +304,28 @@ namespace piw { namespace app {
 
         void StateHandler::onButtonPressed ()
         {
-            backlightOn ();
+            if (lcd.isBacklightOn ()) {
+                lcd.clear ();
+                backlightOn ();
 
-            switch (viewState) {
-                case Normal:
-                    unHookView (sensorViews);
-                    viewState = Ip;
-                    break;
-                case Ip:
-                    hookView (sensorViews);
-                    viewState = Normal;
-                    break;
-                case Error:
-                    hookView (sensorViews);
-                    viewState = Normal;
-                    break;
+                switch (viewState) {
+                    case Normal:
+                        unHookView (sensorViews);
+                        displayIp ();
+                        viewState = Ip;
+                        break;
+                    case Ip:
+                        hookView (sensorViews);
+                        viewState = Normal;
+                        break;
+                    case Error:
+                        hookView (sensorViews);
+                        viewState = Normal;
+                        break;
+                }
+            }
+            else {
+                backlightOn ();
             }
         }
 

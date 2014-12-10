@@ -60,6 +60,7 @@ namespace piw { namespace device {
             static void call (std::uint8_t, void*);
 
         private:
+            Connection connection_;
             std::unique_ptr<LCD20x4> lcd_;
             int button_;
     };

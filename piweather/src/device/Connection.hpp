@@ -25,11 +25,11 @@
 #ifndef PIW_DEVICE_CONNECTION_INC
 #define PIW_DEVICE_CONNECTION_INC
 
-#include    <ip_connection.h>
-
 #include    <cstdint>
 #include    <memory>
 #include    <string>
+
+typedef struct _IPConnection IPConnection;
 
 namespace piw { namespace device {
 

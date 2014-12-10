@@ -60,6 +60,7 @@ namespace piw { namespace sensors {
 
         private:
             Barometer barometer;
+            device::Connection connection;
     };
 
     inline double Temperature::celsius () const
