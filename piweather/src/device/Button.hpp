@@ -25,19 +25,18 @@
 #ifndef PIW_DEVICE_BUTTON_INC
 #define PIW_DEVICE_BUTTON_INC
 
-#include    <ip_connection.h>
 #include    <bricklet_lcd_20x4.h>
 
 #include    <device/Observable.hpp>
 #include    <device/UidRegistry.hpp>
-#include    <device/ConnectedDevice.hpp>
+#include    <device/Connection.hpp>
 
 #include    <cstdint>
 #include    <memory>
 
 namespace piw { namespace device {
 
-    class Button : public Observable, public ConnectedDevice
+    class Button : public Observable
     {
         public:
             enum class Sensitivity
@@ -50,7 +49,7 @@ namespace piw { namespace device {
             Button (
                     const Connection&,
                     const UidRegistry&,
-                    int,
+                    unsigned,
                     Sensitivity = Sensitivity::OnPressure);
 
             virtual ~Button ();

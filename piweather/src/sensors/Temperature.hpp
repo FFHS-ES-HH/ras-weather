@@ -27,17 +27,16 @@
 
 #include    <device/Observable.hpp>
 #include    <device/UidRegistry.hpp>
-#include    <device/ConnectedDevice.hpp>
+#include    <device/Connection.hpp>
 
 #include    <sensors/ThresholdObservable.hpp>
 
 #include    <bricklet_barometer.h>
-#include    <ip_connection.h>
 #include    <chrono>
 
 namespace piw { namespace sensors {
 
-    class Temperature : public ThresholdObservable<std::int16_t>, public device::ConnectedDevice
+    class Temperature : public ThresholdObservable<std::int16_t>
     {
         public:
             Temperature (

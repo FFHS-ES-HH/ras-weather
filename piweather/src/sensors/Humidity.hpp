@@ -26,15 +26,14 @@
 #define PIW_SENSORS_HUMIDITY_INC
 
 #include    <bricklet_humidity.h>
-#include    <ip_connection.h>
 
 #include    <device/UidRegistry.hpp>
-#include    <device/ConnectedDevice.hpp>
+#include    <device/Connection.hpp>
 #include    <sensors/ThresholdObservable.hpp>
 
 namespace piw { namespace sensors {
 
-    class Humidity : public ThresholdObservable<std::uint16_t>, public device::ConnectedDevice
+    class Humidity : public ThresholdObservable<std::uint16_t>
     {
         public:
             Humidity (const device::Connection&, const device::UidRegistry&, double);

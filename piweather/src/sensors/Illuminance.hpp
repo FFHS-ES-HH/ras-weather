@@ -27,14 +27,13 @@
 
 #include    <sensors/ThresholdObservable.hpp>
 #include    <device/UidRegistry.hpp>
-#include    <device/ConnectedDevice.hpp>
+#include    <device/Connection.hpp>
 
-#include    <ip_connection.h>
 #include    <bricklet_ambient_light.h>
 
 namespace piw { namespace sensors {
 
-    class Illuminance : public ThresholdObservable<std::uint16_t>, public device::ConnectedDevice
+    class Illuminance : public ThresholdObservable<std::uint16_t>
     {
         public:
             Illuminance (const device::Connection&, const device::UidRegistry&, double);

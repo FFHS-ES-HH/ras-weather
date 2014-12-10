@@ -78,7 +78,6 @@ libpiweather_la_include_HEADERS	=\
 
 libpiweatherdevice_include_HEADERS =\
 				 $(src)/device/UidRegistry.hpp \
-				 $(src)/device/ConnectedDevice.hpp \
 				 $(src)/device/Observable.hpp \
 				 $(src)/device/Observer.hpp \
 				 $(src)/device/Connection.hpp \

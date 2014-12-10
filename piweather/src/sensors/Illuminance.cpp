@@ -31,17 +31,16 @@ namespace piw { namespace sensors {
     }
 
     Illuminance::Illuminance (
-            const device::Connection& conn,
+            const device::Connection& connection,
             const device::UidRegistry& registry,
             double threshold) :
 
-        ThresholdObservable {std::uint16_t (threshold * 10.0)},
-        ConnectedDevice (conn)
+        ThresholdObservable {std::uint16_t (threshold * 10.0)}
     {
         ambient_light_create (
                 &sensor,
                 registry.getUid (AMBIENT_LIGHT_DEVICE_IDENTIFIER).c_str (),
-                connection ());
+                connection.get ());
 
         init ();
 
