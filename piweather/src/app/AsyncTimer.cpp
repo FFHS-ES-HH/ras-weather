@@ -140,7 +140,10 @@ namespace piw { namespace app {
 
                 if (status == Status::timeout) {
 
-                    event ();
+                    try {
+                        event ();
+                    }
+                    catch (const std::exception&) { /* ignored */ }
 
                     Lock lock {mutex};
 
