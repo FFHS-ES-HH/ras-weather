@@ -34,10 +34,10 @@
 
 namespace piw { namespace sensors {
 
-    class Illuminance : public ThresholdObservable<std::uint16_t>, public ConnectedDevice
+    class Illuminance : public ThresholdObservable<std::uint16_t>, public device::ConnectedDevice
     {
         public:
-            Illuminance (const Connection&, const device::UidRegistry&, std::uint16_t);
+            Illuminance (const device::Connection&, const device::UidRegistry&, std::uint16_t);
             virtual ~Illuminance ();
 
             double lux () const;

@@ -32,13 +32,13 @@ namespace piw { namespace sensors {
      * Constructs a new Temperature.
      */
     Temperature::Temperature (
-            const Connection& connection,
+            const device::Connection& conn,
             const device::UidRegistry& registry,
             std::int16_t threshold,
             const std::chrono::milliseconds& interval) :
 
-        ConnectedDevice (connection),
-        ThresholdObservable {std::int16_t (threshold * 100)}
+        ThresholdObservable {std::int16_t (threshold * 100)},
+        ConnectedDevice (conn)
     {
         barometer_create (
                 &barometer,

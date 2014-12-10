@@ -49,7 +49,7 @@ namespace piw { namespace device {
         private:
             std::unique_ptr<IPConnection> connection_;
             std::string host_;
-            std::uint16_t port;
+            std::uint16_t port_;
     };
 
     inline IPConnection* Connection::get () const

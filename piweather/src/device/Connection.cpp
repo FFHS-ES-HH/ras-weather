@@ -54,7 +54,7 @@ namespace piw { namespace device {
         port_ (other.port_)
     { connect (connection_.get (), host_, port_); }
 
-    Connection& Connection::operator= (const Connection& other) :
+    Connection& Connection::operator= (const Connection& other)
     {
         if (this != &other) {
             ipcon_disconnect (connection_.get ());

@@ -30,7 +30,7 @@
 #include    <memory>
 #include    <set>
 
-#include    <ip_connection.h>
+#include    <device/Connection.hpp>
 
 namespace piw { namespace device {
 
@@ -41,7 +41,7 @@ namespace piw { namespace device {
         friend struct EnumerationState;
 
         public:
-            UidRegistry (IPConnection*);
+            UidRegistry (const Connection&);
             ~UidRegistry ();
 
             UidRegistry (const UidRegistry&) = delete;

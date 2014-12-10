@@ -29,11 +29,11 @@
 namespace piw { namespace device {
 
     Button::Button (
-            const Connection& connection,
+            const Connection& conn,
             const UidRegistry& registry,
             std::uint8_t which,
             Button::Sensitivity sensitivity) :
-        ConnectedDevice (connection),
+        ConnectedDevice (conn),
         lcd_ (new LCD20x4 ()),
         button_ (which)
     {

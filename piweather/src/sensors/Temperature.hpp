@@ -37,11 +37,11 @@
 
 namespace piw { namespace sensors {
 
-    class Temperature : public ThresholdObservable<std::int16_t>, public ConnectedDevice
+    class Temperature : public ThresholdObservable<std::int16_t>, public device::ConnectedDevice
     {
         public:
             Temperature (
-                    const Connection&,
+                    const device::Connection&,
                     const device::UidRegistry&,
                     std::int16_t = 10,
                     const std::chrono::milliseconds& = std::chrono::milliseconds {500});

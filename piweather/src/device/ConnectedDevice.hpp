@@ -32,7 +32,7 @@ namespace piw { namespace device {
     class ConnectedDevice
     {
         public:
-            virtual ~ConnectedDevice ();
+            virtual ~ConnectedDevice () {}
 
         protected:
             ConnectedDevice (const Connection&);

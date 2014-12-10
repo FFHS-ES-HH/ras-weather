@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * Lcd.hpp is free software copyrighted by David Daniel.
+ * ConnectedDevice.cpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,44 +22,12 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#ifndef PIW_DEVICE_LCD_INC
-#define PIW_DEVICE_LCD_INC
-
-#include    <bricklet_lcd_20x4.h>
-
-#include    <device/UidRegistry.hpp>
-
-#include    <string>
-#include    <memory>
-#include    <mutex>
+#include    <device/ConnectedDevice.hpp>
 
 namespace piw { namespace device {
 
-    class Lcd
+    ConnectedDevice::~ConnectedDevice ()
     {
-        public:
-
-            struct Metrics
-            {
-                static constexpr unsigned Lines = 4;
-                static constexpr unsigned Columns = 20;
-            };
-
-        public:
-            Lcd (const Connection&, const device::UidRegistry&);
-            ~Lcd ();
-
-            Lcd& write (unsigned, unsigned, const std::wstring&);
-            Lcd& backlightOn ();
-            Lcd& backlightOff ();
-            bool isBacklightOn () const;
-            Lcd& clear ();
-
-        private:
-            std::unique_ptr<LCD20x4> lcd_;
-            mutable std::mutex mutex_;
-    };
+    }
 }}
-
-#endif /* PIW_DEVICE_LCD_INC */
 

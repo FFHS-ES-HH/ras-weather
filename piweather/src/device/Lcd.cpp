@@ -130,13 +130,13 @@ namespace piw { namespace device {
 
     }
 
-    Lcd::Lcd (IPConnection* connection, const device::UidRegistry& registry) :
+    Lcd::Lcd (const Connection& connection, const device::UidRegistry& registry) :
         lcd_ (new LCD20x4)
     {
         lcd_20x4_create (
                 lcd_.get (),
                 registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
-                connection);
+                connection.get ());
 
         backlightOn ();
         lcd_20x4_clear_display (lcd_.get ());
