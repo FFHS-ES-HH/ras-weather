@@ -50,7 +50,7 @@ namespace piw { namespace device {
             Button (
                     const Connection&,
                     const UidRegistry&,
-                    std::uint8_t,
+                    int,
                     Sensitivity = Sensitivity::OnPressure);
 
             virtual ~Button ();
@@ -62,7 +62,7 @@ namespace piw { namespace device {
 
         private:
             std::unique_ptr<LCD20x4> lcd_;
-            std::uint8_t button_;
+            int button_;
     };
 }}
 

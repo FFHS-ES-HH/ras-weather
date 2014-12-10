@@ -37,7 +37,7 @@ namespace piw { namespace sensors {
     class Humidity : public ThresholdObservable<std::uint16_t>, public device::ConnectedDevice
     {
         public:
-            Humidity (const device::Connection&, const device::UidRegistry&, std::uint16_t);
+            Humidity (const device::Connection&, const device::UidRegistry&, double);
             virtual ~Humidity ();
 
             double humidity () const;

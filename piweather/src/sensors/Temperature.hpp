@@ -43,7 +43,7 @@ namespace piw { namespace sensors {
             Temperature (
                     const device::Connection&,
                     const device::UidRegistry&,
-                    std::int16_t = 10,
+                    double = 0.1,
                     const std::chrono::milliseconds& = std::chrono::milliseconds {500});
 
             virtual ~Temperature ();

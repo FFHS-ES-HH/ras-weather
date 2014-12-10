@@ -38,9 +38,9 @@ namespace piw { namespace sensors {
     Barometer::Barometer (
             const device::Connection& conn,
             const device::UidRegistry& registry,
-            std::int32_t threshold) :
+            double threshold) :
 
-        ThresholdObservable {threshold * 1000},
+        ThresholdObservable {std::int32_t (threshold * 1000.0)},
         ConnectedDevice (conn)
     {
         barometer_create (

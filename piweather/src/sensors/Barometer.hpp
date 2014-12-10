@@ -37,7 +37,7 @@ namespace piw { namespace sensors {
     class Barometer : public ThresholdObservable<std::int32_t>, public device::ConnectedDevice
     {
         public:
-            Barometer (const device::Connection&, const device::UidRegistry&, std::int32_t);
+            Barometer (const device::Connection&, const device::UidRegistry&, double);
             virtual ~Barometer ();
 
             double mbar () const;

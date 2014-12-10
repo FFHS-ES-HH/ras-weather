@@ -38,9 +38,9 @@ namespace piw { namespace sensors {
     Humidity::Humidity (
             const device::Connection& conn,
             const device::UidRegistry& registry,
-            std::uint16_t threshold) :
+            double threshold) :
 
-        ThresholdObservable {std::uint16_t (threshold * 10)},
+        ThresholdObservable {std::uint16_t (threshold * 10.0)},
         ConnectedDevice (conn)
     {
         humidity_create (
