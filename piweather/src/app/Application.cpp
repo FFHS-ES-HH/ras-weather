@@ -115,7 +115,7 @@ namespace piw { namespace app {
         }
 
         SensorViews createSensorViews (
-                IPConnection* connection,
+                const device::Connection& connection,
                 Lcd& lcd,
                 const Configuration& config,
                 const UidRegistry& registry)
@@ -245,12 +245,12 @@ namespace piw { namespace app {
 
         StateHandler::StateHandler (const Configuration& config) :
             connection {config.host, config.port},
-            uidRegistry {connection.get ()},
-            button {connection.get (), uidRegistry, config.button},
-            lcd {connection.get (), uidRegistry},
+            uidRegistry {connection},
+            button {connection, uidRegistry, config.button},
+            lcd {connection, uidRegistry},
             db {config.dbPath},
             configuration (config),
-            sensorViews {createSensorViews (connection.get (), lcd, config, uidRegistry)},
+            sensorViews {createSensorViews (connection, lcd, config, uidRegistry)},
             buttonListener {std::bind (&StateHandler::onButtonPressed, this), nullptr},
             viewState {Normal},
             dbWriter {std::bind (&StateHandler::onStoreValues, this)},
@@ -304,21 +304,28 @@ namespace piw { namespace app {
 
         void StateHandler::onButtonPressed ()
         {
-            backlightOn ();
+            if (lcd.isBacklightOn ()) {
+                lcd.clear ();
+                backlightOn ();
 
-            switch (viewState) {
-                case Normal:
-                    unHookView (sensorViews);
-                    viewState = Ip;
-                    break;
-                case Ip:
-                    hookView (sensorViews);
-                    viewState = Normal;
-                    break;
-                case Error:
-                    hookView (sensorViews);
-                    viewState = Normal;
-                    break;
+                switch (viewState) {
+                    case Normal:
+                        unHookView (sensorViews);
+                        displayIp ();
+                        viewState = Ip;
+                        break;
+                    case Ip:
+                        hookView (sensorViews);
+                        viewState = Normal;
+                        break;
+                    case Error:
+                        hookView (sensorViews);
+                        viewState = Normal;
+                        break;
+                }
+            }
+            else {
+                backlightOn ();
             }
         }
 

@@ -46,7 +46,7 @@ namespace piw { namespace device {
             };
 
         public:
-            Lcd (IPConnection*, const device::UidRegistry&);
+            Lcd (const Connection&, const device::UidRegistry&);
             ~Lcd ();
 
             Lcd& write (unsigned, unsigned, const std::wstring&);

@@ -34,8 +34,8 @@ namespace piw { namespace view {
         std::wostringstream current;
 
         current
-            << "Rel-Hum.: "
-            << std::setw (8) << std::right << std::setprecision (1) << std::fixed
+            << "Rel Humidity: "
+            << std::setw (4) << std::right << std::setprecision (1) << std::fixed
             << sensor.humidity () << L" %";
 
         write (current.str ());

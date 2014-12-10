@@ -25,10 +25,11 @@
 #ifndef PIW_DEVICE_CONNECTION_INC
 #define PIW_DEVICE_CONNECTION_INC
 
-#include    <ip_connection.h>
-
 #include    <cstdint>
 #include    <memory>
+#include    <string>
+
+typedef struct _IPConnection IPConnection;
 
 namespace piw { namespace device {
 
@@ -38,10 +39,18 @@ namespace piw { namespace device {
             Connection (const std::string&, std::uint16_t);
             ~Connection ();
 
+            Connection (const Connection&);
+            Connection& operator= (const Connection&);
+
+            Connection (Connection&&) = default;
+            Connection& operator= (Connection&&) = default;
+
             IPConnection* get () const;
 
         private:
             std::unique_ptr<IPConnection> connection_;
+            std::string host_;
+            std::uint16_t port_;
     };
 
     inline IPConnection* Connection::get () const

@@ -41,7 +41,7 @@ namespace piw { namespace app {
         double illuminanceSensitivity;
         std::string host;
         std::uint16_t port;
-        std::uint8_t button;
+        unsigned button;
         std::string dbPath;
         std::chrono::seconds saveInterval;
         std::chrono::seconds lcdTimeout;

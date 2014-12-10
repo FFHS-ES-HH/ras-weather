@@ -35,7 +35,7 @@ namespace piw { namespace view {
 
         current
             << "Pressure: "
-            << std::setw (5) << std::right << std::setprecision (0) << std::fixed
+            << std::setw (5) << std::right << std::setprecision (1) << std::fixed
             << sensor.mbar () << L" mbar";
 
         write (current.str ());

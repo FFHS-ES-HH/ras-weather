@@ -25,11 +25,11 @@
 #ifndef PIW_DEVICE_BUTTON_INC
 #define PIW_DEVICE_BUTTON_INC
 
-#include    <ip_connection.h>
 #include    <bricklet_lcd_20x4.h>
 
 #include    <device/Observable.hpp>
 #include    <device/UidRegistry.hpp>
+#include    <device/Connection.hpp>
 
 #include    <cstdint>
 #include    <memory>
@@ -47,9 +47,9 @@ namespace piw { namespace device {
 
         public:
             Button (
-                    IPConnection*,
+                    const Connection&,
                     const UidRegistry&,
-                    std::uint8_t,
+                    unsigned,
                     Sensitivity = Sensitivity::OnPressure);
 
             virtual ~Button ();
@@ -60,8 +60,9 @@ namespace piw { namespace device {
             static void call (std::uint8_t, void*);
 
         private:
+            Connection connection_;
             std::unique_ptr<LCD20x4> lcd_;
-            std::uint8_t button_;
+            int button_;
     };
 }}
 

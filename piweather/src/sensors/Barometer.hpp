@@ -26,9 +26,9 @@
 #define PIW_SENSORS_BAROMETER_INC
 
 #include    <device/UidRegistry.hpp>
+#include    <device/Connection.hpp>
 #include    <sensors/ThresholdObservable.hpp>
 
-#include    <ip_connection.h>
 #include    <bricklet_barometer.h>
 
 namespace piw { namespace sensors {
@@ -36,7 +36,7 @@ namespace piw { namespace sensors {
     class Barometer : public ThresholdObservable<std::int32_t>
     {
         public:
-            Barometer (IPConnection*, const device::UidRegistry&, std::int32_t);
+            Barometer (const device::Connection&, const device::UidRegistry&, double);
             virtual ~Barometer ();
 
             double mbar () const;

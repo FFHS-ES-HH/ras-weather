@@ -22,20 +22,52 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
+#include    <ip_connection.h>
+
 #include    <device/Connection.hpp>
 
 #include    <stdexcept>
 
 namespace piw { namespace device {
 
-    Connection::Connection (const std::string& host, std::uint16_t port) :
-        connection_ (new IPConnection)
-    {
-        ipcon_create (connection_.get ());
+    namespace {
+        void connect (
+                IPConnection* connection,
+                const std::string& host,
+                std::uint16_t port)
+        {
+            ipcon_create (connection);
 
-        if (ipcon_connect (connection_.get (), host.c_str (), port) < 0) {
-            throw std::runtime_error ("Cannot connect to the device.");
+            if (ipcon_connect (connection, host.c_str (), port) < 0) {
+                throw std::runtime_error ("Cannot connect to the device.");
+            }
         }
+    }
+
+    Connection::Connection (const std::string& host, std::uint16_t port) :
+        connection_ (new IPConnection),
+        host_ (host),
+        port_ (port)
+    { connect (connection_.get (), host_, port_); }
+
+    Connection::Connection (const Connection& other) :
+        connection_ (new IPConnection),
+        host_ (other.host_),
+        port_ (other.port_)
+    { connect (connection_.get (), host_, port_); }
+
+    Connection& Connection::operator= (const Connection& other)
+    {
+        if (this != &other) {
+            ipcon_disconnect (connection_.get ());
+
+            host_ = other.host_;
+            port_ = other.port_;
+
+            connect (connection_.get (), host_, port_);
+        }
+
+        return *this;
     }
 
     Connection::~Connection ()

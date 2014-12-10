@@ -29,17 +29,19 @@
 namespace piw { namespace device {
 
     Button::Button (
-            IPConnection* connection,
+            const Connection& connection,
             const UidRegistry& registry,
-            std::uint8_t which,
+            unsigned which,
             Button::Sensitivity sensitivity) :
+
+        connection_ (connection),
         lcd_ (new LCD20x4 ()),
-        button_ (which)
+        button_ (static_cast<std::uint8_t> (which))
     {
         lcd_20x4_create (
                 lcd_.get (),
                 registry.getUid (LCD_20X4_DEVICE_IDENTIFIER).c_str (),
-                connection);
+                connection_.get ());
 
         lcd_20x4_register_callback (
                 lcd_.get (),

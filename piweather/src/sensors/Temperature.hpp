@@ -27,11 +27,11 @@
 
 #include    <device/Observable.hpp>
 #include    <device/UidRegistry.hpp>
+#include    <device/Connection.hpp>
 
 #include    <sensors/ThresholdObservable.hpp>
 
 #include    <bricklet_barometer.h>
-#include    <ip_connection.h>
 #include    <chrono>
 
 namespace piw { namespace sensors {
@@ -40,9 +40,9 @@ namespace piw { namespace sensors {
     {
         public:
             Temperature (
-                    IPConnection*,
+                    const device::Connection&,
                     const device::UidRegistry&,
-                    std::int16_t = 10,
+                    double = 0.1,
                     const std::chrono::milliseconds& = std::chrono::milliseconds {500});
 
             virtual ~Temperature ();
@@ -60,6 +60,7 @@ namespace piw { namespace sensors {
 
         private:
             Barometer barometer;
+            device::Connection connection;
     };
 
     inline double Temperature::celsius () const

@@ -22,6 +22,8 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
+#include    <ip_connection.h>
+
 #include    <device/UidRegistry.hpp>
 
 #include    <atomic>
@@ -89,17 +91,17 @@ namespace piw { namespace device {
         }
     }
 
-    UidRegistry::UidRegistry (IPConnection* connection) :
+    UidRegistry::UidRegistry (const Connection& connection) :
         uids_ (),
         state_ (new EnumerationState (*this))
     {
         ipcon_register_callback (
-                connection,
+                connection.get (),
                 IPCON_CALLBACK_ENUMERATE,
                 reinterpret_cast<void*> (&fetch_bricklet),
                 state_);
 
-        ipcon_enumerate (connection);
+        ipcon_enumerate (connection.get ());
     }
 
     UidRegistry::~UidRegistry ()

@@ -38,8 +38,13 @@ namespace piw { namespace view {
         device::IpAddress ip;
         std::wstring address = ip.get ();
 
+        if (address.size () > Metrics::Columns) {
+            address.erase (Metrics::Columns);
+        }
+
         const unsigned column = (Metrics::Columns - address.size ()) / 2;
 
+        lcd.write (0, 5, L"IP Address");
         lcd.write (2, column, address);
     }
 }}

@@ -34,8 +34,8 @@ namespace piw { namespace view {
         std::wostringstream current;
 
         current
-            << "Temp.: "
-            << std::setw (10) << std::right << std::setprecision (1) << std::fixed
+            << "Temperature: "
+            << std::setw (4) << std::right << std::setprecision (1) << std::fixed
             << temperature_.celsius () << L" °C";
 
         write (current.str ());
