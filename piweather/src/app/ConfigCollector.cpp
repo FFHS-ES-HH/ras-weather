@@ -225,6 +225,9 @@ namespace piw { namespace app {
             }
         }
 
+        input.clear ();
+        input.close ();
+
         return config;
     }
 
