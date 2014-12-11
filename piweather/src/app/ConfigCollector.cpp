@@ -57,17 +57,6 @@ namespace piw { namespace app {
             return value;
         }
 
-        struct IfstreamCloser
-        {
-            void operator() (std::ifstream*) const;
-        };
-
-        void IfstreamCloser::operator() (std::ifstream* input) const
-        {
-            input->exceptions (std::ifstream::goodbit);
-            input->close ();
-        }
-
         template<typename T>
             void readValue (std::istream& input, T& value)
             {
@@ -191,13 +180,12 @@ namespace piw { namespace app {
 
     Configuration ConfigCollector::read (const std::string& path) const
     {
-        std::ifstream ifs (path.c_str ());
-        if (!ifs.is_open ()) {
+        std::ifstream input (path.c_str ());
+        if (!input.is_open ()) {
             throw std::runtime_error ("Cannot open the given configuration file."); 
         }
 
-        std::unique_ptr<std::ifstream, IfstreamCloser> input (&ifs);
-        input->exceptions (std::ifstream::failbit | std::ifstream::badbit);
+        input.exceptions (std::ifstream::failbit | std::ifstream::badbit);
 
         Configuration config = Configuration ();
         Params params = getConfigParams (config);
@@ -206,9 +194,9 @@ namespace piw { namespace app {
         constexpr std::streamsize MaximumSize = std::numeric_limits<std::streamsize>::max ();
         std::string name;
 
-        while (input->peek () != Eof) {
+        while (input.peek () != Eof) {
 
-            char next = input->get ();
+            char next = input.get ();
             switch (next) {
                 case '\n':
                 case '\r':
@@ -220,14 +208,14 @@ namespace piw { namespace app {
                 case ' ':
                     break;
                 case '#':
-                    input->ignore (MaximumSize, '\n');
+                    input.ignore (MaximumSize, '\n');
                     break;
                 case '=':
-                    input->ignore (MaximumSize, ' ');
+                    input.ignore (MaximumSize, ' ');
                     {
                         Params::iterator atParam = params.find (trim (name));
                         if (atParam != params.end ()) {
-                            atParam->second (*input);
+                            atParam->second (input);
                         }
                         name.clear ();
                     }
