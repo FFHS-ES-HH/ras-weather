@@ -38,6 +38,7 @@
 #include    <array>
 #include    <iterator>
 #include    <iostream>
+#include    <ios>
 
 #include    <getopt.h>
 
@@ -176,6 +177,24 @@ namespace piw { namespace app {
 
             std::cout << std::endl;
         }
+
+        struct EmaskHandler
+        {
+            EmaskHandler (std::ios&);
+            ~EmaskHandler ();
+
+            std::ios& stream;
+            std::ios::iostate emask;
+        };
+
+        EmaskHandler::EmaskHandler (std::ios& s) :
+            stream (s),
+            emask (s.exceptions ())
+
+        { stream.exceptions (std::ios::failbit | std::ios::badbit); }
+
+        EmaskHandler::~EmaskHandler ()
+        { stream.exceptions (emask); }
     }
 
     Configuration ConfigCollector::read (const std::string& path) const
@@ -185,18 +204,17 @@ namespace piw { namespace app {
             throw std::runtime_error ("Cannot open the given configuration file."); 
         }
 
-        input.exceptions (std::ifstream::failbit | std::ifstream::badbit);
 
         Configuration config = Configuration ();
         Params params = getConfigParams (config);
 
-        constexpr char Eof = std::char_traits<char>::eof ();
         constexpr std::streamsize MaximumSize = std::numeric_limits<std::streamsize>::max ();
         std::string name;
 
-        while (input.peek () != Eof) {
+        for (char next = input.get (); input; next = input.get ()) {
 
-            char next = input.get ();
+            EmaskHandler emaskHandler (input);
+
             switch (next) {
                 case '\n':
                 case '\r':
@@ -225,7 +243,6 @@ namespace piw { namespace app {
             }
         }
 
-        input.clear ();
         input.close ();
 
         return config;
