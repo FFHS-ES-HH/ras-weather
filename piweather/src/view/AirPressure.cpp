@@ -31,14 +31,7 @@ namespace piw { namespace view {
 
     void AirPressure::valueChanged ()
     {
-        std::wostringstream current;
-
-        current
-            << "Pressure: "
-            << std::setw (5) << std::right << std::setprecision (1) << std::fixed
-            << sensor.mbar () << L" mbar";
-
-        write (current.str ());
+        write (L"Druck:", sensor.mbar (), L"mbar", 1);
     }
 
     void AirPressure::storeValue (db::Values& value)

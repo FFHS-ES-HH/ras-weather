@@ -31,14 +31,7 @@ namespace piw { namespace view {
 
     void Temperature::valueChanged ()
     {
-        std::wostringstream current;
-
-        current
-            << "Temperature: "
-            << std::setw (4) << std::right << std::setprecision (1) << std::fixed
-            << temperature_.celsius () << L" °C";
-
-        write (current.str ());
+        write (L"Temperatur:", temperature_.celsius (), L"°C", 1);
     }
 
     void Temperature::storeValue (db::Values& values)

@@ -31,14 +31,7 @@ namespace piw { namespace view {
 
     void Humidity::valueChanged ()
     {
-        std::wostringstream current;
-
-        current
-            << "Rel Humidity: "
-            << std::setw (4) << std::right << std::setprecision (1) << std::fixed
-            << sensor.humidity () << L" %";
-
-        write (current.str ());
+        write (L"Rel. Feucht.:", sensor.humidity (), L"%", 1);
     }
 
     void Humidity::storeValue (db::Values& values)
