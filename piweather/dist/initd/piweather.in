@@ -4,8 +4,8 @@
 # Provides:     piweather
 # Required-Start:   $syslog
 # Required-Stop:    $syslog
-# Default-Start:    2 3 4 5
-# Default-Stop:     
+# Default-Start:    3 4 5
+# Default-Stop:     0 6
 # Short-Description:    PiWeather Station
 ### END INIT INFO
 

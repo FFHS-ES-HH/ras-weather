@@ -117,6 +117,11 @@ $(defaultconfigs)/piweather:	$(defaultconfigs)/piweather.in
 $(configs)/piweather.conf:	$(configs)/piweather.conf.in
 	@sed $(SUBST) $< > $@
 
+EXTRA_DIST			=\
+				 $(initd_SCRIPTS) \
+				 $(initdefault_DATA) \
+				 $(piwconfig_DATA)
+
 CLEANFILES			=\
 				 $(initd_SCRIPTS) \
 				 $(initdefault_DATA) \

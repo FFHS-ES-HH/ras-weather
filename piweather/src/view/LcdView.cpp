@@ -54,7 +54,7 @@ namespace piw { namespace view {
     {
         std::wostringstream out;
 
-        out << std::setprecision (precision) << value << " " << unit;
+        out << std::setprecision (precision) << std::fixed << value << " " << unit;
 
         write (label, out.str ());
     }

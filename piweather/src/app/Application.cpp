@@ -43,7 +43,12 @@
 
 #include    <vector>
 #include    <thread>
+#include    <atomic>
+#include    <mutex>
+#include    <condition_variable>
 #include    <iostream>
+
+#include    <signal.h>
 
 namespace piw { namespace app {
 
@@ -55,6 +60,77 @@ namespace piw { namespace app {
     using view::WeatherView;
 
     namespace {
+
+        class SignalHandler
+        {
+            public:
+                static int wait ();
+
+            private:
+                SignalHandler ();
+
+                static SignalHandler& instance ();
+                static void handle (int, siginfo_t*, void*);
+
+            private:
+                std::mutex mutex;
+                std::condition_variable condition;
+                std::atomic_int signal;
+                std::atomic_bool triggered;
+        };
+
+        SignalHandler::SignalHandler () :
+            mutex (),
+            condition (),
+            signal (0),
+            triggered (false)
+        {
+            struct sigaction handler;
+            handler.sa_sigaction = SignalHandler::handle;
+            handler.sa_flags = SA_SIGINFO;
+            sigemptyset (&handler.sa_mask);
+
+            sigaction (SIGTERM, &handler, nullptr);
+            sigaction (SIGINT, &handler, nullptr);
+        }
+
+        void SignalHandler::handle (int n, siginfo_t*, void*)
+        {
+            SignalHandler& self = instance ();
+
+            self.signal.store (n);
+            self.triggered.store (true);
+            self.condition.notify_all ();
+        }
+
+        SignalHandler& SignalHandler::instance ()
+        {
+            static SignalHandler handler;
+
+            return handler;
+        }
+
+        int SignalHandler::wait ()
+        {
+            SignalHandler& self = SignalHandler::instance ();
+            bool running = true;
+            int result = 0;
+
+            while (running) {
+
+                std::unique_lock<std::mutex> lock (self.mutex);
+                self.condition.wait (lock);
+
+                if (self.triggered.load ()) {
+
+                    result = self.signal.load ();
+
+                    self.triggered.store (running = false);
+                }
+            }
+
+            return result;
+        }
 
         typedef std::unique_ptr<device::Observable> SensorPtr;
         typedef std::unique_ptr<WeatherView> ViewPtr;
@@ -214,7 +290,7 @@ namespace piw { namespace app {
                 virtual ~StateHandler () {}
                 StateHandler (const Configuration&);
 
-                void block ();
+                int run ();
 
             private:
                 static void wrapDisconnect (std::uint8_t, void*);
@@ -268,14 +344,8 @@ namespace piw { namespace app {
             dbWriter.start (config.saveInterval);
         }
 
-
-        void StateHandler::block ()
-        {
-            std::mutex mutex;
-            std::unique_lock<std::mutex> lock (mutex);
-            std::condition_variable condition;
-            condition.wait (lock);
-        }
+        int StateHandler::run ()
+        { return SignalHandler::wait (); }
 
         void StateHandler::wrapDisconnect (std::uint8_t reason, void* s)
         {
@@ -371,25 +441,28 @@ namespace piw { namespace app {
     {
         bool success = true;
         size_t errorCounter = 0;
+        bool running = true;
 
-        while (true) {
+        while (running) {
 
             try {
                 StateHandler handler (config);
-                handler.block ();
+                handler.run ();
+
+                running = false;
             }
             catch (const std::exception& e) {
                 success = false;
+
                 std::cerr
                     << "Error in application execution: " << e.what () << std::endl;
 
                 if (++errorCounter > 5) {
-                    break;
+                    running = false;
                 }
 
                 // try to reconnect
-                std::this_thread::sleep_for (
-                        std::chrono::milliseconds {500});
+                std::this_thread::sleep_for (std::chrono::seconds {2});
             }
         }
 
