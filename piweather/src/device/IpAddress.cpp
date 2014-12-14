@@ -27,6 +27,7 @@
 #include    <stdexcept>
 
 #include    <ifaddrs.h>
+#include    <net/if.h>
 #include    <netdb.h>
 
 namespace piw { namespace device {
@@ -78,6 +79,10 @@ namespace piw { namespace device {
                 continue;
             }
 
+            if ((iface->ifa_flags & IFF_UP) == 0) {
+                continue;
+            }
+
             char ip [128] = {0};
 
             int error = getnameinfo (iface->ifa_addr,
@@ -94,6 +99,10 @@ namespace piw { namespace device {
             }
 
             break;
+        }
+
+        if (address.empty ()) {
+            address = L"Kein Netz erreichbar";
         }
     }
 }}
