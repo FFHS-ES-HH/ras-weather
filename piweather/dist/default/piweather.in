@@ -2,3 +2,9 @@
 # Command line options for piweather.
 ##
 CMD="-c @sysconfdir@/piweather/piweather.conf"
+
+##
+# The user to run the application with.
+##
+PIWUSER="pi"
+PIWGROUP="pi"
