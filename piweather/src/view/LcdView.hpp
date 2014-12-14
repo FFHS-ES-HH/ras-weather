@@ -51,6 +51,7 @@ namespace piw { namespace view {
 
             void write (std::wstring);
             void write (const std::wstring&, const std::wstring&);
+            void write (const std::wstring&, double, const std::wstring&, unsigned = 1);
 
         private:
             device::Lcd& lcd_;
