@@ -46,7 +46,11 @@ namespace piw { namespace view {
         lcd ().write (dim.line (), dim.begin (), text);
     }
 
-    void LcdView::write (const std::wstring& label, double value, const std::wstring& unit, unsigned precision)
+    void LcdView::write (
+            const std::wstring& label,
+            double value,
+            const std::wstring& unit,
+            unsigned precision)
     {
         std::wostringstream out;
 
