@@ -145,6 +145,7 @@ namespace piw { namespace device {
     Lcd::~Lcd ()
     {
         lcd_20x4_backlight_off (lcd_.get ());
+        lcd_20x4_clear_display (lcd_.get ());
         lcd_20x4_destroy (lcd_.get ());
     }
 

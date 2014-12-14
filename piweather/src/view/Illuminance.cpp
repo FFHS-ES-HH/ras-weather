@@ -31,14 +31,7 @@ namespace piw { namespace view {
 
     void Illuminance::valueChanged ()
     {
-        std::wostringstream current;
-
-        current
-            << "Illuminance: "
-            << std::setw (4) << std::right << std::setprecision (0) << std::fixed
-            << sensor.lux () << L" lx";
-
-        write (current.str ());
+        write (L"Helligkeit:", sensor.lux (), L"lx", 1);
     }
 
     void Illuminance::storeValue (db::Values& values)

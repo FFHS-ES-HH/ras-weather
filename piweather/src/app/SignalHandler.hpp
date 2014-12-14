@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * AirPressure.cpp is free software copyrighted by David Daniel.
+ * SignalHandler.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,21 +22,36 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "view/AirPressure.hpp"
+#ifndef PIW_APP_SIGNALHANDLER_INC
+#define PIW_APP_SIGNALHANDLER_INC
 
-#include    <sstream>
-#include    <iomanip>
+#include    <cstdint>
+#include    <mutex>
+#include    <condition_variable>
+#include    <atomic>
 
-namespace piw { namespace view {
+#include    <signal.h>
 
-    void AirPressure::valueChanged ()
+namespace piw { namespace app {
+
+    class SignalHandler
     {
-        write (L"Druck:", sensor.mbar (), L"mbar", 1);
-    }
+        public:
+            static int wait (std::size_t);
 
-    void AirPressure::storeValue (db::Values& value)
-    {
-        value.pressure = sensor.mbar ();
-    }
+        private:
+            SignalHandler ();
+
+            static SignalHandler& instance ();
+            static void handle (int, siginfo_t*, void*);
+
+        private:
+            std::mutex mutex;
+            std::condition_variable condition;
+            std::atomic_int signal;
+            std::atomic_bool triggered;
+    };
 }}
+
+#endif /* PIW_APP_SIGNALHANDLER_INC */
 

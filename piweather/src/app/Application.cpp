@@ -24,13 +24,15 @@
  */
 #include    "app/Application.hpp"
 #include    "app/AsyncTimer.hpp"
+#include    "app/SignalHandler.hpp"
 
 #include    <device/Connection.hpp>
 #include    <device/UidRegistry.hpp>
 
 #include    <device/Button.hpp>
 #include    <device/Lcd.hpp>
-#include    <device/Observable.hpp>
+
+#include    <sensors/SensorDevice.hpp>
 
 #include    "view/Illuminance.hpp"
 #include    "view/AirPressure.hpp"
@@ -56,7 +58,7 @@ namespace piw { namespace app {
 
     namespace {
 
-        typedef std::unique_ptr<device::Observable> SensorPtr;
+        typedef std::unique_ptr<sensors::SensorDevice> SensorPtr;
         typedef std::unique_ptr<WeatherView> ViewPtr;
 
         template<typename T>
@@ -207,14 +209,14 @@ namespace piw { namespace app {
             {
                 Normal,
                 Ip,
-                Error
+                Disconnected
             };
 
             public:
                 virtual ~StateHandler () {}
                 StateHandler (const Configuration&);
 
-                void block ();
+                int run ();
 
             private:
                 static void wrapDisconnect (std::uint8_t, void*);
@@ -268,38 +270,50 @@ namespace piw { namespace app {
             dbWriter.start (config.saveInterval);
         }
 
-
-        void StateHandler::block ()
+        int StateHandler::run ()
         {
-            std::mutex mutex;
-            std::unique_lock<std::mutex> lock (mutex);
-            std::condition_variable condition;
-            condition.wait (lock);
+            int sig = 0;
+
+            while (sig == 0) {
+                sig = SignalHandler::wait (1000);
+
+                for (SensorView& sensorView : sensorViews) {
+                    sensorView.sensor->status ();
+                }
+            }
+            
+            return sig;
         }
 
         void StateHandler::wrapDisconnect (std::uint8_t reason, void* s)
         {
             StateHandler* self = static_cast<StateHandler*> (s);
-            self->onDisconnect (reason);
+            try {
+                self->onDisconnect (reason);
+            }
+            catch (const std::exception&) {}
         }
 
         void StateHandler::onDisconnect (std::uint8_t reason)
         {
+            viewState = Disconnected;
+
             std::wstring error;
 
             switch (reason) {
                 case IPCON_DISCONNECT_REASON_REQUEST:
-                    // error = L"Device disconnected";
+                    error = L"Verbindung getrennt";
                     break;
                 case IPCON_DISCONNECT_REASON_ERROR:
-                    // error = L"Device not available";
+                    error = L"Keine Verbindung";
                     break;
                 case IPCON_DISCONNECT_REASON_SHUTDOWN:
-                    // error = L"Device shutting down";
+                    error = L"Gerät fährt herunter";
                     break;
             }
 
-            viewState = Error;
+            view::ErrorView view (lcd);
+            view.display (error);
         }
 
         void StateHandler::onButtonPressed ()
@@ -310,17 +324,17 @@ namespace piw { namespace app {
 
                 switch (viewState) {
                     case Normal:
+                        viewState = Ip;
                         unHookView (sensorViews);
                         displayIp ();
-                        viewState = Ip;
                         break;
                     case Ip:
-                        hookView (sensorViews);
                         viewState = Normal;
+                        hookView (sensorViews);
                         break;
-                    case Error:
-                        hookView (sensorViews);
+                    case Disconnected:
                         viewState = Normal;
+                        hookView (sensorViews);
                         break;
                 }
             }
@@ -371,25 +385,28 @@ namespace piw { namespace app {
     {
         bool success = true;
         size_t errorCounter = 0;
+        bool running = true;
 
-        while (true) {
+        while (running) {
 
             try {
                 StateHandler handler (config);
-                handler.block ();
+                handler.run ();
+
+                running = false;
             }
             catch (const std::exception& e) {
                 success = false;
+
                 std::cerr
                     << "Error in application execution: " << e.what () << std::endl;
 
                 if (++errorCounter > 5) {
-                    break;
+                    running = false;
                 }
 
                 // try to reconnect
-                std::this_thread::sleep_for (
-                        std::chrono::milliseconds {500});
+                std::this_thread::sleep_for (std::chrono::seconds {2});
             }
         }
 

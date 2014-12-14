@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, David Daniel (dd), david@daniels.li
  *
- * AirPressure.cpp is free software copyrighted by David Daniel.
+ * SensorDevice.hpp is free software copyrighted by David Daniel.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,21 +22,29 @@
  * This is free software, and you are welcome to redistribute it
  * under certain conditions.
  */
-#include    "view/AirPressure.hpp"
+#ifndef PIW_SENSORS_SENSORDEVICE_INC
+#define PIW_SENSORS_SENSORDEVICE_INC
 
-#include    <sstream>
-#include    <iomanip>
+#include    <device/Observable.hpp>
 
-namespace piw { namespace view {
+namespace piw { namespace sensors {
 
-    void AirPressure::valueChanged ()
+    class SensorDevice : public device::Observable
     {
-        write (L"Druck:", sensor.mbar (), L"mbar", 1);
-    }
+        public:
 
-    void AirPressure::storeValue (db::Values& value)
-    {
-        value.pressure = sensor.mbar ();
-    }
+            enum Status
+            {
+                Available,
+                Disconnected
+            };
+
+        public:
+            virtual ~SensorDevice () {}
+
+            virtual Status status () = 0;
+    };
 }}
+
+#endif /* PIW_SENSORS_SENSORDEVICE_INC */
 

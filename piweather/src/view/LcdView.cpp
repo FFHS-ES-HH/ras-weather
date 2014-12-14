@@ -32,7 +32,7 @@ namespace piw { namespace view {
 
     void LcdView::onError (const std::exception&)
     {
-        write (L"??");
+        write (L"!Keine Verbindung!");
     }
 
     void LcdView::write (std::wstring text)
@@ -44,6 +44,19 @@ namespace piw { namespace view {
         }
 
         lcd ().write (dim.line (), dim.begin (), text);
+    }
+
+    void LcdView::write (
+            const std::wstring& label,
+            double value,
+            const std::wstring& unit,
+            unsigned precision)
+    {
+        std::wostringstream out;
+
+        out << std::setprecision (precision) << std::fixed << value << " " << unit;
+
+        write (label, out.str ());
     }
 
     void LcdView::write (const std::wstring& label, const std::wstring& text)
