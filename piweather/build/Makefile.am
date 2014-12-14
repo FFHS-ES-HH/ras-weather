@@ -19,6 +19,8 @@ piweather_SOURCES		=\
 				 $(src)/app/ConfigCollector.cpp \
 				 $(src)/app/AsyncTimer.hpp \
 				 $(src)/app/AsyncTimer.cpp \
+				 $(src)/app/SignalHandler.hpp \
+				 $(src)/app/SignalHandler.cpp \
 				 $(src)/app/Application.hpp \
 				 $(src)/app/Application.cpp \
 				 $(src)/db/Values.hpp \
@@ -85,6 +87,7 @@ libpiweatherdevice_include_HEADERS =\
 				 $(src)/device/Button.hpp
 
 libpiweathersensors_include_HEADERS =\
+				 $(src)/sensors/SensorDevice.hpp \
 				 $(src)/sensors/ThresholdObservable.hpp \
 				 $(src)/sensors/Humidity.hpp \
 				 $(src)/sensors/Barometer.hpp \

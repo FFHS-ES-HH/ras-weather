@@ -29,12 +29,12 @@
 #include    <cstdint>
 #include    <atomic>
 
-#include    <device/Observable.hpp>
+#include    <sensors/SensorDevice.hpp>
 
 namespace piw { namespace sensors {
 
     template<typename T>
-        class ThresholdObservable : public device::Observable
+        class ThresholdObservable : public SensorDevice
     {
         public:
             ThresholdObservable (T);
@@ -42,6 +42,7 @@ namespace piw { namespace sensors {
 
             virtual T threshold () const;
             virtual T value () const;
+            virtual Status status ();
 
         protected:
             void init ();
@@ -114,6 +115,22 @@ namespace piw { namespace sensors {
             T current {value ()};
             T thresh {threshold ()};
             adjust (current - thresh, current + thresh);
+        }
+
+    template<typename T>
+        SensorDevice::Status ThresholdObservable<T>::status ()
+        {
+            Status s = SensorDevice::Disconnected;
+
+            try {
+                read ();
+                s = SensorDevice::Available;
+            }
+            catch (std::exception& error) {
+                onError (error);
+            }
+
+            return s;
         }
 }}
 

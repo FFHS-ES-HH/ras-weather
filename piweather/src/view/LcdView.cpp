@@ -32,7 +32,7 @@ namespace piw { namespace view {
 
     void LcdView::onError (const std::exception&)
     {
-        write (L"??");
+        write (L"!Keine Verbindung!");
     }
 
     void LcdView::write (std::wstring text)

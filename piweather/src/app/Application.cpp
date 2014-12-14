@@ -24,13 +24,15 @@
  */
 #include    "app/Application.hpp"
 #include    "app/AsyncTimer.hpp"
+#include    "app/SignalHandler.hpp"
 
 #include    <device/Connection.hpp>
 #include    <device/UidRegistry.hpp>
 
 #include    <device/Button.hpp>
 #include    <device/Lcd.hpp>
-#include    <device/Observable.hpp>
+
+#include    <sensors/SensorDevice.hpp>
 
 #include    "view/Illuminance.hpp"
 #include    "view/AirPressure.hpp"
@@ -43,12 +45,7 @@
 
 #include    <vector>
 #include    <thread>
-#include    <atomic>
-#include    <mutex>
-#include    <condition_variable>
 #include    <iostream>
-
-#include    <signal.h>
 
 namespace piw { namespace app {
 
@@ -61,78 +58,7 @@ namespace piw { namespace app {
 
     namespace {
 
-        class SignalHandler
-        {
-            public:
-                static int wait ();
-
-            private:
-                SignalHandler ();
-
-                static SignalHandler& instance ();
-                static void handle (int, siginfo_t*, void*);
-
-            private:
-                std::mutex mutex;
-                std::condition_variable condition;
-                std::atomic_int signal;
-                std::atomic_bool triggered;
-        };
-
-        SignalHandler::SignalHandler () :
-            mutex (),
-            condition (),
-            signal (0),
-            triggered (false)
-        {
-            struct sigaction handler;
-            handler.sa_sigaction = SignalHandler::handle;
-            handler.sa_flags = SA_SIGINFO;
-            sigemptyset (&handler.sa_mask);
-
-            sigaction (SIGTERM, &handler, nullptr);
-            sigaction (SIGINT, &handler, nullptr);
-        }
-
-        void SignalHandler::handle (int n, siginfo_t*, void*)
-        {
-            SignalHandler& self = instance ();
-
-            self.signal.store (n);
-            self.triggered.store (true);
-            self.condition.notify_all ();
-        }
-
-        SignalHandler& SignalHandler::instance ()
-        {
-            static SignalHandler handler;
-
-            return handler;
-        }
-
-        int SignalHandler::wait ()
-        {
-            SignalHandler& self = SignalHandler::instance ();
-            bool running = true;
-            int result = 0;
-
-            while (running) {
-
-                std::unique_lock<std::mutex> lock (self.mutex);
-                self.condition.wait (lock);
-
-                if (self.triggered.load ()) {
-
-                    result = self.signal.load ();
-
-                    self.triggered.store (running = false);
-                }
-            }
-
-            return result;
-        }
-
-        typedef std::unique_ptr<device::Observable> SensorPtr;
+        typedef std::unique_ptr<sensors::SensorDevice> SensorPtr;
         typedef std::unique_ptr<WeatherView> ViewPtr;
 
         template<typename T>
@@ -283,7 +209,7 @@ namespace piw { namespace app {
             {
                 Normal,
                 Ip,
-                Error
+                Disconnected
             };
 
             public:
@@ -345,31 +271,49 @@ namespace piw { namespace app {
         }
 
         int StateHandler::run ()
-        { return SignalHandler::wait (); }
+        {
+            int sig = 0;
+
+            while (sig == 0) {
+                sig = SignalHandler::wait (1000);
+
+                for (SensorView& sensorView : sensorViews) {
+                    sensorView.sensor->status ();
+                }
+            }
+            
+            return sig;
+        }
 
         void StateHandler::wrapDisconnect (std::uint8_t reason, void* s)
         {
             StateHandler* self = static_cast<StateHandler*> (s);
-            self->onDisconnect (reason);
+            try {
+                self->onDisconnect (reason);
+            }
+            catch (const std::exception&) {}
         }
 
         void StateHandler::onDisconnect (std::uint8_t reason)
         {
+            viewState = Disconnected;
+
             std::wstring error;
 
             switch (reason) {
                 case IPCON_DISCONNECT_REASON_REQUEST:
-                    // error = L"Device disconnected";
+                    error = L"Verbindung getrennt";
                     break;
                 case IPCON_DISCONNECT_REASON_ERROR:
-                    // error = L"Device not available";
+                    error = L"Keine Verbindung";
                     break;
                 case IPCON_DISCONNECT_REASON_SHUTDOWN:
-                    // error = L"Device shutting down";
+                    error = L"Gerät fährt herunter";
                     break;
             }
 
-            viewState = Error;
+            view::ErrorView view (lcd);
+            view.display (error);
         }
 
         void StateHandler::onButtonPressed ()
@@ -380,17 +324,17 @@ namespace piw { namespace app {
 
                 switch (viewState) {
                     case Normal:
+                        viewState = Ip;
                         unHookView (sensorViews);
                         displayIp ();
-                        viewState = Ip;
                         break;
                     case Ip:
-                        hookView (sensorViews);
                         viewState = Normal;
+                        hookView (sensorViews);
                         break;
-                    case Error:
-                        hookView (sensorViews);
+                    case Disconnected:
                         viewState = Normal;
+                        hookView (sensorViews);
                         break;
                 }
             }
