@@ -16,7 +16,7 @@ illuminance-sensitivity = 1
 ## The humidity sensitivity in %
 humidity-sensitivity = 0.1
 
-## The polling interval in msecs.
+## The temperature polling interval in msecs.
 poll-interval = 1000
 
 ## The button to listen to
