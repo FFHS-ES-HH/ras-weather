@@ -24,28 +24,29 @@
  */
 #include    "view/IpView.hpp"
 
-#include    <device/IpAddress.hpp>
-
 #include    <string>
 
 namespace piw { namespace view {
 
-    void IpView::display ()
+    IpView::IpView (device::Lcd& l, sensors::IpAddress& addr) :
+        lcd (l),
+        address (addr)
+    {}
+
+    void IpView::valueChanged ()
     {
-        using device::Lcd;
-        typedef Lcd::Metrics Metrics;
+        typedef device::Lcd::Metrics Metrics;
 
-        device::IpAddress ip;
-        std::wstring address = ip.get ();
+        std::wstring addr = address.get ();
 
-        if (address.size () > Metrics::Columns) {
-            address.erase (Metrics::Columns);
+        if (addr.size () > Metrics::Columns) {
+            addr.erase (Metrics::Columns);
         }
 
-        const unsigned column = (Metrics::Columns - address.size ()) / 2;
+        const unsigned column = (Metrics::Columns - addr.size ()) / 2;
 
         lcd.write (0, 4, L"IP Addresse:");
-        lcd.write (2, column, address);
+        lcd.write (2, column, addr);
     }
 }}
 

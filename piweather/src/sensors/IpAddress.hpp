@@ -24,22 +24,27 @@
  */
 #ifndef PIW_DEVICE_IPADDRESS_INC
 #define PIW_DEVICE_IPADDRESS_INC
+#include    <sensors/SensorDevice.hpp>
+
 #include    <string>
 
-#include    <device/Observable.hpp>
+namespace piw { namespace sensors {
 
-namespace piw { namespace device {
-    class IpAddress : public Observable
+    class IpAddress : public sensors::SensorDevice
     {
         public:
             IpAddress ();
             virtual ~IpAddress ();
 
+            IpAddress (const IpAddress&) = delete;
+            IpAddress& operator= (const IpAddress&) = delete;
+
             std::wstring get () const;
 
+            virtual Status status ();
+
         private:
-            int socket_;
-            int pipe_ [2];
+            int quitPipe_;
     };
 }}
 

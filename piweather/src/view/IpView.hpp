@@ -26,22 +26,25 @@
 #define PIW_VIEW_IPVIEW_INC
 
 #include    <device/Lcd.hpp>
+#include    <sensors/IpAddress.hpp>
+#include    <view/WeatherView.hpp>
 
 namespace piw { namespace view {
-    class IpView
+
+    class IpView : public WeatherView
     {
         public:
-            IpView (device::Lcd&);
+            IpView (device::Lcd&, sensors::IpAddress&);
 
-            void display ();
+            virtual void valueChanged ();
+
+            virtual void onError (const std::exception&) {}
+            virtual void storeValue (db::Values&) {}
 
         private:
             device::Lcd& lcd;
+            sensors::IpAddress& address;
     };
-
-    inline IpView::IpView (device::Lcd& l) :
-        lcd (l)
-    {}
 }}
 
 #endif /* PIW_VIEW_IPVIEW_INC */
