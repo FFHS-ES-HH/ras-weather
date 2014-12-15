@@ -26,20 +26,21 @@
 #define PIW_DEVICE_IPADDRESS_INC
 #include    <string>
 
+#include    <device/Observable.hpp>
+
 namespace piw { namespace device {
-    class IpAddress
+    class IpAddress : public Observable
     {
         public:
             IpAddress ();
+            virtual ~IpAddress ();
 
-            const std::wstring& get () const;
+            std::wstring get () const;
 
         private:
-            std::wstring address;
+            int socket_;
+            int pipe_ [2];
     };
-
-    inline const std::wstring& IpAddress::get () const
-    { return address; }
 }}
 
 #endif /* PIW_DEVICE_IPADDRESS_INC */

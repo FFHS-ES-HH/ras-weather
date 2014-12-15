@@ -26,6 +26,14 @@
 
 #include    <stdexcept>
 
+#include    <asm/types.h>
+#include    <sys/socket.h>
+#include    <linux/rtnetlink.h>
+
+#include    <sys/select.h>
+#include    <sys/types.h>
+#include    <unistd.h>
+
 #include    <ifaddrs.h>
 #include    <net/if.h>
 #include    <netdb.h>
@@ -50,9 +58,31 @@ namespace piw { namespace device {
         { freeifaddrs (ifaces); }
     }
 
+    /**
+     * Constructs a new IpAddress.
+     */
     IpAddress::IpAddress () :
-        address {}
+        socket_ (0)
     {
+        struct sockaddr_nl sa;
+
+        memset (&sa, 0, sizeof (sa));
+        sa.nl_family = AF_NETLINK;
+        sa.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
+
+        socket_ = socket (AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+        bind (socket_, (struct sockaddr *) &sa, sizeof (sa));
+
+        pipe (pipe_);
+    }
+
+    IpAddress::~IpAddress ()
+    {
+    }
+
+    IpAddress::get ()
+    {
+        std::wstring address;
         ifaddrs* interfaces;
 
         if (getifaddrs (&interfaces) < 0) {
@@ -104,5 +134,7 @@ namespace piw { namespace device {
         if (address.empty ()) {
             address = L"Kein Netz erreichbar";
         }
+
+        return address;
     }
 }}
