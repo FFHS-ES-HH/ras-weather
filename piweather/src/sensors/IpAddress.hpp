@@ -24,22 +24,28 @@
  */
 #ifndef PIW_DEVICE_IPADDRESS_INC
 #define PIW_DEVICE_IPADDRESS_INC
+#include    <sensors/SensorDevice.hpp>
+
 #include    <string>
 
-namespace piw { namespace device {
-    class IpAddress
+namespace piw { namespace sensors {
+
+    class IpAddress : public sensors::SensorDevice
     {
         public:
             IpAddress ();
+            virtual ~IpAddress ();
 
-            const std::wstring& get () const;
+            IpAddress (const IpAddress&) = delete;
+            IpAddress& operator= (const IpAddress&) = delete;
+
+            std::wstring get () const;
+
+            virtual Status status ();
 
         private:
-            std::wstring address;
+            int quitPipe_;
     };
-
-    inline const std::wstring& IpAddress::get () const
-    { return address; }
 }}
 
 #endif /* PIW_DEVICE_IPADDRESS_INC */

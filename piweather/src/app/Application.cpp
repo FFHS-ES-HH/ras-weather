@@ -69,6 +69,8 @@ namespace piw { namespace app {
             template<typename Sensor, typename View>
                 SensorView (Sensor*, Lcd&, Id<View>, view::Dimensions);
 
+            SensorView () = default;
+
             SensorPtr sensor;
             ViewPtr view;
         };
@@ -151,18 +153,28 @@ namespace piw { namespace app {
             return sensorViews;
         }
 
-        void hookView (const SensorViews& sensorViews)
+        void hookView (const SensorView& sensorView)
+        {
+            sensorView.sensor->addObserver (*(sensorView.view));
+            sensorView.view->valueChanged ();
+        }
+
+        void hookViews (const SensorViews& sensorViews)
         {
             for (const SensorView& s : sensorViews) {
-                s.sensor->addObserver (*(s.view));
-                s.view->valueChanged ();
+                hookView (s);
             }
         }
 
-        void unHookView (const SensorViews& sensorViews)
+        void unHookView (const SensorView& sensorView)
+        {
+            sensorView.sensor->removeObserver (*(sensorView.view));
+        }
+
+        void unHookViews (const SensorViews& sensorViews)
         {
             for (const SensorView& s : sensorViews) {
-                s.sensor->removeObserver (*(s.view));
+                unHookView (s);
             }
         }
 
@@ -228,7 +240,6 @@ namespace piw { namespace app {
                 void onStoreValues ();
 
             private:
-                void displayIp ();
                 void backlightOn ();
 
             private:
@@ -239,6 +250,7 @@ namespace piw { namespace app {
                 db::Database db;
                 const Configuration& configuration;
                 SensorViews sensorViews;
+                SensorView ipView;
                 Listener buttonListener;
                 ViewState viewState;
                 AsyncTimer dbWriter;
@@ -253,13 +265,14 @@ namespace piw { namespace app {
             db {config.dbPath},
             configuration (config),
             sensorViews {createSensorViews (connection, lcd, config, uidRegistry)},
+            ipView {},
             buttonListener {std::bind (&StateHandler::onButtonPressed, this), nullptr},
             viewState {Normal},
             dbWriter {std::bind (&StateHandler::onStoreValues, this)},
             lcdDimmer {std::bind (&Lcd::backlightOff, &lcd)}
         {
             backlightOn ();
-            hookView (sensorViews);
+            hookViews (sensorViews);
 
             button.addObserver (buttonListener);
 
@@ -268,6 +281,9 @@ namespace piw { namespace app {
                     reinterpret_cast<void*> (&StateHandler::wrapDisconnect), this);
 
             dbWriter.start (config.saveInterval);
+            std::unique_ptr<sensors::IpAddress> a {new sensors::IpAddress};
+            ipView.view.reset (new view::IpView {lcd, *a});
+            ipView.sensor.reset (a.release ());
         }
 
         int StateHandler::run ()
@@ -325,28 +341,23 @@ namespace piw { namespace app {
                 switch (viewState) {
                     case Normal:
                         viewState = Ip;
-                        unHookView (sensorViews);
-                        displayIp ();
+                        hookView (ipView);
+                        unHookViews (sensorViews);
                         break;
                     case Ip:
                         viewState = Normal;
-                        hookView (sensorViews);
+                        unHookView (ipView);
+                        hookViews (sensorViews);
                         break;
                     case Disconnected:
                         viewState = Normal;
-                        hookView (sensorViews);
+                        hookViews (sensorViews);
                         break;
                 }
             }
             else {
                 backlightOn ();
             }
-        }
-
-        void StateHandler::displayIp ()
-        {
-            view::IpView ip (lcd);
-            ip.display ();
         }
 
         void StateHandler::onStoreValues ()
