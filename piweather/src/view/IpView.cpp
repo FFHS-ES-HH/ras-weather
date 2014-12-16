@@ -45,6 +45,7 @@ namespace piw { namespace view {
 
         const unsigned column = (Metrics::Columns - addr.size ()) / 2;
 
+        lcd.clear ();
         lcd.write (0, 4, L"IP Addresse:");
         lcd.write (2, column, addr);
     }
