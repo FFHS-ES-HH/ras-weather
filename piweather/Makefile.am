@@ -20,7 +20,7 @@ OWNER			= 1000:1000
 bindist:		all
 	@echo "Creating $(BINFILE)..."
 	rm -rf $(BININST) $(BINFIILE) && \
-	$(MAKE) DESTDIR=$(BININST) install-strip && \
+	$(MAKE) DESTDIR=$(BININST) install && \
 	chown $(OWNER) $(BININST)$(localstatedir)/piweather/piweather.sqlite3 && \
 	tar -cvzf $(BINFILE) -C $(BININST) . && \
 	find $(BININST) -type f | sed 's|$(BININST)||' > $(PACKAGE)-$(PACKAGE_VERSION).bin.files
